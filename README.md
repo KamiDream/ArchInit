@@ -12,21 +12,31 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 ## 📋 功能概览 / Feature Overview
 
+### [`niri_init.sh`](niri_init.sh) — 核心安装 / Core Setup
+
 | Step | Content | Description |
 |------|---------|-------------|
 | **1** | 🖥️ 核心桌面 / Core Desktop | 安装 Niri 平铺窗口管理器、DMS Shell、Alacritty、Matugen、Cava、SDDM / Install Niri tiling WM, DMS Shell, Alacritty, Matugen, Cava, SDDM |
 | **2** | 🧰 基础初始化 / Basic Initialization | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts |
-| **3** | 💻 KVM 虚拟化 / KVM Virtualization | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network |
-| **4** | 🎮 NVIDIA 驱动 / NVIDIA Driver | 配置 multilib/archlinuxcn 源，安装 NVIDIA 闭源驱动 (nvidia-dkms) / Configure multilib/archlinuxcn repos, install NVIDIA proprietary driver |
-| **5** | 🎨 终端美化 / Terminal Customization | 安装 Zsh + 插件、配置 Kitty 终端、选择 Nerd 字体 / Install Zsh + plugins, configure Kitty terminal, select Nerd font |
-| **6** | ⚡ Zim + Powerlevel10k | 安装 Zim 框架与 Powerlevel10k 主题 / Install Zim framework & Powerlevel10k theme |
-| **7** | 🖥️ 显示管理器 / Display Manager | 启用并启动 SDDM 显示管理器 / Enable and start SDDM display manager |
+| **3** | 🖥️ 显示管理器 / Display Manager | 启用并启动 SDDM 显示管理器 / Enable and start SDDM display manager |
+
+### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
+
+| Step | Content | Description |
+|------|---------|-------------|
+| Step | Content | Description |
+|------|---------|-------------|
+| **1** | 💻 KVM 虚拟化 / KVM Virtualization | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network |
+| **2** | 🎮 NVIDIA 驱动 / NVIDIA Driver | 配置 multilib/archlinuxcn 源，安装 NVIDIA 闭源驱动 (nvidia-dkms) / Configure multilib/archlinuxcn repos, install NVIDIA proprietary driver |
+| **3** | 🎨 终端美化 / Terminal Customization | 安装 Zsh + 插件、配置 Kitty 终端、选择 Nerd 字体 / Install Zsh + plugins, configure Kitty terminal, select Nerd font |
+| **4** | ⚡ Zim + Powerlevel10k | 安装 Zim 框架与 Powerlevel10k 主题 / Install Zim framework & Powerlevel10k theme |
 
 ---
 
 ## 🖥️ 系统要求 / System Requirements
 
 - **Arch Linux**（已安装并正常启动 / installed and booted）
+- 请确保已经安装 git 和 vim，如果没有安装请运行 `sudo pacman -S vim git`
 - 已拥有 `sudo` 权限的普通用户（**不要以 root 身份运行** / **do not run as root**）
 - 网络连接正常 / Working internet connection
 
@@ -39,26 +49,30 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 ```bash
 git clone https://github.com/KamiDream/ArchInit.git
 cd ArchInit
-chmod +x niri_init.sh
+chmod +x niri_init.sh niri_append.sh
 ./niri_init.sh
 ```
 
 > ⚠️ **注意 / Note**：脚本采用**交互式**执行，每一步都会询问是否执行（`Y/n`），您可以选择跳过某些步骤。部分步骤会打开 vim/kate 编辑器要求手动修改配置文件，**请按提示完成编辑后保存退出**。  
 > The script is **interactive** — each step asks for confirmation (`Y/n`) and you can skip any step. Some steps open vim/kate for manual config file edits; **follow the prompts, edit, save, and exit**.
+>
+> 先运行 `niri_init.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件。  
+> Run `niri_init.sh` first for the core setup, then run `niri_append.sh` for optional extras as needed.
 
 ---
 
 ## 📦 各步骤详解 / Step Details
 
-### Step 1: 核心桌面环境 / Core Desktop Environment (Niri + DMS)
+### [`niri_init.sh`](niri_init.sh) — 核心步骤 / Core Steps
+
+#### Step 1: 核心桌面环境 / Core Desktop Environment (Niri + DMS)
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
 | 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`alacritty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`sddm`（显示管理器 / display manager） |
 | 注册 DMS 服务 / Register DMS service | 将 DMS 添加为 `niri.service` 的 user service 依赖，实现开机自启 / Add DMS as a user service dependency of `niri.service` for auto-start |
-| 启用 SDDM / Enable SDDM | 启用并启动 SDDM 显示管理器 / Enable and start SDDM display manager |
 
-### Step 2: 基础初始化 / Basic Initialization
+#### Step 2: 基础初始化 / Basic Initialization
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
@@ -66,7 +80,18 @@ chmod +x niri_init.sh
 | 配置 locale / Configure locale | 编辑 `/etc/locale.gen` 启用 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Edit `/etc/locale.gen` to enable `zh_CN.UTF-8`, run `locale-gen`, set system locale |
 | 安装字体 / Install fonts | `wqy-microhei`、`wqy-zenhei`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts |
 
-### Step 3: KVM 虚拟化 / KVM Virtualization
+#### Step 3: 显示管理器 / Display Manager (SDDM)
+
+| 操作 / Action | 说明 / Description |
+|--------|-------------|
+| 启用 SDDM / Enable SDDM | 设置 SDDM 开机自启 / Enable SDDM to start on boot |
+| 启动 SDDM / Start SDDM | 立即启动 SDDM 显示管理器 / Start SDDM display manager immediately |
+
+---
+
+### [`niri_append.sh`](niri_append.sh) — 可选扩展步骤 / Optional Steps
+
+#### Step 1: KVM 虚拟化 / KVM Virtualization
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
@@ -75,7 +100,7 @@ chmod +x niri_init.sh
 | 配置网络 / Configure network | 启动并设置 `default` 虚拟网络为自动启动 / Start and autostart the `default` virtual network |
 | 用户权限 / User permissions | 将当前用户加入 `libvirt` 组（需重新登录生效）/ Add current user to `libvirt` group (re-login required) |
 
-### Step 4: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
+#### Step 2: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
@@ -85,7 +110,7 @@ chmod +x niri_init.sh
 | 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings` |
 | 配置 initramfs / Configure initramfs | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, regenerate initramfs |
 
-### Step 5: 终端环境配置 / Terminal Customization (Zsh & Kitty)
+#### Step 3: 终端环境配置 / Terminal Customization (Zsh & Kitty)
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
@@ -95,21 +120,12 @@ chmod +x niri_init.sh
 | 配置 Kitty / Configure Kitty | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects |
 | 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font |
 
-### Step 6: Zim 框架 + Powerlevel10k / Zim Framework & Powerlevel10k
+#### Step 4: Zim 框架 + Powerlevel10k / Zim Framework & Powerlevel10k
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
 | 安装 Zim 框架 / Install Zim framework | 通过官方安装脚本一键安装 / One-click install via the official Zim script |
 | 配置 `.zimrc` / Configure `.zimrc` | 添加 `zmodule romkatv/powerlevel10k` 启用 Powerlevel10k 主题 / Add `zmodule romkatv/powerlevel10k` to enable Powerlevel10k theme |
-
-### Step 7: 显示管理器 / Display Manager (SDDM)
-
-| 操作 / Action | 说明 / Description |
-|--------|-------------|
-| 操作 / Action | 说明 / Description |
-|--------|-------------|
-| 启用 SDDM / Enable SDDM | 设置 SDDM 开机自启 / Enable SDDM to start on boot |
-| 启动 SDDM / Start SDDM | 立即启动 SDDM 显示管理器 / Start SDDM display manager immediately |
 
 ---
 
@@ -117,7 +133,7 @@ chmod +x niri_init.sh
 
 - **跳过步骤 / Skip steps**：每个步骤开始前都会询问，输入 `n` 即可跳过 / Each step asks before running — enter `n` to skip.
 - **手动编辑 / Manual edits**：部分配置（locale、pacman.conf、mkinitcpio.conf 等）需要手动编辑，脚本会打开编辑器等待完成 / Some configs require manual editing; the script opens an editor and waits.
-- **添加自己的包 / Add your own packages**：可直接修改 `niri_init.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit `niri_init.sh` and modify the `pacman -S` lists to suit your needs.
+- **添加自己的包 / Add your own packages**：可直接修改 `niri_init.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
 ---
 
@@ -143,6 +159,7 @@ Check the `MODULES` line in `/etc/mkinitcpio.conf`, then run `sudo mkinitcpio -P
 
 请确保 `/etc/locale.gen` 中 `zh_CN.UTF-8` 已取消注释，并手动运行：  
 Ensure `zh_CN.UTF-8` is uncommented in `/etc/locale.gen`, then manually run:
+
 ```bash
 sudo locale-gen
 sudo localectl set-locale LANG=zh_CN.UTF-8
