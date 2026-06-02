@@ -22,8 +22,6 @@ else
     echo ">>> Registering DMS as a user service dependency of Niri..."
     curl -fsSL https://install.danklinux.com | sh
     systemctl --user add-wants niri.service dms
-    sudo systemctl enable sddm
-    sudo systemctl start sddm
     echo "[Step 1 completed]"
 fi
 echo ""
@@ -206,6 +204,23 @@ else
 
     echo "[Step 6 completed]"
 fi
+echo ""
+
+# ---------- Step 7: Enable Display Manager (SDDM) ----------
+echo "========================================="
+echo " Step 7: Enable Display Manager (SDDM)"
+echo "========================================="
+read -p "Run this step? (Y/n): " do_step
+if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
+    echo "Skipping Step 7."
+else
+    echo ">>> Enabling SDDM display manager..."
+    sudo systemctl enable sddm
+    echo ">>> Starting SDDM..."
+    sudo systemctl start sddm
+    echo "[Step 7 completed]"
+fi
+echo ""
 
 echo "========================================="
 echo " All selected steps completed!"

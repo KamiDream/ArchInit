@@ -20,6 +20,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **4** | 🎮 NVIDIA 驱动 / NVIDIA Driver | 配置 multilib/archlinuxcn 源，安装 NVIDIA 闭源驱动 (nvidia-dkms) / Configure multilib/archlinuxcn repos, install NVIDIA proprietary driver |
 | **5** | 🎨 终端美化 / Terminal Customization | 安装 Zsh + 插件、配置 Kitty 终端、选择 Nerd 字体 / Install Zsh + plugins, configure Kitty terminal, select Nerd font |
 | **6** | ⚡ Zim + Powerlevel10k | 安装 Zim 框架与 Powerlevel10k 主题 / Install Zim framework & Powerlevel10k theme |
+| **7** | 🖥️ 显示管理器 / Display Manager | 启用并启动 SDDM 显示管理器 / Enable and start SDDM display manager |
 
 ---
 
@@ -100,6 +101,15 @@ chmod +x niri_init.sh
 |--------|-------------|
 | 安装 Zim 框架 / Install Zim framework | 通过官方安装脚本一键安装 / One-click install via the official Zim script |
 | 配置 `.zimrc` / Configure `.zimrc` | 添加 `zmodule romkatv/powerlevel10k` 启用 Powerlevel10k 主题 / Add `zmodule romkatv/powerlevel10k` to enable Powerlevel10k theme |
+
+### Step 7: 显示管理器 / Display Manager (SDDM)
+
+| 操作 / Action | 说明 / Description |
+|--------|-------------|
+| 操作 / Action | 说明 / Description |
+|--------|-------------|
+| 启用 SDDM / Enable SDDM | 设置 SDDM 开机自启 / Enable SDDM to start on boot |
+| 启动 SDDM / Start SDDM | 立即启动 SDDM 显示管理器 / Start SDDM display manager immediately |
 
 ---
 
