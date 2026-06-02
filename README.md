@@ -29,6 +29,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **3** | 🎮 NVIDIA 驱动 / NVIDIA Driver | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver |
 | **4** | 🎨 终端美化 / Terminal Customization | 安装 Zsh + 插件、配置 Kitty 终端、选择 Nerd 字体 / Install Zsh + plugins, configure Kitty terminal, select Nerd font |
 | **5** | ⚡ Zim + Powerlevel10k | 安装 Zim 框架与 Powerlevel10k 主题 / Install Zim framework & Powerlevel10k theme |
+| **6** | 📁 fastfetch 配置 / fastfetch Config | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch |
 
 ---
 
@@ -130,6 +131,14 @@ chmod +x niri_init.sh niri_append.sh
 |--------|-------------|
 | 安装 Zim 框架 / Install Zim framework | 通过官方安装脚本一键安装 / One-click install via the official Zim script |
 | 配置 `.zimrc` / Configure `.zimrc` | 添加 `zmodule romkatv/powerlevel10k` 启用 Powerlevel10k 主题 / Add `zmodule romkatv/powerlevel10k` to enable Powerlevel10k theme |
+
+#### Step 6: fastfetch 配置 / fastfetch Configuration
+
+| 操作 / Action | 说明 / Description |
+|--------|-------------|
+| 操作 / Action | 说明 / Description |
+|--------|-------------|
+| 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
 
 ---
 

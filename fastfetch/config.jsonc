@@ -1,0 +1,138 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": {
+    // "type": "builtin",
+    // "source": "windows",
+    "height": 18,
+    "padding": {
+      "top": 1
+    }
+  },
+  "display": {
+    "separator": " : "
+  },
+  "modules": [
+    {
+      // https://www.nerdfonts.com/cheat-sheet
+      "type": "custom",
+      "format": "\u001b[36m    OS Info"
+    },
+    {
+      "type": "custom",
+      "format": "┌────────────────────────────────────────────────────────┐"
+    },
+    {
+      "type": "os",
+      "key": "   OS",
+      "keyColor": "red"
+    },
+    {
+      "type": "kernel",
+      "key": "  󰻹 Kernel",
+      "keyColor": "red"
+    },
+    {
+      "type": "host",
+      "key": "   Machine",
+      "format": "{name}{?vendor}",
+      "keyColor": "red"
+    },
+     {
+       "type": "display",
+       "key": "  󰹑 Display",
+       "format": "{1}x{2} @ {3} Hz",
+       "keyColor": "red"
+     },
+    {
+      "type": "uptime",
+      "key": "  󱫐 Uptime ",
+      "keyColor": "red"
+    },
+    {
+      "type": "shell",
+      "key": "   Shell",
+      "keyColor": "red"
+    },
+
+    {
+      "type": "custom",
+      "format": "└────────────────────────────────────────────────────────┘"
+    },
+    "break",
+    {
+      "type": "title",
+      "key": "  "
+    },
+    {
+      "type": "custom",
+      "format": "┌────────────────────────────────────────────────────────┐"
+    },
+
+    {
+      "type": "cpu",
+      "format": "{1}",
+      "key": "   CPU",
+      "keyColor": "blue"
+    },
+    {
+      "type": "gpu",
+      "key": "  󰋵 GPU",
+      "keyColor": "blue"
+    },
+
+    {
+      "type": "disk",
+      "key": "   Disk",
+      "keyColor": "green"
+    },
+    {
+      "type": "memory",
+      "key": "   Memory",
+      "keyColor": "green"
+    },
+    {
+      "type": "swap",
+      "key": "  󰿣 Swap",
+      "keyColor": "green"
+    },
+    {
+      "type": "bluetooth",
+      "key": "   Bluetooth",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "wifi",
+      "key": "   WiFi",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "localip",
+      "showIpv6": false,
+      "showMac": false,
+      "showSpeed": false,
+      "showMtu": false,
+      "showLoop": false,
+      "showFlags": false,
+      "showAllIps": false,
+      "key": "  󱦂 LAN",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "publicip",
+      "timeout": 500,
+      "url": "http://4.ipw.cn",
+      "key": "  󰩟 WAN",
+      "keyColor": "magenta"
+    },
+    {
+      "type": "custom",
+      "format": "└────────────────────────────────────────────────────────┘"
+    },
+    {
+      "type": "colors",
+      "paddingLeft": 2,
+      "symbol": "circle"
+    },
+    "break"
+  ]
+}

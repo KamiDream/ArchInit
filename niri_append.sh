@@ -169,6 +169,25 @@ else
 fi
 echo ""
 
+# ---------- Step 6: Copy fastfetch Config ----------
+echo "========================================="
+echo " Step 6: Copy fastfetch Configuration"
+echo "========================================="
+read -p "Run this step? (Y/n): " do_step
+if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
+    echo "Skipping Step 6."
+else
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    echo ">>> Copying fastfetch config to ~/.config/fastfetch..."
+    mkdir -p ~/.config/fastfetch
+    cp -r "$SCRIPT_DIR/fastfetch/"* ~/.config/fastfetch/
+    echo "    fastfetch config copied successfully."
+
+    echo "[Step 6 completed]"
+fi
+echo ""
+
 echo "========================================="
 echo " All selected steps completed!"
 echo "========================================="
