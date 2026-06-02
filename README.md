@@ -24,12 +24,11 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 | Step | Content | Description |
 |------|---------|-------------|
-| Step | Content | Description |
-|------|---------|-------------|
 | **1** | 💻 KVM 虚拟化 / KVM Virtualization | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network |
-| **2** | 🎮 NVIDIA 驱动 / NVIDIA Driver | 配置 multilib/archlinuxcn 源，安装 NVIDIA 闭源驱动 (nvidia-dkms) / Configure multilib/archlinuxcn repos, install NVIDIA proprietary driver |
-| **3** | 🎨 终端美化 / Terminal Customization | 安装 Zsh + 插件、配置 Kitty 终端、选择 Nerd 字体 / Install Zsh + plugins, configure Kitty terminal, select Nerd font |
-| **4** | ⚡ Zim + Powerlevel10k | 安装 Zim 框架与 Powerlevel10k 主题 / Install Zim framework & Powerlevel10k theme |
+| **2** | 📦 AUR 助手 / AUR Helper | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers |
+| **3** | 🎮 NVIDIA 驱动 / NVIDIA Driver | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver |
+| **4** | 🎨 终端美化 / Terminal Customization | 安装 Zsh + 插件、配置 Kitty 终端、选择 Nerd 字体 / Install Zsh + plugins, configure Kitty terminal, select Nerd font |
+| **5** | ⚡ Zim + Powerlevel10k | 安装 Zim 框架与 Powerlevel10k 主题 / Install Zim framework & Powerlevel10k theme |
 
 ---
 
@@ -100,17 +99,22 @@ chmod +x niri_init.sh niri_append.sh
 | 配置网络 / Configure network | 启动并设置 `default` 虚拟网络为自动启动 / Start and autostart the `default` virtual network |
 | 用户权限 / User permissions | 将当前用户加入 `libvirt` 组（需重新登录生效）/ Add current user to `libvirt` group (re-login required) |
 
-#### Step 2: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
+#### Step 2: AUR 助手 / AUR Helper (yay / paru)
+
+| 操作 / Action | 说明 / Description |
+|--------|-------------|
+| 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
+| 安装 AUR 助手 / Install AUR helpers | `base-devel`、`yay`、`paru`、`flclash` |
+
+#### Step 3: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
 | 安装内核头文件 / Install kernel headers | `linux-headers`、`linux-zen-headers` |
-| 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
-| 安装 AUR 助手 / Install AUR helpers | `base-devel`、`yay`、`paru` |
 | 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings` |
 | 配置 initramfs / Configure initramfs | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, regenerate initramfs |
 
-#### Step 3: 终端环境配置 / Terminal Customization (Zsh & Kitty)
+#### Step 4: 终端环境配置 / Terminal Customization (Zsh & Kitty)
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
@@ -120,7 +124,7 @@ chmod +x niri_init.sh niri_append.sh
 | 配置 Kitty / Configure Kitty | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects |
 | 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font |
 
-#### Step 4: Zim 框架 + Powerlevel10k / Zim Framework & Powerlevel10k
+#### Step 5: Zim 框架 + Powerlevel10k / Zim Framework & Powerlevel10k
 
 | 操作 / Action | 说明 / Description |
 |--------|-------------|
@@ -147,8 +151,8 @@ chmod +x niri_init.sh niri_append.sh
 
 ### Q：Kitty 字体选择器无法启动？/ Kitty font selector won't launch?
 
-确保已安装 Kitty：`sudo pacman -S kitty`，或在 Step 5 前手动安装。  
-Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before Step 5.
+确保已安装 Kitty：`sudo pacman -S kitty`，或在 Step 4 前手动安装。  
+Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before Step 4.
 
 ### Q：NVIDIA 驱动安装后黑屏？/ Black screen after NVIDIA driver install?
 

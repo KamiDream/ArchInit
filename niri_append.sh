@@ -33,17 +33,14 @@ else
 fi
 echo ""
 
-# ---------- Step 2: NVIDIA Driver ----------
+# ---------- Step 2: Install AUR Helper (yay) ----------
 echo "========================================="
-echo " Step 2: Configure NVIDIA Graphics Driver"
+echo " Step 2: Install AUR Helper (yay / paru)"
 echo "========================================="
 read -p "Run this step? (Y/n): " do_step
 if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
     echo "Skipping Step 2."
 else
-    echo ">>> Installing kernel headers..."
-    sudo pacman -S --needed linux-headers linux-zen-headers
-
     echo ""
     echo ">>> Next, edit /etc/pacman.conf with vim"
     echo "    Make the following changes:"
@@ -65,6 +62,21 @@ else
     sudo pacman -S --needed base-devel yay paru flclash
     sudo pacman -Syu
 
+    echo "[Step 2 completed]"
+fi
+echo ""
+
+# ---------- Step 3: NVIDIA Driver ----------
+echo "========================================="
+echo " Step 3: Configure NVIDIA Graphics Driver"
+echo "========================================="
+read -p "Run this step? (Y/n): " do_step
+if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
+    echo "Skipping Step 3."
+else
+    echo ">>> Installing kernel headers..."
+    sudo pacman -S --needed linux-headers linux-zen-headers
+
     echo ">>> Installing NVIDIA drivers..."
     sudo pacman -S --needed nvidia-dkms nvidia-utils nvidia-settings
 
@@ -78,17 +90,17 @@ else
     echo ">>> Regenerating initramfs..."
     sudo mkinitcpio -P
 
-    echo "[Step 2 completed]"
+    echo "[Step 3 completed]"
 fi
 echo ""
 
-# ---------- Step 3: Terminal Customization (Zsh & Kitty) ----------
+# ---------- Step 4: Terminal Customization (Zsh & Kitty) ----------
 echo "========================================="
-echo " Step 3: Terminal Customization (Zsh & Kitty)"
+echo " Step 4: Terminal Customization (Zsh & Kitty)"
 echo "========================================="
 read -p "Run this step? (Y/n): " do_step
 if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
-    echo "Skipping Step 3."
+    echo "Skipping Step 4."
 else
     echo ">>> Installing Zsh and related plugins..."
     sudo pacman -S --needed zsh zsh-autosuggestions zsh-syntax-highlighting zsh-completions
@@ -124,17 +136,17 @@ else
     kitten choose-fonts
     read -p "Font selected. Press Enter to continue..."
 
-    echo "[Step 3 completed]"
+    echo "[Step 4 completed]"
 fi
 echo ""
 
-# ---------- Step 4: Install Zim Framework & Powerlevel10k ----------
+# ---------- Step 5: Install Zim Framework & Powerlevel10k ----------
 echo "========================================="
-echo " Step 4: Install Zim Framework & Powerlevel10k Theme"
+echo " Step 5: Install Zim Framework & Powerlevel10k Theme"
 echo "========================================="
 read -p "Run this step? (Y/n): " do_step
 if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
-    echo "Skipping Step 4."
+    echo "Skipping Step 5."
 else
     # Check if Zsh is available
     if ! command -v zsh >/dev/null 2>&1; then
@@ -152,7 +164,7 @@ else
     kate ~/.zimrc
     read -p "Edit complete. Press Enter to continue..."
 
-    echo "[Step 4 completed]"
+    echo "[Step 5 completed]"
 fi
 echo ""
 
