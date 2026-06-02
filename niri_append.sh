@@ -131,12 +131,6 @@ else
     kate ~/.config/kitty/kitty.conf
     read -p "Edit complete. Press Enter to continue..."
 
-    echo ""
-    echo ">>> Running Kitty font selector, choose JetBrains Mono..."
-    read -p "Press Enter to launch font selector..."
-    kitten choose-fonts
-    read -p "Font selected. Press Enter to continue..."
-
     echo "[Step 4 completed]"
 fi
 echo ""
@@ -183,7 +177,12 @@ else
     mkdir -p ~/.config/fastfetch
     cp -r "$SCRIPT_DIR/fastfetch/"* ~/.config/fastfetch/
     echo "    fastfetch config copied successfully."
-
+    echo ""
+    echo ">>> Running Kitty font selector, choose JetBrains Mono..."
+    read -p "Press Enter to launch font selector..."
+    kitten choose-fonts
+    read -p "Font selected. Press Enter to continue..."
+    
     echo "[Step 6 completed]"
 fi
 echo ""
