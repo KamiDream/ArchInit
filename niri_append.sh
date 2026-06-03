@@ -17,7 +17,7 @@ STEPS=(
     "AUR 助手 / AUR Helper (yay / paru)"
     "NVIDIA 显卡驱动 / NVIDIA Graphics Driver"
     "启用 Zsh 终端 / Enable Zsh Shell"
-    "Zinit 插件管理器 / Zinit Plugin Manager"
+    "Zim 插件管理器 / Zim Plugin Manager"
     "Powerlevel10k 主题 / Powerlevel10k Theme"
     "fastfetch 配置 / fastfetch Configuration"
     "配置 fastfetch 启动 / Configure fastfetch on startup"
@@ -184,27 +184,26 @@ step_5_zsh_kitty() {
     return 0
 }
 
-step_6_zinit() {
+step_6_zim() {
     step_header 6
     check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
-    echo ">>> Installing Zinit plugin manager..."
-    bash -c "$(curl --fail --show-error --silent --location \
-        https://raw.githubusercontent.com/zdharma-continuum/zinit/main/scripts/install.sh)"
+    echo ">>> Cleaning up any existing Zim configuration..."
+    rm -rf ~/.zim ~/.zimrc
+    # Remove any previous Zim source lines from .zshrc
+    sed -i '/zimfw\.zsh/d' ~/.zshrc 2>/dev/null || true
+    sed -i '/zim\//d' ~/.zshrc 2>/dev/null || true
+    echo "    Cleanup done."
+
+    echo ">>> Installing Zim framework..."
+    curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
 
     echo ""
-    echo ">>> Next, edit ~/.zshrc with Kate, add the following content AFTER the line"
-    echo "    'source \"\$HOME/.zinit/bin/zinit.zsh\"' (which was added by the installer):"
-    echo ""
-    echo "    # Load plugins"
-    echo "    zinit light zsh-users/zsh-autosuggestions"
-    echo "    zinit light zsh-users/zsh-syntax-highlighting"
-    echo "    zinit light zsh-users/zsh-history-substring-search"
+    echo "    Zim is installed with default modules (including autosuggestions and syntax highlighting)."
+    echo "    Powerlevel10k theme will be added in Step 7."
     echo ""
     echo "    ⚠️  Make sure fastfetch is the first line of ~/.zshrc (configured in Step 9)."
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    kate ~/.zshrc
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+    prompt_enter_or_quit || return 1
 
     echo "[Step 6 completed]"
     prompt_enter_or_quit || return 1
@@ -216,16 +215,18 @@ step_7_p10k() {
     check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
     echo ""
-    echo ">>> Next, edit ~/.zshrc with Kate, add the following lines AFTER the plugin list:"
+    echo ">>> Next, edit ~/.zimrc with Kate, add the following line:"
     echo ""
-    echo "    # Load Powerlevel10k theme"
-    echo "    zinit ice depth=1"
-    echo "    zinit light romkatv/powerlevel10k"
+    echo "    zmodule romkatv/powerlevel10k"
     echo ""
+    echo ">>> After saving, Zim will install the theme automatically."
     echo "    ⚠️  Powerlevel10k will prompt for configuration on first shell start."
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    kate ~/.zshrc
+    kate ~/.zimrc
     prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+
+    echo ">>> Installing Powerlevel10k via Zim..."
+    zsh -c "source ~/.zim/zimfw.zsh && zimfw install" 2>/dev/null || true
 
     echo "[Step 7 completed]"
     prompt_enter_or_quit || return 1
@@ -257,8 +258,8 @@ step_9_fastfetch_firstline() {
     echo "    Your ~/.zshrc should look like:"
     echo "    ─────────────────────────────────"
     echo "    fastfetch"
-    echo "    source \"\$HOME/.zinit/bin/zinit.zsh\""
-    echo "    # ... plugins, theme ..."
+    echo "    source \"\${HOME}/.zim/zimfw.zsh\""
+    echo "    # ... modules, theme ..."
     echo "    ─────────────────────────────────"
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
@@ -361,7 +362,7 @@ execute_step() {
         3) step_3_aur ;;
         4) step_4_nvidia ;;
         5) step_5_zsh_kitty ;;
-        6) step_6_zinit ;;
+        6) step_6_zim ;;
         7) step_7_p10k ;;
         8) step_8_fastfetch ;;
         9) step_9_fastfetch_firstline ;;

@@ -30,7 +30,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **3** | 📦 AUR 助手 / AUR Helper             | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                 |
 | **4** | 🎮 NVIDIA 驱动 / NVIDIA Driver       | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                      |
 | **5** | 🎨 启用 Zsh 终端 / Enable Zsh Shell | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                           |
-| **6** | ⚡ Zinit 插件管理器 / Zinit Plugin   | 安装 Zinit 插件管理器，加载自动建议、语法高亮等插件 / Install Zinit plugin manager, load autosuggestions & syntax highlighting |
+| **6** | ⚡ Zim 插件管理器 / Zim Plugin       | 安装 Zim 框架，加载自动建议、语法高亮等模块 / Install Zim framework, load autosuggestions & syntax highlighting modules |
 | **7** | 🎨 Powerlevel10k 主题 / Theme        | 安装 Powerlevel10k 主题 / Install Powerlevel10k theme                                                                       |
 | **8** | 📁 fastfetch 配置 / fastfetch Config | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                |
 | **9** | 🚀 fastfetch 自启 / Startup          | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup         |
@@ -139,18 +139,19 @@ chmod +x niri_init.sh niri_append.sh
 | 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                                    |
 | 选择字体 / Select font                |                                                                                                |
 
-#### Step 6: Zinit 插件管理器 / Zinit Plugin Manager
+#### Step 6: Zim 插件管理器 / Zim Plugin Manager
 
 | 操作 / Action                                  | 说明 / Description                                                                                                                                  |
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 Zinit / Install Zinit                     | 通过官方安装脚本一键安装 / One-click install via the official Zinit script                                                                          |
-| 配置 `~/.zshrc` / Configure `~/.zshrc`         | 添加 Zinit 配置：加载 `zsh-autosuggestions`（自动建议）、`zsh-syntax-highlighting`（语法高亮）、`zsh-history-substring-search`（历史搜索）/ Add Zinit config to load autosuggestions, syntax highlighting, and history search |
+| 清理旧配置 / Clean up old config               | 删除 `~/.zim` 和 `~/.zimrc`，清理 `.zshrc` 中的 Zim 相关内容 / Remove `~/.zim`, `~/.zimrc`, and clean Zim references from `.zshrc`                  |
+| 安装 Zim / Install Zim                         | 通过官方安装脚本一键安装 / One-click install via the official Zim script                                                                           |
 
 #### Step 7: Powerlevel10k 主题 / Powerlevel10k Theme
 
 | 操作 / Action                                      | 说明 / Description                                                                |
 | -------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 配置 `~/.zshrc` / Configure `~/.zshrc`             | 添加 `zinit light romkatv/powerlevel10k` 加载 Powerlevel10k 主题 / Add Powerlevel10k theme to Zinit |
+| 配置 `~/.zimrc` / Configure `~/.zimrc`             | 添加 `zmodule romkatv/powerlevel10k` 加载 Powerlevel10k 主题 / Add Powerlevel10k theme to Zim |
+| 安装模块 / Install module                          | 自动运行 `zimfw install` 安装 Powerlevel10k / Automatically run `zimfw install` to install Powerlevel10k |
 | 首次运行配置 / First-run configuration              | 新开终端时 Powerlevel10k 会引导生成 `~/.p10k.zsh` / Powerlevel10k will guide prompt setup on first shell start |
 
 #### Step 8: fastfetch 配置 / fastfetch Configuration
@@ -163,7 +164,7 @@ chmod +x niri_init.sh niri_append.sh
 
 | 操作 / Action                              | 说明 / Description                                                                                                        |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| 添加 `fastfetch` 到 `.zshrc` 第一行         | 在 `~/.zshrc` 最顶部添加 `fastfetch` 命令，确保在 Zinit/Powerlevel10k 初始化之前执行 / Add `fastfetch` as the first line of `~/.zshrc`, before any Zinit/Powerlevel10k init code |
+| 添加 `fastfetch` 到 `.zshrc` 第一行         | 在 `~/.zshrc` 最顶部添加 `fastfetch` 命令，确保在 Zim/Powerlevel10k 初始化之前执行 / Add `fastfetch` as the first line of `~/.zshrc`, before any Zim/Powerlevel10k init code |
 
 
 ---
