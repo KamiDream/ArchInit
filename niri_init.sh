@@ -16,8 +16,8 @@ if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
 else
     echo ">>> Installing Niri and related components..."
     sudo pacman -Syu niri xwayland-satellite xdg-desktop-portal-gnome \
-        xdg-desktop-portal-gtk alacritty dms-shell-niri matugen cava \
-        qt6-multimedia-ffmpeg sddm power-profiles-daemon kimageformats
+        xdg-desktop-portal-gtk kitty dms-shell-niri matugen cava \
+        qt6-multimedia-ffmpeg lightdm lightdm-gtk-greeter power-profiles-daemon kimageformats
 
     echo ">>> Registering DMS as a user service dependency of Niri..."
     curl -fsSL https://install.danklinux.com | sh
@@ -58,18 +58,18 @@ fi
 echo ""
 
 
-# ---------- Step 3: Enable Display Manager (SDDM) ----------
+# ---------- Step 3: Enable Display Manager (LightDM) ----------
 echo "========================================="
-echo " Step 3: Enable Display Manager (SDDM)"
+echo " Step 3: Enable Display Manager (LightDM)"
 echo "========================================="
 read -p "Run this step? (Y/n): " do_step
 if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
     echo "Skipping Step 3."
 else
-    echo ">>> Enabling SDDM display manager..."
-    sudo systemctl enable sddm
-    echo ">>> Starting SDDM..."
-    sudo systemctl start sddm
+    echo ">>> Enabling LightDM display manager..."
+    sudo systemctl enable lightdm
+    echo ">>> Starting LightDM..."
+    sudo systemctl start lightdm
     echo "[Step 3 completed]"
 fi
 echo ""
