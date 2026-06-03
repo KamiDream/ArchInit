@@ -12,10 +12,11 @@ set -uo pipefail
 # Step definitions
 # ─────────────────────────────────────────────
 STEPS=(
+    "Kitty 字体选择 / Kitty Font Selector"
     "KVM 虚拟化 / KVM Virtualization"
     "AUR 助手 / AUR Helper (yay / paru)"
     "NVIDIA 显卡驱动 / NVIDIA Graphics Driver"
-    "终端美化 / Terminal Customization (Zsh & Kitty)"
+    "启用 Zsh 终端 / Enable Zsh Shell"
     "Zinit 插件管理器 / Zinit Plugin Manager"
     "Powerlevel10k 主题 / Powerlevel10k Theme"
     "fastfetch 配置 / fastfetch Configuration"
@@ -23,11 +24,10 @@ STEPS=(
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
-SAVED_STDERR=""   # placeholder
 
 # ─────────────────────────────────────────────
 # Helper: wait for Enter or 'q' to go back
@@ -73,8 +73,20 @@ check_zsh() {
 # Step functions — return 0 on success, 1 if user quit
 # ─────────────────────────────────────────────
 
-step_1_kvm() {
+step_1_kitty_font() {
     step_header 1
+    echo ">>> Running Kitty font selector, choose JetBrains Mono..."
+    prompt_enter_or_quit "Press Enter to launch font selector" || return 1
+    kitten choose-fonts
+    prompt_enter_or_quit "Font selected. Press Enter to continue" || return 1
+
+    echo "[Step 1 completed]"
+    prompt_enter_or_quit || return 1
+    return 0
+}
+
+step_2_kvm() {
+    step_header 2
     echo ">>> Installing KVM packages..."
     sudo pacman -S --needed qemu-full virt-manager swtpm dnsmasq || return 0
 
@@ -89,13 +101,13 @@ step_1_kvm() {
     sudo usermod -a -G libvirt "$(whoami)"
     echo "    Note: re-login is required for group changes to take effect."
 
-    echo "[Step 1 completed]"
+    echo "[Step 2 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
 
-step_2_aur() {
-    step_header 2
+step_3_aur() {
+    step_header 3
     echo ""
     echo ">>> Next, edit /etc/pacman.conf with vim"
     echo "    Make the following changes:"
@@ -118,13 +130,13 @@ step_2_aur() {
     sudo pacman -S --needed base-devel yay paru flclash
     sudo pacman -Syu
 
-    echo "[Step 2 completed]"
+    echo "[Step 3 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
 
-step_3_nvidia() {
-    step_header 3
+step_4_nvidia() {
+    step_header 4
     echo ">>> Installing kernel headers..."
     sudo pacman -S --needed linux-headers linux-zen-headers
 
@@ -141,13 +153,13 @@ step_3_nvidia() {
     echo ">>> Regenerating initramfs..."
     sudo mkinitcpio -P
 
-    echo "[Step 3 completed]"
+    echo "[Step 4 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
 
-step_4_zsh_kitty() {
-    step_header 4
+step_5_zsh_kitty() {
+    step_header 5
     echo ">>> Installing Zsh..."
     sudo pacman -S --needed zsh zsh-completions
 
@@ -167,13 +179,13 @@ step_4_zsh_kitty() {
     kate ~/.config/kitty/kitty.conf
     prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
-    echo "[Step 4 completed]"
+    echo "[Step 5 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
 
-step_5_zinit() {
-    step_header 5
+step_6_zinit() {
+    step_header 6
     check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
     echo ">>> Installing Zinit plugin manager..."
@@ -189,18 +201,18 @@ step_5_zinit() {
     echo "    zinit light zsh-users/zsh-syntax-highlighting"
     echo "    zinit light zsh-users/zsh-history-substring-search"
     echo ""
-    echo "    ⚠️  Make sure fastfetch is the first line of ~/.zshrc (will be configured in Step 8)."
+    echo "    ⚠️  Make sure fastfetch is the first line of ~/.zshrc (configured in Step 9)."
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
     prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
-    echo "[Step 5 completed]"
+    echo "[Step 6 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
 
-step_6_p10k() {
-    step_header 6
+step_7_p10k() {
+    step_header 7
     check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
     echo ""
@@ -211,37 +223,31 @@ step_6_p10k() {
     echo "    zinit light romkatv/powerlevel10k"
     echo ""
     echo "    ⚠️  Powerlevel10k will prompt for configuration on first shell start."
-    echo "       If you see 'instant prompt warning', run Step 8 to add fastetch as the first line."
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
     prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
-
-    echo "[Step 6 completed]"
-    prompt_enter_or_quit || return 1
-    return 0
-}
-
-step_7_fastfetch() {
-    step_header 7
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-    echo ">>> Copying fastfetch config to ~/.config/fastfetch..."
-    mkdir -p ~/.config/fastfetch
-    cp -r "$SCRIPT_DIR/fastfetch/"* ~/.config/fastfetch/
-    echo "    fastfetch config copied successfully."
-    echo ""
-    echo ">>> Running Kitty font selector, choose JetBrains Mono..."
-    prompt_enter_or_quit "Press Enter to launch font selector" || return 1
-    kitten choose-fonts
-    prompt_enter_or_quit "Font selected. Press Enter to continue" || return 1
 
     echo "[Step 7 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
 
-step_8_fastfetch_firstline() {
+step_8_fastfetch() {
     step_header 8
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    echo ">>> Copying fastfetch config to ~/.config/fastfetch..."
+    mkdir -p ~/.config/fastfetch
+    cp -r "$SCRIPT_DIR/fastfetch/"* ~/.config/fastfetch/
+    echo "    fastfetch config copied successfully."
+
+    echo "[Step 8 completed]"
+    prompt_enter_or_quit || return 1
+    return 0
+}
+
+step_9_fastfetch_firstline() {
+    step_header 9
     echo ">>> Adding fastfetch as the first line of ~/.zshrc..."
     echo ""
     echo "    Open ~/.zshrc with Kate and add 'fastfetch' as the FIRST line."
@@ -258,7 +264,7 @@ step_8_fastfetch_firstline() {
     kate ~/.zshrc
     prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
-    echo "[Step 8 completed]"
+    echo "[Step 9 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
@@ -350,14 +356,15 @@ execute_step() {
     set +e
 
     case $step_num in
-        1) step_1_kvm ;;
-        2) step_2_aur ;;
-        3) step_3_nvidia ;;
-        4) step_4_zsh_kitty ;;
-        5) step_5_zinit ;;
-        6) step_6_p10k ;;
-        7) step_7_fastfetch ;;
-        8) step_8_fastfetch_firstline ;;
+        1) step_1_kitty_font ;;
+        2) step_2_kvm ;;
+        3) step_3_aur ;;
+        4) step_4_nvidia ;;
+        5) step_5_zsh_kitty ;;
+        6) step_6_zinit ;;
+        7) step_7_p10k ;;
+        8) step_8_fastfetch ;;
+        9) step_9_fastfetch_firstline ;;
     esac
 
     local ret=$?

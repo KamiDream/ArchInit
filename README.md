@@ -25,14 +25,15 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 | Step        | Content                              | Description                                                                                                                 |
 | ----------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 💻 KVM 虚拟化 / KVM Virtualization   | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network |
-| **2** | 📦 AUR 助手 / AUR Helper             | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                 |
-| **3** | 🎮 NVIDIA 驱动 / NVIDIA Driver       | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                      |
-| **4** | 🎨 终端美化 / Terminal Customization | 安装 Zsh、配置 Kitty 终端 / Install Zsh, configure Kitty terminal                                                           |
-| **5** | ⚡ Zinit 插件管理器 / Zinit Plugin   | 安装 Zinit 插件管理器，加载自动建议、语法高亮等插件 / Install Zinit plugin manager, load autosuggestions & syntax highlighting |
-| **6** | 🎨 Powerlevel10k 主题 / Theme        | 安装 Powerlevel10k 主题 / Install Powerlevel10k theme                                                                       |
-| **7** | 📁 fastfetch 配置 / fastfetch Config | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                |
-| **8** | 🚀 fastfetch 自启 / Startup          | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup         |
+| **1** | 🎨 Kitty 字体选择 / Font Selector    | 使用 Kitty 字体选择器交互式选择 JetBrains Mono Nerd 字体 / Interactively select JetBrains Mono Nerd Font via Kitty font selector |
+| **2** | 💻 KVM 虚拟化 / KVM Virtualization   | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network |
+| **3** | 📦 AUR 助手 / AUR Helper             | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                 |
+| **4** | 🎮 NVIDIA 驱动 / NVIDIA Driver       | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                      |
+| **5** | 🎨 启用 Zsh 终端 / Enable Zsh Shell | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                           |
+| **6** | ⚡ Zinit 插件管理器 / Zinit Plugin   | 安装 Zinit 插件管理器，加载自动建议、语法高亮等插件 / Install Zinit plugin manager, load autosuggestions & syntax highlighting |
+| **7** | 🎨 Powerlevel10k 主题 / Theme        | 安装 Powerlevel10k 主题 / Install Powerlevel10k theme                                                                       |
+| **8** | 📁 fastfetch 配置 / fastfetch Config | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                |
+| **9** | 🚀 fastfetch 自启 / Startup          | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup         |
 
 ---
 
@@ -99,7 +100,13 @@ chmod +x niri_init.sh niri_append.sh
 
 ### [`niri_append.sh`](niri_append.sh) — 可选扩展步骤 / Optional Steps
 
-#### Step 1: KVM 虚拟化 / KVM Virtualization
+#### Step 1: Kitty 字体选择 / Kitty Font Selector
+
+| 操作 / Action                      | 说明 / Description                                                                                             |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 选择字体 / Select font             | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font via `kitten choose-fonts` |
+
+#### Step 2: KVM 虚拟化 / KVM Virtualization
 
 | 操作 / Action                        | 说明 / Description                                                                                         |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
@@ -108,14 +115,14 @@ chmod +x niri_init.sh niri_append.sh
 | 配置网络 / Configure network         | 启动并设置 `default` 虚拟网络为自动启动 / Start and autostart the `default` virtual network            |
 | 用户权限 / User permissions          | 将当前用户加入 `libvirt` 组（需重新登录生效）/ Add current user to `libvirt` group (re-login required) |
 
-#### Step 2: AUR 助手 / AUR Helper (yay / paru)
+#### Step 3: AUR 助手 / AUR Helper (yay / paru)
 
 | 操作 / Action                           | 说明 / Description                                                                                                                                                            |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
 | 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
 
-#### Step 3: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
+#### Step 4: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
 | 操作 / Action                            | 说明 / Description                                                                                                                        |
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
@@ -123,7 +130,7 @@ chmod +x niri_init.sh niri_append.sh
 | 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                    |
 | 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, regenerate initramfs |
 
-#### Step 4: 终端环境配置 / Terminal Customization (Zsh & Kitty)
+#### Step 5: 启用 Zsh 终端 / Enable Zsh Shell
 
 | 操作 / Action                         | 说明 / Description                                                                             |
 | ------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -132,41 +139,32 @@ chmod +x niri_init.sh niri_append.sh
 | 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                                    |
 | 选择字体 / Select font                |                                                                                                |
 
-#### Step 5: Zinit 插件管理器 / Zinit Plugin Manager
+#### Step 6: Zinit 插件管理器 / Zinit Plugin Manager
 
 | 操作 / Action                                  | 说明 / Description                                                                                                                                  |
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 安装 Zinit / Install Zinit                     | 通过官方安装脚本一键安装 / One-click install via the official Zinit script                                                                          |
 | 配置 `~/.zshrc` / Configure `~/.zshrc`         | 添加 Zinit 配置：加载 `zsh-autosuggestions`（自动建议）、`zsh-syntax-highlighting`（语法高亮）、`zsh-history-substring-search`（历史搜索）/ Add Zinit config to load autosuggestions, syntax highlighting, and history search |
 
-#### Step 6: Powerlevel10k 主题 / Powerlevel10k Theme
+#### Step 7: Powerlevel10k 主题 / Powerlevel10k Theme
 
 | 操作 / Action                                      | 说明 / Description                                                                |
 | -------------------------------------------------- | --------------------------------------------------------------------------------- |
 | 配置 `~/.zshrc` / Configure `~/.zshrc`             | 添加 `zinit light romkatv/powerlevel10k` 加载 Powerlevel10k 主题 / Add Powerlevel10k theme to Zinit |
 | 首次运行配置 / First-run configuration              | 新开终端时 Powerlevel10k 会引导生成 `~/.p10k.zsh` / Powerlevel10k will guide prompt setup on first shell start |
 
-#### Step 7: fastfetch 配置 / fastfetch Configuration
+#### Step 8: fastfetch 配置 / fastfetch Configuration
 
 | 操作 / Action          | 说明 / Description                                                                                                                                |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 操作 / Action          | 说明 / Description                                                                                                                                |
-| --------               | -------------                                                                                                                                     |
 | 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
-| 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font                          |
 
-#### Step 8: 配置 fastfetch 开机自启 / Configure fastfetch on Startup
+#### Step 9: 配置 fastfetch 开机自启 / Configure fastfetch on Startup
 
 | 操作 / Action                              | 说明 / Description                                                                                                        |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
 | 添加 `fastfetch` 到 `.zshrc` 第一行         | 在 `~/.zshrc` 最顶部添加 `fastfetch` 命令，确保在 Zinit/Powerlevel10k 初始化之前执行 / Add `fastfetch` as the first line of `~/.zshrc`, before any Zinit/Powerlevel10k init code |
 
-| 操作 / Action          | 说明 / Description                                                                                                                                |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 操作 / Action          | 说明 / Description                                                                                                                                |
-| --------               | -------------                                                                                                                                     |
-| 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
-| 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font                          |
 
 ---
 
