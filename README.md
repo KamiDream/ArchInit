@@ -28,7 +28,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **2** | 📦 AUR 助手 / AUR Helper             | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                 |
 | **3** | 🎮 NVIDIA 驱动 / NVIDIA Driver       | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                      |
 | **4** | 🎨 终端美化 / Terminal Customization | 安装 Zsh + 插件、配置 Kitty 终端、选择 Nerd 字体 / Install Zsh + plugins, configure Kitty terminal, select Nerd font        |
-| **5** | ⚡ Zim + Powerlevel10k               | 安装 Zim 框架与 Powerlevel10k 主题 / Install Zim framework & Powerlevel10k theme                                            |
+| **5** | ⚡ Zinit + Powerlevel10k             | 安装 Zinit 插件管理器与 Powerlevel10k 主题 / Install Zinit plugin manager & Powerlevel10k theme                              |
 | **6** | 📁 fastfetch 配置 / fastfetch Config | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                |
 
 ---
@@ -117,20 +117,20 @@ chmod +x niri_init.sh niri_append.sh
 
 #### Step 4: 终端环境配置 / Terminal Customization (Zsh & Kitty)
 
-| 操作 / Action                             | 说明 / Description                                                                                 |
-| ----------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| 安装 Zsh 及插件 / Install Zsh and plugins | `zsh`、`zsh-autosuggestions`、`zsh-syntax-highlighting`、`zsh-completions`                 |
-| 更改默认 Shell / Change default shell     | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh                     |
-| 配置 `.zshrc` / Configure `.zshrc`    | 添加 `fastfetch` 启动信息及 Zsh 插件加载 / Add `fastfetch` startup info and Zsh plugin sources |
-| 配置 Kitty / Configure Kitty              | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                                        |
-| 选择字体 / Select font                    |                                                                                                    |
+| 操作 / Action                         | 说明 / Description                                                                             |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| 安装 Zsh / Install Zsh                | `zsh`、`zsh-completions`                                                                |
+| 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh                 |
+| 配置 `.zshrc` / Configure `.zshrc`    | 添加 `fastfetch` 启动信息（插件管理交由 Step 5 的 Zinit 处理）/ Add `fastfetch` startup info (plugin management is handled by Zinit in Step 5) |
+| 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                                    |
+| 选择字体 / Select font                |                                                                                                |
 
-#### Step 5: Zim 框架 + Powerlevel10k / Zim Framework & Powerlevel10k
+#### Step 5: Zinit 插件管理器 + Powerlevel10k / Zinit Plugin Manager & Powerlevel10k
 
-| 操作 / Action                          | 说明 / Description                                                                                                                   |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| 安装 Zim 框架 / Install Zim framework  | 通过官方安装脚本一键安装 / One-click install via the official Zim script                                                             |
-| 配置 `.zimrc` / Configure `.zimrc` | 添加 `zmodule romkatv/powerlevel10k` 启用 Powerlevel10k 主题 / Add `zmodule romkatv/powerlevel10k` to enable Powerlevel10k theme |
+| 操作 / Action                                  | 说明 / Description                                                                                                                                                          |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 安装 Zinit / Install Zinit                     | 通过官方安装脚本一键安装 / One-click install via the official Zinit script                                                                                                  |
+| 配置 `~/.zshrc` / Configure `~/.zshrc`         | 添加 Zinit 配置：加载 `zsh-autosuggestions`（自动建议）、`zsh-syntax-highlighting`（语法高亮）、`zsh-history-substring-search`（历史搜索）和 `Powerlevel10k` 主题 / Add Zinit config to load plugins and Powerlevel10k theme |
 
 #### Step 6: fastfetch 配置 / fastfetch Configuration
 

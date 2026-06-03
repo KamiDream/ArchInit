@@ -103,8 +103,8 @@ read -p "Run this step? (Y/n): " do_step
 if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
     echo "Skipping Step 4."
 else
-    echo ">>> Installing Zsh and related plugins..."
-    sudo pacman -S --needed zsh zsh-autosuggestions zsh-syntax-highlighting zsh-completions
+    echo ">>> Installing Zsh and related packages..."
+    sudo pacman -S --needed zsh zsh-completions
 
     echo ">>> Listing available shells..."
     chsh -l
@@ -113,10 +113,9 @@ else
     chsh -s /usr/bin/zsh
 
     echo ""
-    echo ">>> Next, edit ~/.zshrc with Kate, add the following:"
+    echo ">>> Next, edit ~/.zshrc with Kate, add the following initial content:"
     echo "    fastfetch"
-    echo "    source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh"
-    echo "    source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    echo "    (Zinit and plugin configuration will be added in Step 5)"
     read -p "Press Enter to open the editor..."
     kate ~/.zshrc
     read -p "Edit complete. Press Enter to continue..."
@@ -135,9 +134,9 @@ else
 fi
 echo ""
 
-# ---------- Step 5: Install Zim Framework & Powerlevel10k ----------
+# ---------- Step 5: Install Zinit Plugin Manager & Powerlevel10k ----------
 echo "========================================="
-echo " Step 5: Install Zim Framework & Powerlevel10k Theme"
+echo " Step 5: Install Zinit Plugin Manager & Powerlevel10k Theme"
 echo "========================================="
 read -p "Run this step? (Y/n): " do_step
 if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
@@ -145,18 +144,30 @@ if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
 else
     # Check if Zsh is available
     if ! command -v zsh >/dev/null 2>&1; then
-        echo "Warning: Zsh does not appear to be installed. Zim framework requires Zsh."
+        echo "Warning: Zsh does not appear to be installed. Zinit requires Zsh."
         read -p "Press Enter to continue, or Ctrl+C to cancel..."
     fi
 
-    echo ">>> Installing Zim framework..."
-    curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+    echo ">>> Installing Zinit plugin manager..."
+    bash -c "$(curl --fail --show-error --silent --location \
+        https://raw.githubusercontent.com/zdharma-continuum/zinit/main/scripts/install.sh)"
 
     echo ""
-    echo ">>> Next, edit ~/.zimrc with Kate, add the following:"
-    echo "    zmodule romkatv/powerlevel10k"
+    echo ">>> Next, edit ~/.zshrc with Kate, add the following content AFTER the line"
+    echo "    'source \"\$HOME/.zinit/bin/zinit.zsh\"' (which was added by the installer):"
+    echo ""
+    echo "    # Load plugins"
+    echo "    zinit light zsh-users/zsh-autosuggestions"
+    echo "    zinit light zsh-users/zsh-syntax-highlighting"
+    echo "    zinit light zsh-users/zsh-history-substring-search"
+    echo ""
+    echo "    # Load Powerlevel10k theme"
+    echo "    zinit ice depth=1"
+    echo "    zinit light romkatv/powerlevel10k"
+    echo ""
+    echo "    # Powerlevel10k will prompt for configuration on first shell start."
     read -p "Press Enter to open the editor..."
-    kate ~/.zimrc
+    kate ~/.zshrc
     read -p "Edit complete. Press Enter to continue..."
 
     echo "[Step 5 completed]"
