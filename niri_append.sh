@@ -17,8 +17,8 @@ STEPS=(
     "AUR 助手 / AUR Helper (yay / paru)"
     "NVIDIA 显卡驱动 / NVIDIA Graphics Driver"
     "启用 Zsh 终端 / Enable Zsh Shell"
-    "Zim 插件管理器 / Zim Plugin Manager"
-    "Powerlevel10k 主题 / Powerlevel10k Theme"
+    "Antidote 插件管理器 / Antidote Plugin Manager"
+    "Starship 提示符 / Starship Prompt"
     "fastfetch 配置 / fastfetch Configuration"
     "配置 fastfetch 启动 / Configure fastfetch on startup"
 )
@@ -184,49 +184,60 @@ step_5_zsh_kitty() {
     return 0
 }
 
-step_6_zim() {
+step_6_antidote() {
     step_header 6
     check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
-    echo ">>> Cleaning up any existing Zim configuration..."
-    rm -rf ~/.zim ~/.zimrc
-    # Remove any previous Zim source lines from .zshrc
-    sed -i '/zimfw\.zsh/d' ~/.zshrc 2>/dev/null || true
-    sed -i '/zim\//d' ~/.zshrc 2>/dev/null || true
+    echo ">>> Cleaning up any previous plugin manager configuration..."
+    rm -rf ~/.zim ~/.zimrc ~/.antidote 2>/dev/null || true
+    # Remove previous framework source lines from .zshrc
+    sed -i '/antidote/d; /zimfw\.zsh/d; /zim\//d; /zinit/d' ~/.zshrc 2>/dev/null || true
     echo "    Cleanup done."
 
-    echo ">>> Installing Zim framework..."
-    curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+    echo ">>> Installing Antidote plugin manager..."
+    git clone --depth=1 https://github.com/mattmc3/antidote.git ~/.antidote
 
     echo ""
-    echo "    Zim is installed with default modules (including autosuggestions and syntax highlighting)."
-    echo "    Powerlevel10k theme will be added in Step 7."
+    echo ">>> Creating ~/.zsh_plugins.txt with recommended plugins..."
+    cat > ~/.zsh_plugins.txt << 'EOF'
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting
+zsh-users/zsh-history-substring-search
+EOF
+    echo "    Plugins configured."
+
     echo ""
-    echo "    ⚠️  Make sure fastfetch is the first line of ~/.zshrc (configured in Step 9)."
-    prompt_enter_or_quit || return 1
+    echo ">>> Next, edit ~/.zshrc with Kate, add the following content AFTER the fastfetch line:"
+    echo ""
+    echo "    # Antidote plugin manager"
+    echo "    source ~/.antidote/antidote.zsh"
+    echo "    antidote load ~/.zsh_plugins.txt"
+    echo ""
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
+    kate ~/.zshrc
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
     echo "[Step 6 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
 
-step_7_p10k() {
+step_7_starship() {
     step_header 7
     check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
-    echo ""
-    echo ">>> Next, edit ~/.zimrc with Kate, add the following line:"
-    echo ""
-    echo "    zmodule romkatv/powerlevel10k"
-    echo ""
-    echo ">>> After saving, Zim will install the theme automatically."
-    echo "    ⚠️  Powerlevel10k will prompt for configuration on first shell start."
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    kate ~/.zimrc
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+    echo ">>> Installing Starship prompt..."
+    sudo pacman -S --needed starship
 
-    echo ">>> Installing Powerlevel10k via Zim..."
-    zsh -c "source ~/.zim/zimfw.zsh && zimfw install" 2>/dev/null || true
+    echo ""
+    echo ">>> Next, edit ~/.zshrc with Kate, add the following line at the end:"
+    echo ""
+    echo "    eval \"\$(starship init zsh)\""
+    echo ""
+    echo "    You can also create a config file at ~/.config/starship.toml to customize the prompt."
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
+    kate ~/.zshrc
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
     echo "[Step 7 completed]"
     prompt_enter_or_quit || return 1
@@ -252,14 +263,14 @@ step_9_fastfetch_firstline() {
     echo ">>> Adding fastfetch as the first line of ~/.zshrc..."
     echo ""
     echo "    Open ~/.zshrc with Kate and add 'fastfetch' as the FIRST line."
-    echo "    ⚠️  fastfetch must be the very first line, before any Zinit/Powerlevel10k init code,"
-    echo "       otherwise Powerlevel10k's instant prompt will show a warning."
+    echo "    ⚠️  fastfetch must be the very first line, before any Antidote/Starship init code."
     echo ""
     echo "    Your ~/.zshrc should look like:"
     echo "    ─────────────────────────────────"
     echo "    fastfetch"
-    echo "    source \"\${HOME}/.zim/zimfw.zsh\""
-    echo "    # ... modules, theme ..."
+    echo "    source ~/.antidote/antidote.zsh"
+    echo "    antidote load ~/.zsh_plugins.txt"
+    echo "    # ... Starship init ..."
     echo "    ─────────────────────────────────"
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
@@ -362,8 +373,8 @@ execute_step() {
         3) step_3_aur ;;
         4) step_4_nvidia ;;
         5) step_5_zsh_kitty ;;
-        6) step_6_zim ;;
-        7) step_7_p10k ;;
+        6) step_6_antidote ;;
+        7) step_7_starship ;;
         8) step_8_fastfetch ;;
         9) step_9_fastfetch_firstline ;;
     esac

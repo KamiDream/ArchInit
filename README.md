@@ -30,8 +30,8 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **3** | 📦 AUR 助手 / AUR Helper             | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                 |
 | **4** | 🎮 NVIDIA 驱动 / NVIDIA Driver       | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                      |
 | **5** | 🎨 启用 Zsh 终端 / Enable Zsh Shell | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                           |
-| **6** | ⚡ Zim 插件管理器 / Zim Plugin       | 安装 Zim 框架，加载自动建议、语法高亮等模块 / Install Zim framework, load autosuggestions & syntax highlighting modules |
-| **7** | 🎨 Powerlevel10k 主题 / Theme        | 安装 Powerlevel10k 主题 / Install Powerlevel10k theme                                                                       |
+| **6** | ⚡ Antidote 插件管理器 / Antidote Plugin | 安装 Antidote 插件管理器，加载自动建议、语法高亮等插件 / Install Antidote plugin manager, load autosuggestions & syntax highlighting plugins |
+| **7** | 🚀 Starship 提示符 / Starship Prompt | 安装 Starship 提示符 / Install Starship prompt                                                                       |
 | **8** | 📁 fastfetch 配置 / fastfetch Config | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                |
 | **9** | 🚀 fastfetch 自启 / Startup          | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup         |
 
@@ -139,20 +139,22 @@ chmod +x niri_init.sh niri_append.sh
 | 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                                    |
 | 选择字体 / Select font                |                                                                                                |
 
-#### Step 6: Zim 插件管理器 / Zim Plugin Manager
+#### Step 6: Antidote 插件管理器 / Antidote Plugin Manager
 
 | 操作 / Action                                  | 说明 / Description                                                                                                                                  |
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 清理旧配置 / Clean up old config               | 删除 `~/.zim` 和 `~/.zimrc`，清理 `.zshrc` 中的 Zim 相关内容 / Remove `~/.zim`, `~/.zimrc`, and clean Zim references from `.zshrc`                  |
-| 安装 Zim / Install Zim                         | 通过官方安装脚本一键安装 / One-click install via the official Zim script                                                                           |
+| 清理旧配置 / Clean up old config               | 删除 `~/.zim`、`~/.zimrc`、`~/.antidote`，清理 `.zshrc` 中的框架引用 / Remove old framework dirs and clean `.zshrc`                                |
+| 安装 Antidote / Install Antidote               | 通过 `git clone` 安装 Antidote 到 `~/.antidote` / Install Antidote via `git clone`                                                                  |
+| 配置插件 / Configure plugins                   | 创建 `~/.zsh_plugins.txt`，添加 `autosuggestions`、`syntax-highlighting`、`history-substring-search` / Create plugin list file with recommended plugins |
+| 配置 `.zshrc` / Configure `.zshrc`             | 添加 `source ~/.antidote/antidote.zsh` 和 `antidote load` / Add Antidote source and load to `.zshrc`                                                |
 
-#### Step 7: Powerlevel10k 主题 / Powerlevel10k Theme
+#### Step 7: Starship 提示符 / Starship Prompt
 
 | 操作 / Action                                      | 说明 / Description                                                                |
 | -------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 配置 `~/.zimrc` / Configure `~/.zimrc`             | 添加 `zmodule romkatv/powerlevel10k` 加载 Powerlevel10k 主题 / Add Powerlevel10k theme to Zim |
-| 安装模块 / Install module                          | 自动运行 `zimfw install` 安装 Powerlevel10k / Automatically run `zimfw install` to install Powerlevel10k |
-| 首次运行配置 / First-run configuration              | 新开终端时 Powerlevel10k 会引导生成 `~/.p10k.zsh` / Powerlevel10k will guide prompt setup on first shell start |
+| 安装 Starship / Install Starship                   | 通过 pacman 安装 Starship / Install Starship via pacman                           |
+| 配置 `~/.zshrc` / Configure `~/.zshrc`             | 添加 `eval "$(starship init zsh)"` 启用 Starship 提示符 / Add Starship init to .zshrc |
+| 可选配置 / Optional config                         | 编辑 `~/.config/starship.toml` 自定义提示符外观 / Customize prompt via `starship.toml` |
 
 #### Step 8: fastfetch 配置 / fastfetch Configuration
 
@@ -164,7 +166,7 @@ chmod +x niri_init.sh niri_append.sh
 
 | 操作 / Action                              | 说明 / Description                                                                                                        |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| 添加 `fastfetch` 到 `.zshrc` 第一行         | 在 `~/.zshrc` 最顶部添加 `fastfetch` 命令，确保在 Zim/Powerlevel10k 初始化之前执行 / Add `fastfetch` as the first line of `~/.zshrc`, before any Zim/Powerlevel10k init code |
+| 添加 `fastfetch` 到 `.zshrc` 第一行         | 在 `~/.zshrc` 最顶部添加 `fastfetch` 命令，确保在 Antidote/Starship 初始化之前执行 / Add `fastfetch` as the first line of `~/.zshrc`, before any Antidote/Starship init code |
 
 
 ---
@@ -207,33 +209,18 @@ sudo localectl set-locale LANG=zh_CN.UTF-8
 
 ---
 
-### Q：Powerlevel10k 提示 `[WARNING]: Console output during zsh initialization detected`？/ Powerlevel10k instant prompt warning?
+### Q：如何自定义 Starship 提示符？/ How to customize Starship prompt?
 
-这是因为 `fastfetch` 的输出被放在了 Powerlevel10k 的 instant prompt 初始化代码之后。
-**解决方法**：确保 `~/.zshrc` 中的第一行是 `fastfetch`，位于所有 Zinit 和 Powerlevel10k 初始化代码之前。
+Starship 使用 TOML 配置文件 `~/.config/starship.toml`。你可以从预设配置开始：
 
-正确的 `~/.zshrc` 结构：
-```zsh
-# 第 1 行 — fastfetch 必须最先执行
-fastfetch
-
-# Zinit 初始化
-source "$HOME/.zinit/bin/zinit.zsh"
-
-# 加载插件
-zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-history-substring-search
-
-# 加载 Powerlevel10k 主题
-zinit ice depth=1
-zinit light romkatv/powerlevel10k
-
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-# Powerlevel10k 会在首次启动时引导生成配置文件。
+```bash
+mkdir -p ~/.config
+starship preset tokyo-night -o ~/.config/starship.toml
 ```
 
-> 🔧 如果你已经配置完成不想再看到该警告，也可以在 `~/.zshrc` 中设置 `typeset -g POWERLEVEL9K_INSTANT_PROMPT=quiet` 来静默警告，但更好的做法是将 `fastfetch` 放到第一行。
+常用预设：`tokyo-night`、`pastel-powerline`、`gruvbox-rainbow`。完整列表见 [Starship Presets](https://starship.rs/presets/)。
+
+你也可以手动编辑配置文件，参考 [Starship 配置文档](https://starship.rs/config/)。
 
 ---
 
@@ -247,7 +234,7 @@ This project is for personal and educational use. Feel free to open issues or PR
 ## 🙏 致谢 / Credits
 
 - [Niri](https://github.com/YaLTeR/niri) — 滚动式平铺窗口管理器 / Scrolling tiling Wayland compositor
-- [Zinit](https://github.com/zdharma-continuum/zinit) — Zsh 插件框架 / Zsh plugin framework
-- [Powerlevel10k](https://github.com/romkatv/powerlevel10k) — Zsh 主题 / Zsh theme
+- [Antidote](https://github.com/mattmc3/antidote) — Zsh 插件管理器 / Zsh plugin manager
+- [Starship](https://starship.rs) — 跨 Shell 提示符 / Cross-shell prompt
 - [Kitty](https://sw.kovidgoyal.net/kitty/) — GPU 加速终端 / GPU-accelerated terminal emulator
 - [LightDM](https://github.com/canonical/lightdm) — 显示管理器 / Display manager
