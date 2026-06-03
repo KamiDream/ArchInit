@@ -188,10 +188,10 @@ step_6_antidote() {
     step_header 6
     check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
-    echo ">>> Cleaning up any previous plugin manager configuration..."
-    rm -rf ~/.zim ~/.zimrc ~/.antidote 2>/dev/null || true
-    # Remove previous framework source lines from .zshrc
-    sed -i '/antidote/d; /zimfw\.zsh/d; /zim\//d; /zinit/d' ~/.zshrc 2>/dev/null || true
+    echo ">>> Cleaning up any previous Antidote configuration..."
+    rm -rf ~/.antidote 2>/dev/null || true
+    # Remove any previous Antidote source lines from .zshrc
+    sed -i '/antidote/d' ~/.zshrc 2>/dev/null || true
     echo "    Cleanup done."
 
     echo ">>> Installing Antidote plugin manager..."
@@ -237,8 +237,8 @@ step_7_starship() {
     if [[ -f "$SCRIPT_DIR/starship/starship.toml" ]]; then
         cp "$SCRIPT_DIR/starship/starship.toml" ~/.config/starship.toml
         echo "    Starship config copied successfully."
-        echo "    Prompt style: ╭─    ~  ...  ✔"
-        echo "                   ╰─"
+        echo "    Prompt: 󰄛 ❯  (Catppuccin Macchiato palette)"
+        echo "    Character: [󰄛](green) ❯  on success, [󰄛](red) ❯  on error"
     else
         echo "    Warning: starship/starship.toml not found, skipping."
     fi

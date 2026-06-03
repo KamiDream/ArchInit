@@ -143,7 +143,7 @@ chmod +x niri_init.sh niri_append.sh
 
 | 操作 / Action                                  | 说明 / Description                                                                                                                                  |
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 清理旧配置 / Clean up old config               | 删除 `~/.zim`、`~/.zimrc`、`~/.antidote`，清理 `.zshrc` 中的框架引用 / Remove old framework dirs and clean `.zshrc`                                |
+| 清理旧配置 / Clean up old config               | 删除 `~/.antidote`（如有），清理 `.zshrc` 中的 Antidote 引用 / Remove `~/.antidote` if exists, clean Antidote references from `.zshrc`              |
 | 安装 Antidote / Install Antidote               | 通过 `git clone` 安装 Antidote 到 `~/.antidote` / Install Antidote via `git clone`                                                                  |
 | 配置插件 / Configure plugins                   | 创建 `~/.zsh_plugins.txt`，添加 `autosuggestions`、`syntax-highlighting`、`history-substring-search` / Create plugin list file with recommended plugins |
 | 配置 `.zshrc` / Configure `.zshrc`             | 添加 `source ~/.antidote/antidote.zsh` 和 `antidote load` / Add Antidote source and load to `.zshrc`                                                |
@@ -156,7 +156,7 @@ chmod +x niri_init.sh niri_append.sh
 | 复制配置 / Copy config                             | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config |
 | 配置 `~/.zshrc` / Configure `~/.zshrc`             | 添加 `eval "$(starship init zsh)"` 启用 Starship 提示符 / Add Starship init to .zshrc |
 
-> 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main) 配色方案。
+> 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main)，默认使用 **Macchiato** 配色。提示符：`󰄛 ❯`（成功绿色，错误红色），目录淡紫色，Git 分支紫色。
 
 #### Step 8: fastfetch 配置 / fastfetch Configuration
 
