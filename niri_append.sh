@@ -39,12 +39,10 @@ prompt_enter_or_quit() {
         echo -e "$extra"
     fi
     echo -e "  [${msg}]  (or press q to return to menu)"
-    read -rsn1 key
-    if [[ "$key" == "q" ]] || [[ "$key" == "Q" ]]; then
+    read -rs input
+    if [[ "$input" == "q" ]] || [[ "$input" == "Q" ]]; then
         return 1   # signal quit
     fi
-    # Flush any leftover input (e.g. \n after \r on some terminals)
-    read -rsn1 -t 0.1 flush 2>/dev/null || true
     return 0
 }
 
