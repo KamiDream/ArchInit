@@ -16,9 +16,10 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 | Step        | Content                              | Description                                                                                                                                 |
 | ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 🖥️ 核心桌面 / Core Desktop         | 安装 Niri 平铺窗口管理器、DMS Shell、Alacritty、Matugen、Cava、LightDM / Install Niri tiling WM, DMS Shell, Alacritty, Matugen, Cava, LightDM     |
-| **2** | 🧰 基础初始化 / Basic Initialization | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts |
-| **3** | 🖥️ 显示管理器 / Display Manager    | 启用并启动 LightDM 显示管理器 / Enable and start LightDM display manager                                                                          |
+| **1** | 🖥️ 核心桌面 / Core Desktop         | 安装 Niri 平铺窗口管理器、Kitty、DMS Shell 等核心组件 / Install Niri tiling WM, Kitty, DMS Shell and other core components                     |
+| **2** | 🔗 注册 DMS 服务 / Register DMS    | 将 DMS 注册为 Niri 的 user service 依赖 / Register DMS as a user service dependency of Niri                                                  |
+| **3** | 🧰 基础初始化 / Basic Initialization | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts |
+| **4** | 🖥️ 显示管理器 / Display Manager    | 启用并启动 LightDM 显示管理器 / Enable and start LightDM display manager                                                                          |
 
 ### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
 
@@ -66,14 +67,19 @@ chmod +x niri_init.sh niri_append.sh
 
 ### [`niri_init.sh`](niri_init.sh) — 核心步骤 / Core Steps
 
-#### Step 1: 核心桌面环境 / Core Desktop Environment (Niri + DMS)
+#### Step 1: 核心桌面环境 / Core Desktop Environment (Niri)
 
 | 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`alacritty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter） |
-| 注册 DMS 服务 / Register DMS service                   | 将 DMS 添加为 `niri.service` 的 user service 依赖，实现开机自启 / Add DMS as a user service dependency of `niri.service` for auto-start                                                                                                                                                                                                                                                                                                                                              |
+| 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter） |
 
-#### Step 2: 基础初始化 / Basic Initialization
+#### Step 2: 注册 DMS 服务 / Register DMS Service
+
+| 操作 / Action                        | 说明 / Description                                                                                                 |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| 注册 DMS 服务 / Register DMS service | 通过官方脚本安装 DMS，并将其添加为 `niri.service` 的 user service 依赖，实现开机自启 / Install DMS via official script and add as a user service dependency of `niri.service` for auto-start |
+
+#### Step 3: 基础初始化 / Basic Initialization
 
 | 操作 / Action                      | 说明 / Description                                                                                                                                                              |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -81,7 +87,7 @@ chmod +x niri_init.sh niri_append.sh
 | 配置 locale / Configure locale     | 编辑 `/etc/locale.gen` 启用 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Edit `/etc/locale.gen` to enable `zh_CN.UTF-8`, run `locale-gen`, set system locale |
 | 安装字体 / Install fonts           | `wqy-microhei`、`wqy-zenhei`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts                                                   |
 
-#### Step 3: 显示管理器 / Display Manager (LightDM)
+#### Step 4: 显示管理器 / Display Manager (LightDM)
 
 | 操作 / Action               | 说明 / Description                                                    |
 | --------------------------- | ----------------------------------------------------------------- |

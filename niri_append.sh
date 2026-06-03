@@ -259,42 +259,30 @@ step_7_fastfetch() {
 
 render_menu() {
     clear
-    echo "╔═══════════════════════════════════════════════╗"
-    echo "║     ArchInit — 可选扩展步骤 / Optional Steps    ║"
-    echo "╚═══════════════════════════════════════════════╝"
+    echo "════════════════════════════════════════════════════════════════"
+    echo "          ArchInit — 可选扩展步骤 / Optional Steps"
+    echo "════════════════════════════════════════════════════════════════"
     echo ""
 
-    local icons=("1" "2" "3" "4" "5" "6" "7")
     for i in "${!STEPS[@]}"; do
-        local prefix="  "
-        local arrow=" "
+        local sel=" "
         local mark=" "
-        local style=""
-
-        if [[ $i -eq $SELECTED ]]; then
-            prefix="▸ "
-            arrow=""
-        else
-            prefix="  "
-        fi
 
         if [[ ${COMPLETED[$i]} -eq 1 ]]; then
             mark="✓"
-        else
-            mark=" "
         fi
 
-        # Highlight selected line
         if [[ $i -eq $SELECTED ]]; then
-            echo -e " \033[7m ${arrow}${mark} Step $((i+1)): ${STEPS[$i]} \033[0m"
+            sel=">"
+            echo -e " ${sel} ${mark} Step $((i+1)): ${STEPS[$i]}"
         else
             echo -e "   ${mark} Step $((i+1)): ${STEPS[$i]}"
         fi
     done
 
     echo ""
-    echo " ─────────────────────────────────────────────"
-    echo "  ↑/↓ 导航 • Enter 执行 • q 退出"
+    echo "════════════════════════════════════════════════════════════════"
+    echo "                     ↑/↓ 导航 • Enter 执行 • q 退出"
     echo ""
 }
 
