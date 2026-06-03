@@ -2,27 +2,90 @@
 
 # Supplementary script for ArchInit — optional environment setup
 # Run after niri_init.sh if you need additional components.
-# Each major step will ask for confirmation before execution.
+# Interactive menu — use ↑/↓ to navigate, Enter to execute, q to quit.
 # Manual edits will pause the script until the editor is closed.
 
-set -euo pipefail
+set -uo pipefail
+# Note: we do NOT use 'set -e' so that step functions can return 1 gracefully
 
-# ---------- Step 1: KVM Virtualization ----------
-echo "========================================="
-echo " Step 1: Install and Configure KVM Virtualization"
-echo "========================================="
-read -p "Run this step? (Y/n): " do_step
-if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
-    echo "Skipping Step 1."
-else
+# ─────────────────────────────────────────────
+# Step definitions
+# ─────────────────────────────────────────────
+STEPS=(
+    "KVM 虚拟化 / KVM Virtualization"
+    "AUR 助手 / AUR Helper (yay / paru)"
+    "NVIDIA 显卡驱动 / NVIDIA Graphics Driver"
+    "终端美化 / Terminal Customization (Zsh & Kitty)"
+    "Zinit 插件管理器 / Zinit Plugin Manager"
+    "Powerlevel10k 主题 / Powerlevel10k Theme"
+    "fastfetch 配置 / fastfetch Configuration"
+)
+
+# 0 = pending, 1 = completed
+COMPLETED=(0 0 0 0 0 0 0)
+
+CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
+SELECTED=0
+SAVED_STDERR=""   # placeholder
+
+# ─────────────────────────────────────────────
+# Helper: wait for Enter or 'q' to go back
+# ─────────────────────────────────────────────
+prompt_enter_or_quit() {
+    local msg="${1:-Press Enter to continue...}"
+    local extra="${2:-}"
+    if [[ -n "$extra" ]]; then
+        echo -e "$extra"
+    fi
+    echo -e "  [${msg}]  (or press q to return to menu)"
+    read -rsn1 key
+    if [[ "$key" == "q" ]] || [[ "$key" == "Q" ]]; then
+        return 1   # signal quit
+    fi
+    # consume rest of line if key was not newline
+    if [[ "$key" != $'\n' ]] && [[ "$key" != $'\r' ]]; then
+        read -r rest 2>/dev/null || true
+    fi
+    return 0
+}
+
+# ─────────────────────────────────────────────
+# Helper: step header
+# ─────────────────────────────────────────────
+step_header() {
+    local num="$1"
+    local title="${STEPS[$((num-1))]}"
+    echo ""
+    echo "========================================="
+    echo " Step $num: $title"
+    echo "========================================="
+}
+
+# ─────────────────────────────────────────────
+# Helper: ensure Zsh is installed
+# ─────────────────────────────────────────────
+check_zsh() {
+    if ! command -v zsh >/dev/null 2>&1; then
+        echo "Warning: Zsh does not appear to be installed."
+        return 1
+    fi
+    return 0
+}
+
+# ─────────────────────────────────────────────
+# Step functions — return 0 on success, 1 if user quit
+# ─────────────────────────────────────────────
+
+step_1_kvm() {
+    step_header 1
     echo ">>> Installing KVM packages..."
-    sudo pacman -S --needed qemu-full virt-manager swtpm dnsmasq
+    sudo pacman -S --needed qemu-full virt-manager swtpm dnsmasq || return 0
 
     echo ">>> Enabling and starting libvirtd service..."
     sudo systemctl enable --now libvirtd
 
     echo ">>> Starting default virtual network..."
-    sudo virsh net-start default
+    sudo virsh net-start default 2>/dev/null || true
     sudo virsh net-autostart default
 
     echo ">>> Adding current user to libvirt group..."
@@ -30,17 +93,12 @@ else
     echo "    Note: re-login is required for group changes to take effect."
 
     echo "[Step 1 completed]"
-fi
-echo ""
+    prompt_enter_or_quit || return 1
+    return 0
+}
 
-# ---------- Step 2: Install AUR Helper (yay) ----------
-echo "========================================="
-echo " Step 2: Install AUR Helper (yay / paru)"
-echo "========================================="
-read -p "Run this step? (Y/n): " do_step
-if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
-    echo "Skipping Step 2."
-else
+step_2_aur() {
+    step_header 2
     echo ""
     echo ">>> Next, edit /etc/pacman.conf with vim"
     echo "    Make the following changes:"
@@ -54,9 +112,9 @@ else
     echo "    Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/\$arch"
     echo "    Server = https://mirrors.hit.edu.cn/archlinuxcn/\$arch"
     echo "    Server = https://repo.huaweicloud.com/archlinuxcn/\$arch"
-    read -p "Press Enter to open the editor..."
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
     sudo vim /etc/pacman.conf
-    read -p "Edit complete. Press Enter to continue..."
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
     echo ">>> Installing archlinuxcn-keyring and updating system..."
     sudo pacman -Sy --needed archlinuxcn-keyring
@@ -64,17 +122,12 @@ else
     sudo pacman -Syu
 
     echo "[Step 2 completed]"
-fi
-echo ""
+    prompt_enter_or_quit || return 1
+    return 0
+}
 
-# ---------- Step 3: NVIDIA Driver ----------
-echo "========================================="
-echo " Step 3: Configure NVIDIA Graphics Driver"
-echo "========================================="
-read -p "Run this step? (Y/n): " do_step
-if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
-    echo "Skipping Step 3."
-else
+step_3_nvidia() {
+    step_header 3
     echo ">>> Installing kernel headers..."
     sudo pacman -S --needed linux-headers linux-zen-headers
 
@@ -84,25 +137,20 @@ else
     echo ""
     echo ">>> Next, edit /etc/mkinitcpio.conf, add nvidia modules to MODULES=():"
     echo "    MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)"
-    read -p "Press Enter to open the editor..."
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
     sudo vim /etc/mkinitcpio.conf
-    read -p "Edit complete. Press Enter to continue..."
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
     echo ">>> Regenerating initramfs..."
     sudo mkinitcpio -P
 
     echo "[Step 3 completed]"
-fi
-echo ""
+    prompt_enter_or_quit || return 1
+    return 0
+}
 
-# ---------- Step 4: Terminal Customization (Zsh & Kitty) ----------
-echo "========================================="
-echo " Step 4: Terminal Customization (Zsh & Kitty)"
-echo "========================================="
-read -p "Run this step? (Y/n): " do_step
-if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
-    echo "Skipping Step 4."
-else
+step_4_zsh_kitty() {
+    step_header 4
     echo ">>> Installing Zsh and related packages..."
     sudo pacman -S --needed zsh zsh-completions
 
@@ -110,15 +158,17 @@ else
     chsh -l
 
     echo ">>> Changing default shell to Zsh (password required)..."
-    chsh -s /usr/bin/zsh
+    chsh -s /usr/bin/zsh || true
 
     echo ""
-    echo ">>> Next, edit ~/.zshrc with Kate, add the following initial content:"
+    echo ">>> Next, edit ~/.zshrc with Kate, add fastfetch as the FIRST line:"
     echo "    fastfetch"
-    echo "    (Zinit and plugin configuration will be added in Step 5)"
-    read -p "Press Enter to open the editor..."
+    echo "    (Zinit configuration will be added in Step 5, Powerlevel10k theme in Step 6)"
+    echo "    ⚠️  fastfetch must be the very first line in .zshrc, before any Zinit/Powerlevel10k init code,"
+    echo "       otherwise Powerlevel10k's instant prompt will show a warning."
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
-    read -p "Edit complete. Press Enter to continue..."
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
     echo ""
     echo ">>> Next, edit Kitty terminal config ~/.config/kitty/kitty.conf"
@@ -126,27 +176,18 @@ else
     echo "    cursor_trail 2"
     echo "    cursor_blink_interval 0.5"
     echo "    cursor_stop_blinking_after 0"
-    read -p "Press Enter to open the editor..."
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.config/kitty/kitty.conf
-    read -p "Edit complete. Press Enter to continue..."
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
     echo "[Step 4 completed]"
-fi
-echo ""
+    prompt_enter_or_quit || return 1
+    return 0
+}
 
-# ---------- Step 5: Install Zinit Plugin Manager & Powerlevel10k ----------
-echo "========================================="
-echo " Step 5: Install Zinit Plugin Manager & Powerlevel10k Theme"
-echo "========================================="
-read -p "Run this step? (Y/n): " do_step
-if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
-    echo "Skipping Step 5."
-else
-    # Check if Zsh is available
-    if ! command -v zsh >/dev/null 2>&1; then
-        echo "Warning: Zsh does not appear to be installed. Zinit requires Zsh."
-        read -p "Press Enter to continue, or Ctrl+C to cancel..."
-    fi
+step_5_zinit() {
+    step_header 5
+    check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
     echo ">>> Installing Zinit plugin manager..."
     bash -c "$(curl --fail --show-error --silent --location \
@@ -161,27 +202,40 @@ else
     echo "    zinit light zsh-users/zsh-syntax-highlighting"
     echo "    zinit light zsh-users/zsh-history-substring-search"
     echo ""
+    echo "    ⚠️  Make sure fastfetch is the first line of ~/.zshrc (set in Step 4)."
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
+    kate ~/.zshrc
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+
+    echo "[Step 5 completed]"
+    prompt_enter_or_quit || return 1
+    return 0
+}
+
+step_6_p10k() {
+    step_header 6
+    check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
+
+    echo ""
+    echo ">>> Next, edit ~/.zshrc with Kate, add the following lines AFTER the plugin list:"
+    echo ""
     echo "    # Load Powerlevel10k theme"
     echo "    zinit ice depth=1"
     echo "    zinit light romkatv/powerlevel10k"
     echo ""
-    echo "    # Powerlevel10k will prompt for configuration on first shell start."
-    read -p "Press Enter to open the editor..."
+    echo "    ⚠️  Powerlevel10k will prompt for configuration on first shell start."
+    echo "       If you see 'instant prompt warning', ensure fastfetch is the very first line of .zshrc."
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
-    read -p "Edit complete. Press Enter to continue..."
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
-    echo "[Step 5 completed]"
-fi
-echo ""
+    echo "[Step 6 completed]"
+    prompt_enter_or_quit || return 1
+    return 0
+}
 
-# ---------- Step 6: Copy fastfetch Config ----------
-echo "========================================="
-echo " Step 6: Copy fastfetch Configuration"
-echo "========================================="
-read -p "Run this step? (Y/n): " do_step
-if [[ ! "$do_step" =~ ^[Yy]$ ]] && [ -n "$do_step" ]; then
-    echo "Skipping Step 6."
-else
+step_7_fastfetch() {
+    step_header 7
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
     echo ">>> Copying fastfetch config to ~/.config/fastfetch..."
@@ -190,14 +244,157 @@ else
     echo "    fastfetch config copied successfully."
     echo ""
     echo ">>> Running Kitty font selector, choose JetBrains Mono..."
-    read -p "Press Enter to launch font selector..."
+    prompt_enter_or_quit "Press Enter to launch font selector" || return 1
     kitten choose-fonts
-    read -p "Font selected. Press Enter to continue..."
-    
-    echo "[Step 6 completed]"
-fi
-echo ""
+    prompt_enter_or_quit "Font selected. Press Enter to continue" || return 1
 
-echo "========================================="
-echo " All selected steps completed!"
-echo "========================================="
+    echo "[Step 7 completed]"
+    prompt_enter_or_quit || return 1
+    return 0
+}
+
+# ─────────────────────────────────────────────
+# Menu rendering & navigation
+# ─────────────────────────────────────────────
+
+render_menu() {
+    clear
+    echo "╔═══════════════════════════════════════════════╗"
+    echo "║     ArchInit — 可选扩展步骤 / Optional Steps    ║"
+    echo "╚═══════════════════════════════════════════════╝"
+    echo ""
+
+    local icons=("1" "2" "3" "4" "5" "6" "7")
+    for i in "${!STEPS[@]}"; do
+        local prefix="  "
+        local arrow=" "
+        local mark=" "
+        local style=""
+
+        if [[ $i -eq $SELECTED ]]; then
+            prefix="▸ "
+            arrow=""
+        else
+            prefix="  "
+        fi
+
+        if [[ ${COMPLETED[$i]} -eq 1 ]]; then
+            mark="✓"
+        else
+            mark=" "
+        fi
+
+        # Highlight selected line
+        if [[ $i -eq $SELECTED ]]; then
+            echo -e " \033[7m ${arrow}${mark} Step $((i+1)): ${STEPS[$i]} \033[0m"
+        else
+            echo -e "   ${mark} Step $((i+1)): ${STEPS[$i]}"
+        fi
+    done
+
+    echo ""
+    echo " ─────────────────────────────────────────────"
+    echo "  ↑/↓ 导航 • Enter 执行 • q 退出"
+    echo ""
+}
+
+# ─────────────────────────────────────────────
+# Main menu loop
+# ─────────────────────────────────────────────
+
+main_menu() {
+    # Read arrow keys and Enter
+    while true; do
+        render_menu
+
+        # Read single keypress
+        read -rsn1 key
+        if [[ "$key" == $'\e' ]]; then
+            # Escape sequence (arrow keys)
+            read -rsn2 -t 0.1 seq 2>/dev/null || true
+            case "$seq" in
+                '[A')  # Up
+                    ((SELECTED--))
+                    if [[ $SELECTED -lt 0 ]]; then
+                        SELECTED=$((${#STEPS[@]} - 1))
+                    fi
+                    ;;
+                '[B')  # Down
+                    ((SELECTED++))
+                    if [[ $SELECTED -ge ${#STEPS[@]} ]]; then
+                        SELECTED=0
+                    fi
+                    ;;
+            esac
+        elif [[ "$key" == "" ]] || [[ "$key" == $'\n' ]] || [[ "$key" == $'\r' ]]; then
+            # Enter — execute selected step
+            execute_step $SELECTED
+        elif [[ "$key" == "q" ]] || [[ "$key" == "Q" ]]; then
+            clear
+            echo "========================================="
+            echo " 已退出 / Exited"
+            echo "========================================="
+            exit 0
+        fi
+        # Ignore other keys
+    done
+}
+
+# ─────────────────────────────────────────────
+# Execute a step by index
+# ─────────────────────────────────────────────
+
+execute_step() {
+    local idx=$1
+    local step_num=$((idx + 1))
+
+    # Temporarily disable exit-on-error for step execution
+    set +e
+
+    case $step_num in
+        1) step_1_kvm ;;
+        2) step_2_aur ;;
+        3) step_3_nvidia ;;
+        4) step_4_zsh_kitty ;;
+        5) step_5_zinit ;;
+        6) step_6_p10k ;;
+        7) step_7_fastfetch ;;
+    esac
+
+    local ret=$?
+
+    # Re-enable
+    set -e
+
+    if [[ $ret -eq 0 ]]; then
+        COMPLETED[$idx]=1
+    fi
+    # If ret == 1 (user quit), we simply return to menu without marking completed
+    # If ret == 0, we mark completed and return to menu
+    # Sleep a tiny bit so the user can see the final message before menu redraws
+    sleep 0.3
+}
+
+# ─────────────────────────────────────────────
+# Entry point
+# ─────────────────────────────────────────────
+
+# Check for required commands
+for cmd in pacman sudo; do
+    if ! command -v $cmd >/dev/null 2>&1; then
+        echo "Error: '$cmd' not found. This script must be run on Arch Linux."
+        exit 1
+    fi
+done
+
+# Trap Ctrl+C to clean up terminal
+trap 'echo ""; echo "Interrupted."; exit 1' INT
+
+# Hide cursor during menu
+echo -ne "\e[?25l"
+
+# Start main menu
+main_menu
+
+# Show cursor on exit
+echo -ne "\e[?25h"
