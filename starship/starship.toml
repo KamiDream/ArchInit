@@ -1,0 +1,82 @@
+# Starship configuration
+# Prompt style:
+#   ╭─    ~                                             ✔
+#   ╰─
+#
+# Requires a Nerd Font (e.g. JetBrains Mono Nerd Font)
+
+add_newline = true
+
+# ── Format ──────────────────────────────────────────
+format = """
+╭─$os$directory$fill$git_branch$git_status$status
+╰─$character"""
+
+# ── Right prompt ────────────────────────────────────
+# (status is already placed inline at the right side via $fill)
+
+# ── OS Icon ─────────────────────────────────────────
+[os]
+disabled = false
+style = "fg:#7aa2f7 bg:#1a1b26"
+format = "[  ]($style)"
+
+# ── Directory ───────────────────────────────────────
+[directory]
+style = "fg:#a9b1d6 bg:#1a1b26"
+format = "[ ](fg:#7aa2f7 bg:#1a1b26)[  $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+home_symbol = "~"
+
+# ── Fill (pushes content to the right) ──────────────
+[fill]
+symbol = " "
+
+# ── Git Branch ──────────────────────────────────────
+[git_branch]
+style = "fg:#bb9af7 bg:#1a1b26"
+format = "[ ](fg:#1a1b26 bg:#1a1b26)[ $branch ]($style)"
+
+# ── Git Status ──────────────────────────────────────
+[git_status]
+style = "fg:#bb9af7 bg:#1a1b26"
+format = "[$all_status$ahead_behind]($style)"
+conflicted = "🏳"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕${count}"
+untracked = "?"
+stashed = "📦"
+modified = "!"
+staged = "+"
+renamed = "»"
+deleted = "✘"
+
+# ── Status (exit code) ─────────────────────────────
+[status]
+disabled = false
+style = "fg:#9ece6a bg:#1a1b26"
+format = "[ ](fg:#1a1b26)[ ✔ ](fg:#1a1b26 bg:#9ece6a)"
+pipestatus = false
+not_found_symbol = "✘"
+not_executable_symbol = "✘"
+sigint_symbol = "✘"
+signal_symbol = "✘"
+symbol = "✔"
+success_symbol = ""
+# Show only on error
+map_symbol = true
+
+# ── Character (input prompt) ────────────────────────
+[character]
+success_symbol = "[╰─](bold green)"
+error_symbol = "[╰─](bold red)"
+vicmd_symbol = "[╰─](bold yellow)"
+
+# ── Hostname ────────────────────────────────────────
+# (optional, uncomment if desired)
+# [hostname]
+# style = "fg:#a9b1d6 bg:#1a1b26"
+# format = "[ ](fg:#7aa2f7)[ $hostname ]($style)"
+# ssh_only = true

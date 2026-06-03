@@ -153,8 +153,8 @@ chmod +x niri_init.sh niri_append.sh
 | 操作 / Action                                      | 说明 / Description                                                                |
 | -------------------------------------------------- | --------------------------------------------------------------------------------- |
 | 安装 Starship / Install Starship                   | 通过 pacman 安装 Starship / Install Starship via pacman                           |
+| 复制配置 / Copy config                             | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config |
 | 配置 `~/.zshrc` / Configure `~/.zshrc`             | 添加 `eval "$(starship init zsh)"` 启用 Starship 提示符 / Add Starship init to .zshrc |
-| 可选配置 / Optional config                         | 编辑 `~/.config/starship.toml` 自定义提示符外观 / Customize prompt via `starship.toml` |
 
 #### Step 8: fastfetch 配置 / fastfetch Configuration
 

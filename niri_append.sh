@@ -226,15 +226,27 @@ step_7_starship() {
     step_header 7
     check_zsh || { prompt_enter_or_quit "Press Enter to skip" || return 1; return 0; }
 
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
     echo ">>> Installing Starship prompt..."
     sudo pacman -S --needed starship
+
+    echo ""
+    echo ">>> Copying Starship config to ~/.config/starship.toml..."
+    mkdir -p ~/.config
+    if [[ -f "$SCRIPT_DIR/starship/starship.toml" ]]; then
+        cp "$SCRIPT_DIR/starship/starship.toml" ~/.config/starship.toml
+        echo "    Starship config copied successfully."
+        echo "    Prompt style: ╭─    ~  ...  ✔"
+        echo "                   ╰─"
+    else
+        echo "    Warning: starship/starship.toml not found, skipping."
+    fi
 
     echo ""
     echo ">>> Next, edit ~/.zshrc with Kate, add the following line at the end:"
     echo ""
     echo "    eval \"\$(starship init zsh)\""
-    echo ""
-    echo "    You can also create a config file at ~/.config/starship.toml to customize the prompt."
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
     prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
