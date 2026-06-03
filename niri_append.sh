@@ -19,10 +19,11 @@ STEPS=(
     "Zinit 插件管理器 / Zinit Plugin Manager"
     "Powerlevel10k 主题 / Powerlevel10k Theme"
     "fastfetch 配置 / fastfetch Configuration"
+    "配置 fastfetch 启动 / Configure fastfetch on startup"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -42,10 +43,8 @@ prompt_enter_or_quit() {
     if [[ "$key" == "q" ]] || [[ "$key" == "Q" ]]; then
         return 1   # signal quit
     fi
-    # consume rest of line if key was not newline
-    if [[ "$key" != $'\n' ]] && [[ "$key" != $'\r' ]]; then
-        read -r rest 2>/dev/null || true
-    fi
+    # Flush any leftover input (e.g. \n after \r on some terminals)
+    read -rsn1 -t 0.1 flush 2>/dev/null || true
     return 0
 }
 
@@ -151,7 +150,7 @@ step_3_nvidia() {
 
 step_4_zsh_kitty() {
     step_header 4
-    echo ">>> Installing Zsh and related packages..."
+    echo ">>> Installing Zsh..."
     sudo pacman -S --needed zsh zsh-completions
 
     echo ">>> Listing available shells..."
@@ -159,16 +158,6 @@ step_4_zsh_kitty() {
 
     echo ">>> Changing default shell to Zsh (password required)..."
     chsh -s /usr/bin/zsh || true
-
-    echo ""
-    echo ">>> Next, edit ~/.zshrc with Kate, add fastfetch as the FIRST line:"
-    echo "    fastfetch"
-    echo "    (Zinit configuration will be added in Step 5, Powerlevel10k theme in Step 6)"
-    echo "    ⚠️  fastfetch must be the very first line in .zshrc, before any Zinit/Powerlevel10k init code,"
-    echo "       otherwise Powerlevel10k's instant prompt will show a warning."
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    kate ~/.zshrc
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
 
     echo ""
     echo ">>> Next, edit Kitty terminal config ~/.config/kitty/kitty.conf"
@@ -202,7 +191,7 @@ step_5_zinit() {
     echo "    zinit light zsh-users/zsh-syntax-highlighting"
     echo "    zinit light zsh-users/zsh-history-substring-search"
     echo ""
-    echo "    ⚠️  Make sure fastfetch is the first line of ~/.zshrc (set in Step 4)."
+    echo "    ⚠️  Make sure fastfetch is the first line of ~/.zshrc (will be configured in Step 8)."
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
     prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
@@ -224,7 +213,7 @@ step_6_p10k() {
     echo "    zinit light romkatv/powerlevel10k"
     echo ""
     echo "    ⚠️  Powerlevel10k will prompt for configuration on first shell start."
-    echo "       If you see 'instant prompt warning', ensure fastfetch is the very first line of .zshrc."
+    echo "       If you see 'instant prompt warning', run Step 8 to add fastetch as the first line."
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
     prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
@@ -249,6 +238,29 @@ step_7_fastfetch() {
     prompt_enter_or_quit "Font selected. Press Enter to continue" || return 1
 
     echo "[Step 7 completed]"
+    prompt_enter_or_quit || return 1
+    return 0
+}
+
+step_8_fastfetch_firstline() {
+    step_header 8
+    echo ">>> Adding fastfetch as the first line of ~/.zshrc..."
+    echo ""
+    echo "    Open ~/.zshrc with Kate and add 'fastfetch' as the FIRST line."
+    echo "    ⚠️  fastfetch must be the very first line, before any Zinit/Powerlevel10k init code,"
+    echo "       otherwise Powerlevel10k's instant prompt will show a warning."
+    echo ""
+    echo "    Your ~/.zshrc should look like:"
+    echo "    ─────────────────────────────────"
+    echo "    fastfetch"
+    echo "    source \"\$HOME/.zinit/bin/zinit.zsh\""
+    echo "    # ... plugins, theme ..."
+    echo "    ─────────────────────────────────"
+    prompt_enter_or_quit "Press Enter to open the editor" || return 1
+    kate ~/.zshrc
+    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+
+    echo "[Step 8 completed]"
     prompt_enter_or_quit || return 1
     return 0
 }
@@ -347,6 +359,7 @@ execute_step() {
         5) step_5_zinit ;;
         6) step_6_p10k ;;
         7) step_7_fastfetch ;;
+        8) step_8_fastfetch_firstline ;;
     esac
 
     local ret=$?
