@@ -264,8 +264,43 @@ EOF
 source ~/.antidote/antidote.zsh
 antidote load ~/.zsh_plugins.txt
 
-# 补全初始化（必须在 antidote load 之后）
+# ─── 命令历史记录配置（确保终端间持久化）─────────────────
+HISTFILE=~/.zsh_history
+HISTSIZE=100000
+SAVEHIST=100000
+setopt SHARE_HISTORY          # 在多个终端会话间实时共享历史
+setopt HIST_EXPIRE_DUPS_FIRST # 历史存满时优先删除重复项
+setopt HIST_IGNORE_DUPS       # 不记录已存在的命令
+setopt HIST_IGNORE_SPACE      # 忽略以空格开头的命令
+
+# ─── 补全初始化（必须在 antidote load 之后）────────────────
 autoload -Uz compinit && compinit -C
+
+# ─── 补全系统配置：启用方向键菜单选择 ─────────────────────
+# 核心：按 Tab 后使用 ↑/↓ 方向键自由选择补全项
+# （"menu select" 是让用户能用方向键导航的关键配置）
+zstyle ':completion:*' menu select
+
+# 补全列表颜色
+zstyle ':completion:*' list-colors ''
+zstyle ':completion:*' list-prompt '%S%l 个匹配项 %s'
+
+# 智能大小写匹配（例：README 输入 readme 也能匹配）
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+
+# 补全描述美化
+zstyle ':completion:*:descriptions' format '%U%F{cyan}── %d ──%f%u'
+zstyle ':completion:*:messages' format ' %F{red}── %d ──%f'
+zstyle ':completion:*:warnings' format ' %F{yellow}── 无匹配结果 ──%f'
+zstyle ':completion:*:corrections' format '%U%F{green}── %d ──%f%u'
+
+# 分组显示（先显示普通补全，再显示额外说明）
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' verbose yes
+
+# 缓存提升性能
+zstyle ':completion:*' use-cache on
+zstyle ':completion:*' cache-path ~/.zsh/cache
 # === Antidote End ===
 EOF
     echo "    Antidote configuration written to ~/.zshrc."
