@@ -16,30 +16,30 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 | Step        | Content                              | Description                                                                                                                                 |
 | ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 🖥️ 核心桌面 / Core Desktop         | 安装 Niri 平铺窗口管理器、Kitty、DMS Shell 等核心组件 / Install Niri tiling WM, Kitty, DMS Shell and other core components                     |
-| **2** | 🔗 注册 DMS 服务 / Register DMS    | 将 DMS 注册为 Niri 的 user service 依赖 / Register DMS as a user service dependency of Niri                                                  |
+| **1** | 🖥️ 核心桌面 / Core Desktop         | 安装 Niri 平铺窗口管理器、Kitty、DMS Shell 等核心组件 / Install Niri tiling WM, Kitty, DMS Shell and other core components                  |
+| **2** | 🔗 注册 DMS 服务 / Register DMS      | 将 DMS 注册为 Niri 的 user service 依赖 / Register DMS as a user service dependency of Niri                                                 |
 | **3** | 🧰 基础初始化 / Basic Initialization | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts |
-| **4** | 🖥️ 显示管理器 / Display Manager    | 启用并启动 LightDM 显示管理器 / Enable and start LightDM display manager                                                                          |
+| **4** | 🖥️ 显示管理器 / Display Manager    | 启用并启动 LightDM 显示管理器 / Enable and start LightDM display manager                                                                    |
 
 ### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
 
-| Step        | Content                              | Description                                                                                                                 |
-| ----------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 🎨 Kitty 字体选择 / Font Selector    | 使用 Kitty 字体选择器交互式选择 JetBrains Mono Nerd 字体 / Interactively select JetBrains Mono Nerd Font via Kitty font selector |
-| **2** | 💻 KVM 虚拟化 / KVM Virtualization   | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network |
-| **3** | 📦 AUR 助手 / AUR Helper             | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                 |
-| **4** | 🎮 NVIDIA 驱动 / NVIDIA Driver       | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                      |
-| **5** | 🎨 启用 Zsh 终端 / Enable Zsh Shell | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                           |
+| Step        | Content                                  | Description                                                                                                                                  |
+| ----------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1** | 🎨 Kitty 字体选择 / Font Selector        | 使用 Kitty 字体选择器交互式选择 JetBrains Mono Nerd 字体 / Interactively select JetBrains Mono Nerd Font via Kitty font selector             |
+| **2** | 💻 KVM 虚拟化 / KVM Virtualization       | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network                  |
+| **3** | 📦 AUR 助手 / AUR Helper                 | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                  |
+| **4** | 🎮 NVIDIA 驱动 / NVIDIA Driver           | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                                       |
+| **5** | 🎨 启用 Zsh 终端 / Enable Zsh Shell      | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                                      |
 | **6** | ⚡ Antidote 插件管理器 / Antidote Plugin | 安装 Antidote 插件管理器，加载自动建议、语法高亮等插件 / Install Antidote plugin manager, load autosuggestions & syntax highlighting plugins |
-| **7** | 🚀 Starship 提示符 / Starship Prompt | 安装 Starship 提示符 / Install Starship prompt                                                                       |
-| **8** | 📁 fastfetch 配置 / fastfetch Config | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                |
-| **9** | 🚀 fastfetch 自启 / Startup          | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup         |
+| **7** | 🚀 Starship 提示符 / Starship Prompt     | 安装 Starship 提示符 / Install Starship prompt                                                                                               |
+| **8** | 📁 fastfetch 配置 / fastfetch Config     | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                                 |
+| **9** | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
 
 ---
 
 ## 🖥️ 系统要求 / System Requirements
 
-- **Arch Linux**（已安装并正常启动 / installed and booted）
+- **Arch Linux**（已安装并正常启动 / installed and booted）（个人习惯是archinstall时桌面不安装）
 - 请确保已经安装 git 和 vim，如果没有安装请运行 `sudo pacman -S vim git`
 - 已拥有 `sudo` 权限的普通用户（**不要以 root 身份运行** / **do not run as root**）
 - 网络连接正常 / Working internet connection
@@ -58,6 +58,7 @@ chmod +x niri_init.sh niri_append.sh
 ```
 
 > ⚠️ **注意 / Note**：
+>
 > - **`niri_init.sh`**：**全自动一键安装**。运行后只需输入 sudo 密码，即可依次完成所有步骤。无需任何手动操作。
 >   **Fully automated one-click setup** — enter your sudo password and all steps run sequentially.
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
@@ -74,30 +75,30 @@ chmod +x niri_init.sh niri_append.sh
 
 #### Step 1: 核心桌面环境 / Core Desktop Environment (Niri)
 
-| 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter） |
 
 #### Step 2: 注册 DMS 服务 / Register DMS Service
 
-| 操作 / Action                        | 说明 / Description                                                                                                 |
-| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| 操作 / Action                        | 说明 / Description                                                                                                                                                                               |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 注册 DMS 服务 / Register DMS service | 通过官方脚本安装 DMS，并将其添加为 `niri.service` 的 user service 依赖，实现开机自启 / Install DMS via official script and add as a user service dependency of `niri.service` for auto-start |
 
 #### Step 3: 基础初始化 / Basic Initialization
 
-| 操作 / Action                      | 说明 / Description                                                                                                                                                              |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装基础包 / Install base packages | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`  |
+| 操作 / Action                      | 说明 / Description                                                                                                                                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 安装基础包 / Install base packages | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`             |
 | 配置 locale / Configure locale     | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale |
-| 安装字体 / Install fonts           | `wqy-microhei`、`wqy-zenhei`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts                                                   |
+| 安装字体 / Install fonts           | `wqy-microhei`、`wqy-zenhei`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts                                                              |
 
 #### Step 4: 显示管理器 / Display Manager (LightDM)
 
-| 操作 / Action               | 说明 / Description                                                    |
-| --------------------------- | ----------------------------------------------------------------- |
+| 操作 / Action                 | 说明 / Description                                                      |
+| ----------------------------- | ----------------------------------------------------------------------- |
 | 启用 LightDM / Enable LightDM | 设置 LightDM 开机自启 / Enable LightDM to start on boot                 |
-| 启动 LightDM / Start LightDM | 立即启动 LightDM 显示管理器 / Start LightDM display manager immediately |
+| 启动 LightDM / Start LightDM  | 立即启动 LightDM 显示管理器 / Start LightDM display manager immediately |
 
 ---
 
@@ -105,9 +106,9 @@ chmod +x niri_init.sh niri_append.sh
 
 #### Step 1: Kitty 字体选择 / Kitty Font Selector
 
-| 操作 / Action                      | 说明 / Description                                                                                             |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| 选择字体 / Select font             | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font via `kitten choose-fonts` |
+| 操作 / Action          | 说明 / Description                                                                                                                                   |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font via `kitten choose-fonts` |
 
 #### Step 2: KVM 虚拟化 / KVM Virtualization
 
@@ -127,37 +128,37 @@ chmod +x niri_init.sh niri_append.sh
 
 #### Step 4: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
-| 操作 / Action                            | 说明 / Description                                                                                                                        |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装内核头文件 / Install kernel headers  | `linux-headers`、`linux-zen-headers`                                                                                                  |
-| 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                    |
+| 操作 / Action                            | 说明 / Description                                                                                                                                                                                                                               |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 安装内核头文件 / Install kernel headers  | `linux-headers`、`linux-zen-headers`                                                                                                                                                                                                         |
+| 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                                                                                                                           |
 | 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs |
 
 #### Step 5: 启用 Zsh 终端 / Enable Zsh Shell
 
-| 操作 / Action                         | 说明 / Description                                                                             |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| 安装 Zsh / Install Zsh                | `zsh`、`zsh-completions`                                                                |
-| 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh                 |
-| 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                                    |
-| 选择字体 / Select font                |                                                                                                |
+| 操作 / Action                         | 说明 / Description                                                             |
+| ------------------------------------- | ------------------------------------------------------------------------------ |
+| 安装 Zsh / Install Zsh                | `zsh`、`zsh-completions`                                                   |
+| 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh |
+| 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                    |
+| 选择字体 / Select font                |                                                                                |
 
 #### Step 6: Antidote 插件管理器 / Antidote Plugin Manager
 
-| 操作 / Action                                  | 说明 / Description                                                                                                                                  |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 清理旧配置 / Clean up old config               | 删除 `~/.antidote`（如有），清理 `.zshrc` 中的 Antidote 引用 / Remove `~/.antidote` if exists, clean Antidote references from `.zshrc`              |
-| 安装 Antidote / Install Antidote               | 通过 `git clone` 安装 Antidote 到 `~/.antidote` / Install Antidote via `git clone`                                                                  |
-| 配置插件 / Configure plugins                   | 创建 `~/.zsh_plugins.txt`，添加 `zsh-completions`、`zsh-autosuggestions`、`fast-syntax-highlighting` / Create plugin list file with recommended plugins |
-| 配置 `.zshrc` / Configure `.zshrc`             | 添加 `source ~/.antidote/antidote.zsh`、`antidote load` 和 `compinit` / Add Antidote source, load and compinit to `.zshrc`                           |
+| 操作 / Action                          | 说明 / Description                                                                                                                                              |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 清理旧配置 / Clean up old config       | 删除 `~/.antidote`（如有），清理 `.zshrc` 中的 Antidote 引用 / Remove `~/.antidote` if exists, clean Antidote references from `.zshrc`                  |
+| 安装 Antidote / Install Antidote       | 通过 `git clone` 安装 Antidote 到 `~/.antidote` / Install Antidote via `git clone`                                                                        |
+| 配置插件 / Configure plugins           | 创建 `~/.zsh_plugins.txt`，添加 `zsh-completions`、`zsh-autosuggestions`、`fast-syntax-highlighting` / Create plugin list file with recommended plugins |
+| 配置 `.zshrc` / Configure `.zshrc` | 添加 `source ~/.antidote/antidote.zsh`、`antidote load` 和 `compinit` / Add Antidote source, load and compinit to `.zshrc`                              |
 
 #### Step 7: Starship 提示符 / Starship Prompt
 
-| 操作 / Action                                      | 说明 / Description                                                                |
-| -------------------------------------------------- | --------------------------------------------------------------------------------- |
-| 安装 Starship / Install Starship                   | 通过 pacman 安装 Starship / Install Starship via pacman                           |
-| 复制配置 / Copy config                             | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config |
-| 配置 `~/.zshrc` / Configure `~/.zshrc`             | 在 `compinit` 之后添加 `eval "$(starship init zsh)"` / Add Starship init after compinit in `.zshrc` |
+| 操作 / Action                              | 说明 / Description                                                                                        |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| 安装 Starship / Install Starship           | 通过 pacman 安装 Starship / Install Starship via pacman                                                   |
+| 复制配置 / Copy config                     | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config                     |
+| 配置 `~/.zshrc` / Configure `~/.zshrc` | 在 `compinit` 之后添加 `eval "$(starship init zsh)"` / Add Starship init after compinit in `.zshrc` |
 
 > 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main)，默认使用 **Macchiato** 配色。提示符：`󰄛 ❯`（成功绿色，错误红色），目录淡紫色，Git 分支紫色。
 
@@ -169,10 +170,9 @@ chmod +x niri_init.sh niri_append.sh
 
 #### Step 9: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
 
-| 操作 / Action                              | 说明 / Description                                                                                                        |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| 切换 `fastfetch` 自启 / Toggle fastfetch   | 若 `.zshrc` 第一行是 `fastfetch` 则删除之（关闭）；否则添加为第一行（开启）/ If `.zshrc` first line is `fastfetch`, remove it (disable); otherwise add it (enable) |
-
+| 操作 / Action                              | 说明 / Description                                                                                                                                                         |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch` 则删除之（关闭）；否则添加为第一行（开启）/ If `.zshrc` first line is `fastfetch`, remove it (disable); otherwise add it (enable) |
 
 ---
 
