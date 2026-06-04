@@ -19,7 +19,7 @@ BOLD='\e[1m'
 
 print_logo() {
     while IFS= read -r line; do
-        echo -e "${LIGHT_BLUE}${line:0:45}${LIGHT_PINK}${line:45}${RESET}"
+        echo -e "${LIGHT_BLUE}${line:0:48}${LIGHT_PINK}${line:48}${RESET}"
     done << 'LOGO'
 88      a8P                                   88  88888888ba,
 88    ,88'                                    ""  88      `"8b
