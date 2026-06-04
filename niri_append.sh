@@ -8,6 +8,16 @@
 set -uo pipefail
 # Note: we do NOT use 'set -e' so that step functions can return 1 gracefully
 
+# ─── Error handling ──────────────────────────
+# Ensure cleanup on Ctrl+C
+cleanup() {
+    echo "" >&2
+    echo -e "${YELLOW}  ⚠️  Script interrupted by user.${RESET}" >&2
+    exit 1
+}
+trap 'cleanup' INT
+# ─────────────────────────────────────────────
+
 # ─── Color definitions ───────────────────────
 GREEN='\e[32m'
 RED='\e[31m'
@@ -113,7 +123,7 @@ step_1_kitty_font() {
 step_2_kvm() {
     step_header 2
     echo ">>> Installing KVM packages..."
-    sudo pacman -S --needed --noconfirm qemu-full virt-manager swtpm dnsmasq || return 0
+    sudo pacman -S --needed --noconfirm qemu-full virt-manager swtpm dnsmasq
 
     echo ">>> Enabling and starting libvirtd service..."
     sudo systemctl enable --now libvirtd
@@ -473,9 +483,6 @@ for cmd in pacman sudo; do
         exit 1
     fi
 done
-
-# Trap Ctrl+C to clean up terminal
-trap 'echo ""; echo "Interrupted."; exit 1' INT
 
 # Hide cursor during menu
 echo -ne "\e[?25l"

@@ -4,7 +4,28 @@
 # Run this script as a normal user with sudo privileges.
 # All steps run sequentially after initial privilege escalation.
 
-set -euo pipefail
+set -Euo pipefail
+
+# ─── Error handling ──────────────────────────
+# Display a clear error message on failure, then exit
+error_handler() {
+    local exit_code=$?
+    echo "" >&2
+    echo -e "${RED}${BOLD}  ❌ Error at line $1 — exit code $exit_code${RESET}" >&2
+    echo -e "${RED}  Please fix the issue and re-run the script.${RESET}" >&2
+    echo "" >&2
+    exit "$exit_code"
+}
+trap 'error_handler $LINENO' ERR
+
+# Ensure cleanup on Ctrl+C
+cleanup() {
+    echo "" >&2
+    echo -e "${YELLOW}  ⚠️  Script interrupted by user.${RESET}" >&2
+    exit 1
+}
+trap 'cleanup' INT
+# ─────────────────────────────────────────────
 
 # ─── Color definitions ───────────────────────
 GREEN='\e[32m'
