@@ -345,9 +345,11 @@ step_9_fastfetch_firstline() {
 
 render_menu() {
     clear
-    echo "═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════"
-    echo "          ArchInit — 可选扩展步骤 / Optional Steps"
-    echo "═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════"
+    print_logo
+    echo ""
+    echo "========================================================================================================================="
+    echo "                     ArchInit — 可选扩展步骤 / Optional Steps"
+    echo "========================================================================================================================="
     echo ""
 
     for i in "${!STEPS[@]}"; do
@@ -474,12 +476,6 @@ done
 
 # Trap Ctrl+C to clean up terminal
 trap 'echo ""; echo "Interrupted."; exit 1' INT
-
-# Show logo once at startup
-clear
-print_logo
-echo ""
-sleep 1
 
 # Hide cursor during menu
 echo -ne "\e[?25l"
