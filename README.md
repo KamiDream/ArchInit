@@ -57,8 +57,11 @@ chmod +x niri_init.sh niri_append.sh
 ./niri_init.sh
 ```
 
-> ⚠️ **注意 / Note**：脚本提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。每个步骤执行完毕后会自动返回菜单。部分步骤会打开 vim/kate 编辑器要求手动修改配置文件，**请按提示完成编辑后保存退出**。
-> The script provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute the selected step, q to quit. After each step completes, you return to the menu automatically. Some steps open vim/kate for manual config file edits; **follow the prompts, edit, save, and exit**.
+> ⚠️ **注意 / Note**：
+> - **`niri_init.sh`**：**全自动一键安装**。运行后只需输入 sudo 密码，即可依次完成所有步骤。无需任何手动操作。
+>   **Fully automated one-click setup** — enter your sudo password and all steps run sequentially.
+> - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
+>   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
 >
 > 先运行 `niri_init.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件。
 > Run `niri_init.sh` first for the core setup, then run `niri_append.sh` for optional extras as needed.
