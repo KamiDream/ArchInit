@@ -279,28 +279,24 @@ step_8_fastfetch() {
 
 step_9_fastfetch_firstline() {
     step_header 9
-    echo ">>> Adding fastfetch as the first line of ~/.zshrc..."
-    echo ""
-    echo "    Open ~/.zshrc with Kate and add 'fastfetch' as the FIRST line."
-    echo "    ⚠️  fastfetch must be the very first line, before any Antidote/Starship init code."
-    echo ""
-    echo "    Your ~/.zshrc should look like:"
-    echo "    ─────────────────────────────────"
-    echo "    fastfetch"
-    echo ""
-    echo "    # Antidote 插件管理器"
-    echo "    source ~/.antidote/antidote.zsh"
-    echo "    antidote load ~/.zsh_plugins.txt"
-    echo ""
-    echo "    # 补全初始化"
-    echo "    autoload -Uz compinit && compinit -C"
-    echo ""
-    echo "    # Starship 提示符"
-    echo "    eval \"\$(starship init zsh)\""
-    echo "    ─────────────────────────────────"
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    kate ~/.zshrc
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+
+    # Check if fastfetch is already the first line of ~/.zshrc
+    if [[ -f ~/.zshrc ]] && head -1 ~/.zshrc | grep -q '^fastfetch$'; then
+        echo ">>> fastfetch 已存在于 ~/.zshrc 第一行，正在移除（关闭自启）..."
+        # Remove the first line (fastfetch) from .zshrc
+        sed -i '1{/^fastfetch$/d}' ~/.zshrc
+        echo "    fastfetch 已从 .zshrc 第一行移除。"
+        echo "    ✅ 已关闭 fastfetch 开机自启。"
+    else
+        echo ">>> fastfetch 不在 ~/.zshrc 第一行，正在添加（开启自启）..."
+        # Insert fastfetch as the first line
+        if [[ ! -f ~/.zshrc ]]; then
+            touch ~/.zshrc
+        fi
+        sed -i '1i\fastfetch' ~/.zshrc
+        echo "    fastfetch 已添加为 .zshrc 第一行。"
+        echo "    ✅ 已开启 fastfetch 开机自启。"
+    fi
 
     echo "[Step 9 completed]"
     prompt_enter_or_quit || return 1

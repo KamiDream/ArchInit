@@ -86,7 +86,7 @@ chmod +x niri_init.sh niri_append.sh
 | 操作 / Action                      | 说明 / Description                                                                                                                                                              |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 安装基础包 / Install base packages | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`  |
-| 配置 locale / Configure locale     | 编辑 `/etc/locale.gen` 启用 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Edit `/etc/locale.gen` to enable `zh_CN.UTF-8`, run `locale-gen`, set system locale |
+| 配置 locale / Configure locale     | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale |
 | 安装字体 / Install fonts           | `wqy-microhei`、`wqy-zenhei`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts                                                   |
 
 #### Step 4: 显示管理器 / Display Manager (LightDM)
@@ -164,11 +164,11 @@ chmod +x niri_init.sh niri_append.sh
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
 
-#### Step 9: 配置 fastfetch 开机自启 / Configure fastfetch on Startup
+#### Step 9: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
 
 | 操作 / Action                              | 说明 / Description                                                                                                        |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| 添加 `fastfetch` 到 `.zshrc` 第一行         | 在 `~/.zshrc` 最顶部添加 `fastfetch` 命令，在 Antidote/Starship 初始化之前执行 / Add `fastfetch` as the first line of `~/.zshrc`, before any Antidote/Starship init code |
+| 切换 `fastfetch` 自启 / Toggle fastfetch   | 若 `.zshrc` 第一行是 `fastfetch` 则删除之（关闭）；否则添加为第一行（开启）/ If `.zshrc` first line is `fastfetch`, remove it (disable); otherwise add it (enable) |
 
 
 ---

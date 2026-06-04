@@ -51,11 +51,9 @@ else
     sudo pacman -S --needed fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g git quickshell flatseal dolphin kate firefox
 
     echo ""
-    echo ">>> Next, edit /etc/locale.gen with vim"
-    echo "    Find and uncomment 'zh_CN.UTF-8' (remove the leading #), then save and exit."
-    read -p "Press Enter to open the editor..."
-    sudo vim /etc/locale.gen
-    read -p "Edit complete. Press Enter to continue..."
+    echo ">>> Uncommenting zh_CN.UTF-8 in /etc/locale.gen..."
+    sudo sed -i 's/^#zh_CN.UTF-8/zh_CN.UTF-8/' /etc/locale.gen
+    echo "    zh_CN.UTF-8 enabled."
 
     echo ">>> Generating locale..."
     sudo locale-gen
