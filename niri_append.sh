@@ -264,14 +264,18 @@ EOF
 source ~/.antidote/antidote.zsh
 antidote load ~/.zsh_plugins.txt
 
-# ─── 命令历史记录配置（确保终端间持久化）─────────────────
+# ─── 命令历史记录配置（仅记录用户主动输入的命令）────────────
 HISTFILE=~/.zsh_history
 HISTSIZE=100000
 SAVEHIST=100000
-setopt SHARE_HISTORY          # 在多个终端会话间实时共享历史
-setopt HIST_EXPIRE_DUPS_FIRST # 历史存满时优先删除重复项
-setopt HIST_IGNORE_DUPS       # 不记录已存在的命令
-setopt HIST_IGNORE_SPACE      # 忽略以空格开头的命令
+setopt SHARE_HISTORY           # 在多个终端会话间实时共享历史
+setopt HIST_EXPIRE_DUPS_FIRST  # 历史存满时优先删除重复项
+setopt HIST_IGNORE_ALL_DUPS    # 若新命令与历史重复则删除旧条目
+setopt HIST_IGNORE_DUPS        # 连续重复的命令只保留一条
+setopt HIST_IGNORE_SPACE       # 忽略以空格开头的命令（如自动运行的脚本）
+setopt HIST_REDUCE_BLANKS      # 去除命令中多余的空格
+setopt HIST_NO_FUNCTIONS       # 不记录函数定义
+setopt HIST_NO_STORE           # 不记录 history 命令本身
 
 # ─── 补全初始化（必须在 antidote load 之后）────────────────
 autoload -Uz compinit && compinit -C
@@ -362,21 +366,21 @@ step_8_fastfetch() {
 step_9_fastfetch_firstline() {
     step_header 9
 
-    # Check if fastfetch is already the first line of ~/.zshrc
-    if [[ -f ~/.zshrc ]] && head -1 ~/.zshrc | grep -q '^fastfetch$'; then
+    # Check if fastfetch (with or without leading space) is already the first line
+    if [[ -f ~/.zshrc ]] && head -1 ~/.zshrc | grep -qE '^\s?fastfetch$'; then
         echo ">>> fastfetch 已存在于 ~/.zshrc 第一行，正在移除（关闭自启）..."
-        # Remove the first line (fastfetch) from .zshrc
-        sed -i '1{/^fastfetch$/d}' ~/.zshrc
+        # Remove the first line (fastfetch or  fastfetch) from .zshrc
+        sed -i '1{/^\s\?fastfetch$/d}' ~/.zshrc
         echo "    fastfetch 已从 .zshrc 第一行移除。"
         echo "    ✅ 已关闭 fastfetch 开机自启。"
     else
         echo ">>> fastfetch 不在 ~/.zshrc 第一行，正在添加（开启自启）..."
-        # Insert fastfetch as the first line
+        # Insert fastfetch 时加前导空格（利用 HIST_IGNORE_SPACE 避免被记入历史）
         if [[ ! -f ~/.zshrc ]]; then
             touch ~/.zshrc
         fi
-        sed -i '1i\fastfetch' ~/.zshrc
-        echo "    fastfetch 已添加为 .zshrc 第一行。"
+        sed -i '1i\ fastfetch' ~/.zshrc
+        echo "    fastfetch 已添加为 .zshrc 第一行（带前导空格，不记入历史）。"
         echo "    ✅ 已开启 fastfetch 开机自启。"
     fi
 
