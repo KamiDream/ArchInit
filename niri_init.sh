@@ -10,27 +10,26 @@ set -euo pipefail
 # Initial privilege escalation & keep-alive
 # ─────────────────────────────────────────────
 echo "══════════════════════════════════════════════════"
-echo "  ArchInit — 一键初始化 / One-Click Setup"
+echo "  ArchInit — One-Click Setup"
 echo "══════════════════════════════════════════════════"
 echo ""
-echo ">>> 正在请求 sudo 权限（需要输入密码）..."
 echo ">>> Requesting sudo access (password required)..."
 sudo -v
 
 # Keep sudo session alive in the background
 while true; do sudo -n true; sleep 60; kill -0 "$$" 2>/dev/null || break; done 2>/dev/null &
 
-echo "    ✅ Sudo 权限已获取 / Privileges acquired."
+echo "    ✅ Sudo privileges acquired."
 echo ""
 
 # ─────────────────────────────────────────────
 # Step 1: Core Desktop (Niri)
 # ─────────────────────────────────────────────
 echo "========================================="
-echo " Step 1: 核心桌面 / Core Desktop (Niri)"
+echo " Step 1: Core Desktop (Niri)"
 echo "========================================="
 echo ">>> Installing Niri and related components..."
-sudo pacman -Syu --noconfirm niri xwayland-satellite xdg-desktop-portal-gnome \
+sudo pacman -Syu --needed --noconfirm niri xwayland-satellite xdg-desktop-portal-gnome \
     xdg-desktop-portal-gtk kitty dms-shell-niri matugen cava \
     qt6-multimedia-ffmpeg lightdm lightdm-gtk-greeter power-profiles-daemon kimageformats
 
@@ -41,7 +40,7 @@ echo ""
 # Step 2: Register DMS Service
 # ─────────────────────────────────────────────
 echo "========================================="
-echo " Step 2: 注册 DMS 服务 / Register DMS Service"
+echo " Step 2: Register DMS Service"
 echo "========================================="
 echo ">>> Registering DMS as a user service dependency of Niri..."
 curl -fsSL https://install.danklinux.com | sh
@@ -54,7 +53,7 @@ echo ""
 # Step 3: Basic Initialization
 # ─────────────────────────────────────────────
 echo "========================================="
-echo " Step 3: 基础初始化 / Basic Initialization"
+echo " Step 3: Basic Initialization"
 echo "========================================="
 echo ">>> Installing base packages..."
 sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g git \
@@ -81,7 +80,7 @@ echo ""
 # Step 4: Enable Display Manager (LightDM)
 # ─────────────────────────────────────────────
 echo "========================================="
-echo " Step 4: 显示管理器 / Display Manager (LightDM)"
+echo " Step 4: Display Manager (LightDM)"
 echo "========================================="
 echo ">>> Enabling LightDM display manager..."
 sudo systemctl enable lightdm
@@ -94,8 +93,7 @@ echo ""
 # Done
 # ─────────────────────────────────────────────
 echo "══════════════════════════════════════════════════"
-echo "  ✅ 所有步骤已完成 / All steps completed!"
+echo "  ✅ All steps completed!"
 echo ""
-echo "  请重新登录或重启系统使更改生效。"
 echo "  Please re-login or reboot for changes to take effect."
 echo "══════════════════════════════════════════════════"
