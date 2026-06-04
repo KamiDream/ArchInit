@@ -8,6 +8,15 @@
 set -uo pipefail
 # Note: we do NOT use 'set -e' so that step functions can return 1 gracefully
 
+# ─── Color definitions ───────────────────────
+GREEN='\e[32m'
+RED='\e[31m'
+YELLOW='\e[33m'
+CYAN='\e[36m'
+RESET='\e[0m'
+BOLD='\e[1m'
+# ─────────────────────────────────────────────
+
 # ─────────────────────────────────────────────
 # Step definitions
 # ─────────────────────────────────────────────
@@ -81,7 +90,6 @@ step_1_kitty_font() {
     prompt_enter_or_quit "Font selected. Press Enter to continue" || return 1
 
     echo "[Step 1 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -102,7 +110,6 @@ step_2_kvm() {
     echo "    Note: re-login is required for group changes to take effect."
 
     echo "[Step 2 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -135,7 +142,6 @@ EOF
     sudo pacman -Syu --noconfirm
 
     echo "[Step 3 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -167,7 +173,6 @@ step_4_nvidia() {
     sudo mkinitcpio -P
 
     echo "[Step 4 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -199,7 +204,6 @@ EOF
     fi
 
     echo "[Step 5 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -240,7 +244,6 @@ EOF
     echo "    Antidote configuration written to ~/.zshrc."
 
     echo "[Step 6 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -278,7 +281,6 @@ EOF
     echo "    Starship init written to ~/.zshrc."
 
     echo "[Step 7 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -292,7 +294,6 @@ step_8_fastfetch() {
     echo "    fastfetch config copied successfully."
 
     echo "[Step 8 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -318,7 +319,6 @@ step_9_fastfetch_firstline() {
     fi
 
     echo "[Step 9 completed]"
-    prompt_enter_or_quit || return 1
     return 0
 }
 
@@ -404,6 +404,7 @@ main_menu() {
 execute_step() {
     local idx=$1
     local step_num=$((idx + 1))
+    local step_title="${STEPS[$idx]}"
 
     # Temporarily disable exit-on-error for step execution
     set +e
@@ -425,13 +426,21 @@ execute_step() {
     # Re-enable
     set -e
 
+    echo ""
     if [[ $ret -eq 0 ]]; then
+        # Success — mark as completed, show green, wait 5s, auto-return
         COMPLETED[$idx]=1
+        echo -e "${GREEN}${BOLD}  ✅ Step ${step_num} completed: ${step_title}${RESET}"
+        echo ""
+        echo -e "${YELLOW}  ⏳ Returning to menu in 3 seconds...${RESET}"
+        sleep 3
+    else
+        # Failure — show red, wait for Enter
+        echo -e "${RED}${BOLD}  ❌ Step ${step_num} failed: ${step_title}${RESET}"
+        echo ""
+        echo -e "${RED}  Press Enter to return to menu...${RESET}"
+        read -rs
     fi
-    # If ret == 1 (user quit), we simply return to menu without marking completed
-    # If ret == 0, we mark completed and return to menu
-    # Sleep a tiny bit so the user can see the final message before menu redraws
-    sleep 0.3
 }
 
 # ─────────────────────────────────────────────
