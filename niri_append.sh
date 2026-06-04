@@ -190,8 +190,8 @@ step_6_antidote() {
 
     echo ">>> Cleaning up any previous Antidote configuration..."
     rm -rf ~/.antidote 2>/dev/null || true
-    # Remove any previous Antidote source lines from .zshrc
-    sed -i '/antidote/d' ~/.zshrc 2>/dev/null || true
+    # Remove existing Antidote block from .zshrc (between markers)
+    sed -i '/^# === Antidote Start ===$/,/^# === Antidote End ===$/d' ~/.zshrc 2>/dev/null || true
     echo "    Cleanup done."
 
     echo ">>> Installing Antidote plugin manager..."
@@ -207,18 +207,18 @@ EOF
     echo "    Plugins configured."
 
     echo ""
-    echo ">>> Next, edit ~/.zshrc with Kate, add the following content AFTER the fastfetch line:"
-    echo ""
-    echo "    # Antidote plugin manager"
-    echo "    source ~/.antidote/antidote.zsh"
-    echo "    antidote load ~/.zsh_plugins.txt"
-    echo ""
-    echo "    # 补全初始化（必须在 antidote load 之后）"
-    echo "    autoload -Uz compinit && compinit -C"
-    echo ""
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    kate ~/.zshrc
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+    echo ">>> Appending Antidote configuration to ~/.zshrc..."
+    cat >> ~/.zshrc << 'EOF'
+
+# === Antidote Start ===
+source ~/.antidote/antidote.zsh
+antidote load ~/.zsh_plugins.txt
+
+# 补全初始化（必须在 antidote load 之后）
+autoload -Uz compinit && compinit -C
+# === Antidote End ===
+EOF
+    echo "    Antidote configuration written to ~/.zshrc."
 
     echo "[Step 6 completed]"
     prompt_enter_or_quit || return 1
@@ -247,20 +247,16 @@ step_7_starship() {
     fi
 
     echo ""
-    echo ">>> Next, edit ~/.zshrc with Kate, ensure the file looks like this (add at the end):"
-    echo ""
-    echo "    # Antidote plugin manager"
-    echo "    source ~/.antidote/antidote.zsh"
-    echo "    antidote load ~/.zsh_plugins.txt"
-    echo ""
-    echo "    # 补全初始化（必须在 antidote load 之后）"
-    echo "    autoload -Uz compinit && compinit -C"
-    echo ""
-    echo "    # Starship 提示符（放在最后）"
-    echo "    eval \"\$(starship init zsh)\""
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    kate ~/.zshrc
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+    echo ">>> Adding Starship init to ~/.zshrc..."
+    # Remove existing Starship init line to avoid duplicates
+    sed -i '/^eval "\$\(starship init zsh\)"$/d' ~/.zshrc 2>/dev/null || true
+    # Append after the Antidote block (or at end if Antidote not present)
+    cat >> ~/.zshrc << 'EOF'
+
+# Starship 提示符
+eval "$(starship init zsh)"
+EOF
+    echo "    Starship init written to ~/.zshrc."
 
     echo "[Step 7 completed]"
     prompt_enter_or_quit || return 1
