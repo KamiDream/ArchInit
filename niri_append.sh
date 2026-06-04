@@ -108,22 +108,26 @@ step_2_kvm() {
 
 step_3_aur() {
     step_header 3
-    echo ""
-    echo ">>> Next, edit /etc/pacman.conf with vim"
-    echo "    Make the following changes:"
-    echo "    1) Remove the '#' before [multilib]"
-    echo "    2) Remove the '#' before 'Include = /etc/pacman.d/mirrorlist'"
-    echo "    3) Add archlinuxcn repository at end of file (see below)"
-    echo ""
-    echo "    Content to add at the end of file:"
-    echo "    [archlinuxcn]"
-    echo "    Server = https://mirrors.ustc.edu.cn/archlinuxcn/\$arch"
-    echo "    Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/\$arch"
-    echo "    Server = https://mirrors.hit.edu.cn/archlinuxcn/\$arch"
-    echo "    Server = https://repo.huaweicloud.com/archlinuxcn/\$arch"
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    sudo vim /etc/pacman.conf
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+
+    echo ">>> Configuring /etc/pacman.conf..."
+    # Uncomment [multilib] and its Include line
+    sudo sed -i '/^#\[multilib\]/,/^#Include/ s/^#//' /etc/pacman.conf
+    echo "    [multilib] enabled."
+
+    # Add archlinuxcn repository if not already present
+    if ! grep -q '^\[archlinuxcn\]' /etc/pacman.conf; then
+        sudo tee -a /etc/pacman.conf > /dev/null << 'EOF'
+
+[archlinuxcn]
+Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.hit.edu.cn/archlinuxcn/$arch
+Server = https://repo.huaweicloud.com/archlinuxcn/$arch
+EOF
+        echo "    [archlinuxcn] repository added."
+    else
+        echo "    [archlinuxcn] already present, skipping."
+    fi
 
     echo ">>> Installing archlinuxcn-keyring and updating system..."
     sudo pacman -Sy --needed archlinuxcn-keyring
@@ -144,11 +148,11 @@ step_4_nvidia() {
     sudo pacman -S --needed nvidia-dkms nvidia-utils nvidia-settings
 
     echo ""
-    echo ">>> Next, edit /etc/mkinitcpio.conf, add nvidia modules to MODULES=():"
-    echo "    MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)"
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    sudo vim /etc/mkinitcpio.conf
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+    echo ">>> Adding nvidia modules to /etc/mkinitcpio.conf..."
+    # Replace existing MODULES=() or #MODULES=() with nvidia modules
+    sudo sed -i 's/^MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+    sudo sed -i 's/^#MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+    echo "    MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm) set."
 
     echo ">>> Regenerating initramfs..."
     sudo mkinitcpio -P
@@ -170,14 +174,20 @@ step_5_zsh_kitty() {
     chsh -s /usr/bin/zsh || true
 
     echo ""
-    echo ">>> Next, edit Kitty terminal config ~/.config/kitty/kitty.conf"
-    echo "    Content to add:"
-    echo "    cursor_trail 2"
-    echo "    cursor_blink_interval 0.5"
-    echo "    cursor_stop_blinking_after 0"
-    prompt_enter_or_quit "Press Enter to open the editor" || return 1
-    kate ~/.config/kitty/kitty.conf
-    prompt_enter_or_quit "Edit complete. Press Enter to continue" || return 1
+    echo ">>> Configuring Kitty terminal..."
+    mkdir -p ~/.config/kitty
+    # Append cursor settings if not already present
+    if ! grep -q 'cursor_trail' ~/.config/kitty/kitty.conf 2>/dev/null; then
+        cat >> ~/.config/kitty/kitty.conf << 'EOF'
+
+cursor_trail 2
+cursor_blink_interval 0.5
+cursor_stop_blinking_after 0
+EOF
+        echo "    Kitty cursor settings added."
+    else
+        echo "    Kitty cursor settings already present, skipping."
+    fi
 
     echo "[Step 5 completed]"
     prompt_enter_or_quit || return 1
