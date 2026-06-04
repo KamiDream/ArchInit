@@ -154,6 +154,15 @@ step_4_nvidia() {
     sudo sed -i 's/^#MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
     echo "    MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm) set."
 
+    # Remove kms from HOOKS if present — kms conflicts with NVIDIA proprietary driver on Wayland
+    if grep -q '^HOOKS=' /etc/mkinitcpio.conf && grep '^HOOKS=' /etc/mkinitcpio.conf | grep -q 'kms'; then
+        echo "    Found kms in HOOKS, removing it (conflicts with NVIDIA proprietary driver)..."
+        sudo sed -i '/^HOOKS=/ s/ *kms *//' /etc/mkinitcpio.conf
+        echo "    kms removed from HOOKS."
+    else
+        echo "    kms not found in HOOKS, no change needed."
+    fi
+
     echo ">>> Regenerating initramfs..."
     sudo mkinitcpio -P
 

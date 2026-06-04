@@ -131,7 +131,7 @@ chmod +x niri_init.sh niri_append.sh
 | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | 安装内核头文件 / Install kernel headers  | `linux-headers`、`linux-zen-headers`                                                                                                  |
 | 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                    |
-| 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, regenerate initramfs |
+| 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs |
 
 #### Step 5: 启用 Zsh 终端 / Enable Zsh Shell
 
