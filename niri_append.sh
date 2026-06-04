@@ -88,7 +88,7 @@ step_1_kitty_font() {
 step_2_kvm() {
     step_header 2
     echo ">>> Installing KVM packages..."
-    sudo pacman -S --needed qemu-full virt-manager swtpm dnsmasq || return 0
+    sudo pacman -S --needed --noconfirm qemu-full virt-manager swtpm dnsmasq || return 0
 
     echo ">>> Enabling and starting libvirtd service..."
     sudo systemctl enable --now libvirtd
@@ -130,9 +130,9 @@ EOF
     fi
 
     echo ">>> Installing archlinuxcn-keyring and updating system..."
-    sudo pacman -Sy --needed archlinuxcn-keyring
-    sudo pacman -S --needed base-devel yay paru flclash
-    sudo pacman -Syu
+    sudo pacman -Sy --needed --noconfirm archlinuxcn-keyring
+    sudo pacman -S --needed --noconfirm base-devel yay paru flclash
+    sudo pacman -Syu --noconfirm
 
     echo "[Step 3 completed]"
     prompt_enter_or_quit || return 1
@@ -142,10 +142,10 @@ EOF
 step_4_nvidia() {
     step_header 4
     echo ">>> Installing kernel headers..."
-    sudo pacman -S --needed linux-headers linux-zen-headers
+    sudo pacman -S --needed --noconfirm linux-headers linux-zen-headers
 
     echo ">>> Installing NVIDIA drivers..."
-    sudo pacman -S --needed nvidia-dkms nvidia-utils nvidia-settings
+    sudo pacman -S --needed --noconfirm nvidia-dkms nvidia-utils nvidia-settings
 
     echo ""
     echo ">>> Adding nvidia modules to /etc/mkinitcpio.conf..."
@@ -174,7 +174,7 @@ step_4_nvidia() {
 step_5_zsh_kitty() {
     step_header 5
     echo ">>> Installing Zsh..."
-    sudo pacman -S --needed zsh zsh-completions
+    sudo pacman -S --needed --noconfirm zsh zsh-completions
 
     echo ">>> Listing available shells..."
     chsh -l
@@ -251,7 +251,7 @@ step_7_starship() {
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
     echo ">>> Installing Starship prompt..."
-    sudo pacman -S --needed starship
+    sudo pacman -S --needed --noconfirm starship
 
     echo ""
     echo ">>> Copying Starship config to ~/.config/starship.toml..."
