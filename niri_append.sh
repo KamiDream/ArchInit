@@ -200,9 +200,9 @@ step_6_antidote() {
     echo ""
     echo ">>> Creating ~/.zsh_plugins.txt with recommended plugins..."
     cat > ~/.zsh_plugins.txt << 'EOF'
+zsh-users/zsh-completions
 zsh-users/zsh-autosuggestions
-zsh-users/zsh-syntax-highlighting
-zsh-users/zsh-history-substring-search
+zdharma-continuum/fast-syntax-highlighting
 EOF
     echo "    Plugins configured."
 
@@ -212,6 +212,9 @@ EOF
     echo "    # Antidote plugin manager"
     echo "    source ~/.antidote/antidote.zsh"
     echo "    antidote load ~/.zsh_plugins.txt"
+    echo ""
+    echo "    # 补全初始化（必须在 antidote load 之后）"
+    echo "    autoload -Uz compinit && compinit -C"
     echo ""
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
@@ -244,8 +247,16 @@ step_7_starship() {
     fi
 
     echo ""
-    echo ">>> Next, edit ~/.zshrc with Kate, add the following line at the end:"
+    echo ">>> Next, edit ~/.zshrc with Kate, ensure the file looks like this (add at the end):"
     echo ""
+    echo "    # Antidote plugin manager"
+    echo "    source ~/.antidote/antidote.zsh"
+    echo "    antidote load ~/.zsh_plugins.txt"
+    echo ""
+    echo "    # 补全初始化（必须在 antidote load 之后）"
+    echo "    autoload -Uz compinit && compinit -C"
+    echo ""
+    echo "    # Starship 提示符（放在最后）"
     echo "    eval \"\$(starship init zsh)\""
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
@@ -280,9 +291,16 @@ step_9_fastfetch_firstline() {
     echo "    Your ~/.zshrc should look like:"
     echo "    ─────────────────────────────────"
     echo "    fastfetch"
+    echo ""
+    echo "    # Antidote 插件管理器"
     echo "    source ~/.antidote/antidote.zsh"
     echo "    antidote load ~/.zsh_plugins.txt"
-    echo "    # ... Starship init ..."
+    echo ""
+    echo "    # 补全初始化"
+    echo "    autoload -Uz compinit && compinit -C"
+    echo ""
+    echo "    # Starship 提示符"
+    echo "    eval \"\$(starship init zsh)\""
     echo "    ─────────────────────────────────"
     prompt_enter_or_quit "Press Enter to open the editor" || return 1
     kate ~/.zshrc
