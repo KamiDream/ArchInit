@@ -46,6 +46,19 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 ---
 
+> ⚠️ **免责声明 / Disclaimer**
+>
+> **使用本项目即表示您已接受并同意自行承担一切风险。**
+> **By using this project, you acknowledge and agree to assume all risks.**
+>
+> · 本免责声明以最新版 README 为准。
+> · 本项目按"原样"提供，不附带任何明示或暗示的保证。作者不保证本程序能在所有设备上正常运行，也不对因使用本程序造成的任何直接或间接损失、数据丢失、系统损坏或其他后果承担责任。
+>
+> · This disclaimer is governed by the latest version of this README.
+> · This project is provided "as is" without warranty of any kind. The author makes no guarantees that it will work correctly on all devices, and shall not be held liable for any direct or indirect damages, data loss, system damage, or other consequences arising from its use.
+
+---
+
 ## 🚀 使用方法 / Usage
 
 ### 克隆运行 / Clone & Run
@@ -75,9 +88,9 @@ chmod +x niri_init.sh niri_append.sh
 
 #### Step 1: 核心桌面环境 / Core Desktop Environment (Niri)
 
-| 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter） |
+| 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter）、`power-profiles-daemon`（电源管理 / power management）、`kimageformats`（KDE 图像格式插件 / KDE image format plugins） |
 
 #### Step 2: 注册 DMS 服务 / Register DMS Service
 
@@ -91,7 +104,7 @@ chmod +x niri_init.sh niri_append.sh
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 安装基础包 / Install base packages | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`             |
 | 配置 locale / Configure locale     | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale |
-| 安装字体 / Install fonts           | `wqy-microhei`、`wqy-zenhei`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts                                                              |
+| 安装字体 / Install fonts           | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts |
 
 #### Step 4: 显示管理器 / Display Manager (LightDM)
 
@@ -141,7 +154,6 @@ chmod +x niri_init.sh niri_append.sh
 | 安装 Zsh / Install Zsh                | `zsh`、`zsh-completions`                                                   |
 | 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh |
 | 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                    |
-| 选择字体 / Select font                |                                                                                |
 
 #### Step 6: Antidote 插件管理器 / Antidote Plugin Manager
 
@@ -158,7 +170,7 @@ chmod +x niri_init.sh niri_append.sh
 | ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
 | 安装 Starship / Install Starship           | 通过 pacman 安装 Starship / Install Starship via pacman                                                   |
 | 复制配置 / Copy config                     | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config                     |
-| 配置 `~/.zshrc` / Configure `~/.zshrc` | 在 `compinit` 之后添加 `eval "$(starship init zsh)"` / Add Starship init after compinit in `.zshrc` |
+| 配置 `~/.zshrc` / Configure `~/.zshrc` | 在 `.zshrc` 末尾追加 `eval "$(starship init zsh)"`（在 Antidote 配置块之后）/ Append `eval "$(starship init zsh)"` at end of `.zshrc` (after the Antidote block) |
 
 > 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main)，默认使用 **Macchiato** 配色。提示符：`󰄛 ❯`（成功绿色，错误红色），目录淡紫色，Git 分支紫色。
 
@@ -172,14 +184,14 @@ chmod +x niri_init.sh niri_append.sh
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                         |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch` 则删除之（关闭）；否则添加为第一行（开启）/ If `.zshrc` first line is `fastfetch`, remove it (disable); otherwise add it (enable) |
+| 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
 
 ---
 
 ## 🔧 自定义与扩展 / Customization
 
-- **跳过步骤 / Skip steps**：每个步骤开始前都会询问，输入 `n` 即可跳过 / Each step asks before running — enter `n` to skip.
-- **手动编辑 / Manual edits**：部分配置（locale、pacman.conf、mkinitcpio.conf 等）需要手动编辑，脚本会打开编辑器等待完成 / Some configs require manual editing; the script opens an editor and waits.
+- **选择步骤 / Choose steps**：[`niri_init.sh`](niri_init.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_init.sh`](niri_init.sh) runs fully automated; [`niri_append.sh`](niri_append.sh) provides an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
+- **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
 - **添加自己的包 / Add your own packages**：可直接修改 `niri_init.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
 ---
@@ -194,13 +206,33 @@ chmod +x niri_init.sh niri_append.sh
 
 ### Q：Kitty 字体选择器无法启动？/ Kitty font selector won't launch?
 
-确保已安装 Kitty：`sudo pacman -S kitty`，或在 Step 4 前手动安装。
-Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before Step 4.
+确保已安装 Kitty：`sudo pacman -S kitty`，或在 [`niri_append.sh`](niri_append.sh) 的 **Step 1** 前手动安装。
+Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before **Step 1** of [`niri_append.sh`](niri_append.sh).
 
 ### Q：NVIDIA 驱动安装后黑屏？/ Black screen after NVIDIA driver install?
 
 检查 `/etc/mkinitcpio.conf` 中的 `MODULES` 配置是否正确，重新运行 `sudo mkinitcpio -P` 并重启。
 Check the `MODULES` line in `/etc/mkinitcpio.conf`, then run `sudo mkinitcpio -P` and reboot.
+
+### Q：编译 NVIDIA 驱动时出现 LTS 内核报错？/ LTS kernel error when compiling NVIDIA driver?
+
+这是因为脚本未安装 `linux-lts-headers`，而 `mkinitcpio -P` 会为系统中**所有**已安装的内核生成 initramfs，缺少 LTS 头文件会导致编译报错。
+
+- **不影响正常使用**：报错仅针对 LTS 内核，而你日常使用的并非 LTS 内核。
+- **LTS 内核定位**：仅作为紧急情况下的备用内核，正常情况下不会使用。
+- **如果不想看到报错**，按以下步骤操作：
+  1. 安装 LTS 头文件：`sudo pacman -S linux-lts-headers`
+  2. 重新运行 [`niri_append.sh`](niri_append.sh) 的 **Step 4**（NVIDIA 显卡驱动脚本）
+  3. 重启系统
+
+This error occurs because `linux-lts-headers` is not installed, but `mkinitcpio -P` builds initramfs for **all** installed kernels. Missing LTS headers cause compilation warnings/errors.
+
+- **No impact on normal use**: The error only affects the LTS kernel, which is not your daily driver.
+- **LTS kernel role**: Emergency backup only — not used under normal circumstances.
+- **To suppress the error**:
+  1. Install LTS headers: `sudo pacman -S linux-lts-headers`
+  2. Re-run **Step 4** of [`niri_append.sh`](niri_append.sh) (NVIDIA driver script)
+  3. Reboot
 
 ### Q：locales 未生效？/ Locales not working?
 
