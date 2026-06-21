@@ -436,6 +436,7 @@ main_menu() {
         read -rsn1 key
         if [[ "$key" == $'\e' ]]; then
             # Escape sequence (arrow keys)
+            local seq=""
             read -rsn2 -t 0.1 seq 2>/dev/null || true
             case "$seq" in
                 '[A')  # Up
@@ -491,8 +492,8 @@ execute_step() {
 
     local ret=$?
 
-    # Re-enable
-    set -e
+    # Restore errexit to original state (script starts without -e)
+    set +e
 
     echo ""
     if [[ $ret -eq 0 ]]; then

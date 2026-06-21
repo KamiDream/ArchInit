@@ -207,8 +207,8 @@ execute_step() {
 
     local ret=$?
 
-    # Re-enable
-    set -e
+    # Restore errexit to original state (script starts without -e)
+    set +e
 
     echo ""
     if [[ $ret -eq 0 ]]; then
