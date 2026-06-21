@@ -114,6 +114,8 @@ step_1_kitty_font() {
     echo ">>> Running Kitty font selector, choose JetBrains Mono..."
     prompt_enter_or_quit "Press Enter to launch font selector" || return 1
     kitten choose-fonts
+    # Restore terminal settings in case kitten choose-fonts left them modified
+    stty sane 2>/dev/null || true
     prompt_enter_or_quit "Font selected. Press Enter to continue" || return 1
 
     echo "[Step 1 completed]"

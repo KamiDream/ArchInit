@@ -35,6 +35,12 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **8** | 📁 fastfetch 配置 / fastfetch Config     | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                                 |
 | **9** | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
 
+### [`universal.sh`](universal.sh) — 通用工具 / Universal Tools
+
+| Step        | Content                                            | Description                                                                                                                                                                                                    |
+| ----------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1** | 🎮 UU 加速器安装（SteamDeck）/ UU Accelerator Install | 创建 /home/deck 目录并安装 UU 加速器 SteamDeck 版 / Create /home/deck directory and install UU Accelerator for SteamDeck                                                                                       |
+
 ---
 
 ## 🖥️ 系统要求 / System Requirements
@@ -66,7 +72,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 ```bash
 git clone https://github.com/KamiDream/ArchInit.git
 cd ArchInit
-chmod +x niri_init.sh niri_append.sh
+chmod +x niri_init.sh niri_append.sh universal.sh
 ./niri_init.sh
 ```
 
@@ -76,9 +82,11 @@ chmod +x niri_init.sh niri_append.sh
 >   **Fully automated one-click setup** — enter your sudo password and all steps run sequentially.
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
+> - **`universal.sh`**：**通用工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装等通用工具。
+>   **Universal tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation and other general-purpose tools.
 >
-> 先运行 `niri_init.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件。
-> Run `niri_init.sh` first for the core setup, then run `niri_append.sh` for optional extras as needed.
+> 先运行 `niri_init.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`universal.sh` 可随时运行。
+> Run `niri_init.sh` first for the core setup, then run `niri_append.sh` for optional extras. `universal.sh` can be run at any time.
 
 ---
 
@@ -185,6 +193,27 @@ chmod +x niri_init.sh niri_append.sh
 | 操作 / Action                              | 说明 / Description                                                                                                                                                         |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
+
+---
+
+### [`universal.sh`](universal.sh) — 通用工具步骤 / Universal Tool Steps
+
+#### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install
+
+> **手机用户注意**：
+> 1. 先在手机上安装 **UU 加速器主机版**
+> 2. 在 SteamDeck 上运行此脚本安装 UU 加速器
+> 3. 然后在手机 App 中按 **SteamDeck 安装方法** 指引完成后续配置
+>
+> **For phone users**:
+> 1. Install the **UU Accelerator console version** on your phone first.
+> 2. Run this script on SteamDeck to install the UU Accelerator client.
+> 3. Then follow the **SteamDeck installation guide** in the phone app to complete the setup.
+
+| 操作 / Action                          | 说明 / Description                                                                                          |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| 创建 /home/deck 目录 / Create directory | 创建 `/home/deck` 并设置当前用户为所有者 / Create `/home/deck` and set ownership to current user          |
+| 下载安装脚本 / Download install script | 从 `uudeck.com` 下载并执行 UU 加速器安装脚本 / Download and run the UU Accelerator install script from `uudeck.com` |
 
 ---
 

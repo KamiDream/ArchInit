@@ -1,9 +1,16 @@
 #!/bin/bash
 
-# Supplementary script for ArchInit — other optional environment setup
-# Run after niri_init.sh if you need additional components.
+# Universal toolbox for ArchInit — general-purpose utilities
+# Can be run independently or after niri_init.sh.
 # Interactive menu — use ↑/↓ to navigate, Enter to execute, q to quit.
-# Manual edits will pause the script until the editor is closed.
+#
+# Currently includes:
+#   - UU Accelerator install for SteamDeck
+#
+# For phone users:
+#   1. Install UU Accelerator console version on your phone first.
+#   2. Run this script to install the SteamDeck client.
+#   3. Then follow the "SteamDeck installation guide" in the phone app to complete the setup.
 
 set -uo pipefail
 # Note: we do NOT use 'set -e' so that step functions can return 1 gracefully
@@ -160,6 +167,7 @@ main_menu() {
         read -rsn1 key
         if [[ "$key" == $'\e' ]]; then
             # Escape sequence (arrow keys)
+            local seq=""
             read -rsn2 -t 0.1 seq 2>/dev/null || true
             case "$seq" in
                 '[A')  # Up
