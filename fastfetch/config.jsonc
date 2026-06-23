@@ -1,138 +1,91 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
-    // "type": "builtin",
-    // "source": "windows",
-    "height": 18,
+    "type": "small",
     "padding": {
-      "top": 1
+      "top": 2,
+      "left": 3
     }
   },
   "display": {
-    "separator": " : "
+    "separator": " "
   },
   "modules": [
     {
-      // https://www.nerdfonts.com/cheat-sheet
-      "type": "custom",
-      "format": "\u001b[36m    OS Info"
-    },
-    {
-      "type": "custom",
-      "format": "┌────────────────────────────────────────────────────────┐"
-    },
-    {
-      "type": "os",
-      "key": "   OS",
-      "keyColor": "red"
-    },
-    {
-      "type": "kernel",
-      "key": "  󰻹 Kernel",
-      "keyColor": "red"
-    },
-    {
-      "type": "host",
-      "key": "   Machine",
-      "format": "{name}{?vendor}",
-      "keyColor": "red"
-    },
-     {
-       "type": "display",
-       "key": "  󰹑 Display",
-       "format": "{1}x{2} @ {3} Hz",
-       "keyColor": "red"
-     },
-    {
-      "type": "uptime",
-      "key": "  󱫐 Uptime ",
-      "keyColor": "red"
-    },
-    {
-      "type": "shell",
-      "key": "   Shell",
-      "keyColor": "red"
-    },
-
-    {
-      "type": "custom",
-      "format": "└────────────────────────────────────────────────────────┘"
-    },
-    "break",
-    {
       "type": "title",
-      "key": "  "
+      "format": "  {1} {#34} {2}",
+      "outputColor": "cyan"
     },
     {
-      "type": "custom",
-      "format": "┌────────────────────────────────────────────────────────┐"
+      "key": "{#34}  • 󰖔 OS",
+      "type": "os",
+      "format": "{3}"
     },
-
     {
+      "key": "{#94}  •  kernel",
+      "type": "kernel",
+      "format": "{1} {2}"
+    },
+    {
+      "key": "{#36}  • 󰫣 shell",
+      "type": "shell",
+      "format": "{6}"
+    },
+    {
+      "type": "packages",
+      "key": "{#96}  •  pkgs"
+    },
+    {
+      "key": "{#39}  •  uptime",
+      "type": "uptime",
+      "format": "{2} Hrs {3} Mins"
+    },
+    {
+      "key": "{#39}  *",
+      "type": "custom"
+    },
+    {
+      "key": "{#32}  •  cpu",
       "type": "cpu",
-      "format": "{1}",
-      "key": "   CPU",
-      "keyColor": "blue"
+      "format": "{1}"
     },
     {
+      "key": "{#92}  •  gpu",
       "type": "gpu",
-      "key": "  󰋵 GPU",
-      "keyColor": "blue"
+      "format": "{1} {2}"
     },
-
     {
+      "key": "{#37}  • 󰫢 display",
+      "type": "display",
+      "format": "{1}x{2} {3} Hz"
+    },
+    {
+       "key": "{#39}  *",
+      "type": "custom"
+    },
+    {
+      "key": "{#35}  • 󱕣 disk",
       "type": "disk",
-      "key": "   Disk",
-      "keyColor": "green"
+      "format": "{1} ({3})"
     },
     {
+      "key": "{#95}  • 󱝁 memory",
       "type": "memory",
-      "key": "   Memory",
-      "keyColor": "green"
+      "format": "{1} ({3})"
     },
     {
-      "type": "swap",
-      "key": "  󰿣 Swap",
-      "keyColor": "green"
-    },
-    {
-      "type": "bluetooth",
-      "key": "   Bluetooth",
-      "keyColor": "magenta"
-    },
-    {
-      "type": "wifi",
-      "key": "   WiFi",
-      "keyColor": "magenta"
-    },
-    {
+      "key": "{#33}  • 󰸋 network",
       "type": "localip",
-      "showIpv6": false,
-      "showMac": false,
-      "showSpeed": false,
-      "showMtu": false,
-      "showLoop": false,
-      "showFlags": false,
-      "showAllIps": false,
-      "key": "  󱦂 LAN",
-      "keyColor": "magenta"
+      "format": "{1}"
     },
     {
-      "type": "publicip",
-      "timeout": 500,
-      "url": "http://4.ipw.cn",
-      "key": "  󰩟 WAN",
-      "keyColor": "magenta"
+       "key": "{#39}  *",
+      "type": "custom"
     },
     {
-      "type": "custom",
-      "format": "└────────────────────────────────────────────────────────┘"
-    },
-    {
+      "key": "{#39}  •  colors  󰮯 ",
       "type": "colors",
-      "paddingLeft": 2,
       "symbol": "circle"
-    },
-    "break"
+    }
   ]
 }
