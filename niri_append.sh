@@ -57,10 +57,11 @@ STEPS=(
     "Starship 提示符 / Starship Prompt"
     "fastfetch 配置 / fastfetch Configuration"
     "配置 fastfetch 启动 / Configure fastfetch on startup"
+    "Kitty 背景透明度 / Kitty Background Opacity"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -390,6 +391,76 @@ step_9_fastfetch_firstline() {
     return 0
 }
 
+step_10_kitty_opacity() {
+    step_header 10
+
+    local kitty_conf="$HOME/.config/kitty/kitty.conf"
+
+    if [[ ! -f "$kitty_conf" ]]; then
+        echo -e "${YELLOW}  ⚠️  Kitty 配置文件不存在 / Kitty config not found at ${kitty_conf}${RESET}"
+        echo "    请先执行 Step 5 (Kitty 终端配置) / Please run Step 5 first."
+        prompt_enter_or_quit "按 Enter 返回菜单 / Press Enter to return" || return 1
+        return 0
+    fi
+
+    # Get current opacity value
+    local current_opacity
+    current_opacity=$(grep -oP '^background_opacity\s+\K[\d.]+' "$kitty_conf" 2>/dev/null || echo "未设置 / not set")
+
+    echo ""
+    echo ">>> 当前 Kitty 背景透明度 / Current Kitty background opacity: ${current_opacity}"
+    echo "    (0.0 = 完全透明 / fully transparent, 1.0 = 完全不透明 / fully opaque)"
+    echo ""
+    echo ">>> 请选择新的透明度 / Select new opacity:"
+    echo "    1) 0.6"
+    echo "    2) 0.7"
+    echo "    3) 0.8  (默认 / default)"
+    echo "    4) 0.9"
+    echo "    5) 1.0  (不透明 / opaque)"
+    echo "    6) 自定义 / Custom value"
+    echo ""
+    read -rp "  输入选项 (1-6) / Enter option (1-6): " choice
+
+    local new_opacity
+    case "$choice" in
+        1) new_opacity="0.6" ;;
+        2) new_opacity="0.7" ;;
+        3) new_opacity="0.8" ;;
+        4) new_opacity="0.9" ;;
+        5) new_opacity="1.0" ;;
+        6)
+            read -rp "  输入透明度值 (0.0-1.0) / Enter opacity value (0.0-1.0): " new_opacity
+            # Validate: must be a number between 0 and 1
+            if ! [[ "$new_opacity" =~ ^[0-9]+(\.[0-9]+)?$ ]] || \
+               [[ "${new_opacity%.*}" -gt 1 ]] || \
+               { [[ "$new_opacity" == *.* ]] && [[ "${new_opacity#*.}" -gt 0 ]] && [[ "${new_opacity%.*}" -eq 1 ]]; }; then
+                echo -e "${YELLOW}    ⚠️  无效值，使用默认 0.8 / Invalid value, using default 0.8${RESET}"
+                new_opacity="0.8"
+            fi
+            ;;
+        *)
+            echo -e "${YELLOW}    ⚠️  无效选项，使用默认 0.8 / Invalid option, using default 0.8${RESET}"
+            new_opacity="0.8"
+            ;;
+    esac
+
+    echo ""
+    echo ">>> 设置背景透明度为 ${new_opacity} / Setting background opacity to ${new_opacity}..."
+
+    # Update kitty.conf — replace existing line or append if absent
+    if grep -q '^background_opacity' "$kitty_conf"; then
+        sed -i "s/^background_opacity\s\+.*/background_opacity ${new_opacity}/" "$kitty_conf"
+    else
+        echo "background_opacity ${new_opacity}" >> "$kitty_conf"
+    fi
+
+    echo -e "${GREEN}    ✅ 已更新 Kitty 背景透明度为 ${new_opacity}${RESET}"
+    echo "    💡 重启 Kitty 终端即可生效 / Restart Kitty terminal to apply"
+
+    echo "[Step 10 completed]"
+    return 0
+}
+
 # ─────────────────────────────────────────────
 # Menu rendering & navigation
 # ─────────────────────────────────────────────
@@ -490,6 +561,7 @@ execute_step() {
         7) step_7_starship ;;
         8) step_8_fastfetch ;;
         9) step_9_fastfetch_firstline ;;
+        10) step_10_kitty_opacity ;;
     esac
 
     local ret=$?
