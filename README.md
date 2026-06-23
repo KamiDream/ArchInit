@@ -34,6 +34,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **7** | 🚀 Starship 提示符 / Starship Prompt     | 安装 Starship 提示符 / Install Starship prompt                                                                                               |
 | **8** | 📁 fastfetch 配置 / fastfetch Config     | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                                 |
 | **9** | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
+| **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
 
 ### [`universal.sh`](universal.sh) — 通用工具 / Universal Tools
 
@@ -193,6 +194,12 @@ chmod +x niri_init.sh niri_append.sh universal.sh
 | 操作 / Action                              | 说明 / Description                                                                                                                                                         |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
+
+#### Step 10: Kitty 背景透明度 / Kitty Background Opacity
+
+| 操作 / Action                          | 说明 / Description                                                                                             |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| 调整背景透明度 / Adjust opacity        | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
 
 ---
 
