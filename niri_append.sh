@@ -58,10 +58,11 @@ STEPS=(
     "fastfetch 配置 / fastfetch Configuration"
     "配置 fastfetch 启动 / Configure fastfetch on startup"
     "Kitty 背景透明度 / Kitty Background Opacity"
+    "雾凇拼音 / Rime-ice Input Method"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -461,6 +462,35 @@ step_10_kitty_opacity() {
     return 0
 }
 
+step_11_rime_ice() {
+    step_header 11
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+    echo ">>> 安装雾凇拼音 / Installing Rime-ice input method..."
+    yay -S --noconfirm rime-ice-pinyin-git
+    echo "    rime-ice-pinyin-git 安装完成 / installed."
+
+    echo ""
+    echo ">>> 复制 Fcitx5 雾凇拼音配置 / Copying Fcitx5 Rime-ice config..."
+    mkdir -p ~/.local/share/fcitx5/rime
+    if [[ -f "$SCRIPT_DIR/fcitx5/default.custom.yaml" ]]; then
+        cp "$SCRIPT_DIR/fcitx5/default.custom.yaml" ~/.local/share/fcitx5/rime/default.custom.yaml
+        echo "    配置已复制到 ~/.local/share/fcitx5/rime/default.custom.yaml"
+        echo "    Config copied successfully."
+    else
+        echo "    Warning: fcitx5/default.custom.yaml not found, skipping."
+    fi
+
+    echo ""
+    echo "    💡 请重新登录或重启 Fcitx5 以加载雾凇拼音"
+    echo "    💡 如果词库未生效，可尝试在 Fcitx5 中重新部署（右键托盘图标 → 重新部署）"
+    echo "    💡 Log out and back in, or restart Fcitx5 to load Rime-ice."
+    echo "    💡 If the schema does not appear, try re-deploying from Fcitx5 tray."
+
+    echo "[Step 11 completed]"
+    return 0
+}
+
 # ─────────────────────────────────────────────
 # Menu rendering & navigation
 # ─────────────────────────────────────────────
@@ -562,6 +592,7 @@ execute_step() {
         8) step_8_fastfetch ;;
         9) step_9_fastfetch_firstline ;;
         10) step_10_kitty_opacity ;;
+        11) step_11_rime_ice ;;
     esac
 
     local ret=$?

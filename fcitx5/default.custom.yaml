@@ -1,0 +1,8 @@
+patch:
+  schema_list:
+    - schema: rime_ice              # 全拼
+    # - schema: luna_pinyin_simp    # 拼音
+    # 你還可以加入其他雙拼方案，例如：
+    # - schema: double_pinyin        # 自然碼雙拼
+    # - schema: double_pinyin_mspy   # 微軟雙拼
+    # - schema: double_pinyin_abc    # 智能ABC雙拼

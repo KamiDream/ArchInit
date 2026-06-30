@@ -35,6 +35,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **8** | 📁 fastfetch 配置 / fastfetch Config     | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                                 |
 | **9** | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
 | **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
+| **11** | 🀄 雾凇拼音 / Rime-ice Input Method      | 安装雾凇拼音输入法并复制 Fcitx5 配置 / Install Rime-ice input method and copy Fcitx5 config                                                  |
 
 ### [`universal.sh`](universal.sh) — 通用工具 / Universal Tools
 
@@ -200,6 +201,13 @@ chmod +x niri_init.sh niri_append.sh universal.sh
 | 操作 / Action                          | 说明 / Description                                                                                             |
 | -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | 调整背景透明度 / Adjust opacity        | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
+
+#### Step 11: 雾凇拼音 / Rime-ice Input Method
+
+| 操作 / Action                          | 说明 / Description                                                                                                                                                          |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 安装雾凇拼音 / Install Rime-ice        | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                        |
+| 复制 Fcitx5 配置 / Copy Fcitx5 config  | 将仓库中的 [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
 ---
 
