@@ -23,25 +23,25 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 ### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
 
-| Step        | Content                                  | Description                                                                                                                                  |
-| ----------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 🎨 Kitty 字体选择 / Font Selector        | 使用 Kitty 字体选择器交互式选择 JetBrains Mono Nerd 字体 / Interactively select JetBrains Mono Nerd Font via Kitty font selector             |
-| **2** | 💻 KVM 虚拟化 / KVM Virtualization       | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network                  |
-| **3** | 📦 AUR 助手 / AUR Helper                 | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                  |
-| **4** | 🎮 NVIDIA 驱动 / NVIDIA Driver           | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                                       |
-| **5** | 🎨 启用 Zsh 终端 / Enable Zsh Shell      | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                                      |
-| **6** | ⚡ Antidote 插件管理器 / Antidote Plugin | 安装 Antidote 插件管理器，加载自动建议、语法高亮等插件 / Install Antidote plugin manager, load autosuggestions & syntax highlighting plugins |
-| **7** | 🚀 Starship 提示符 / Starship Prompt     | 安装 Starship 提示符 / Install Starship prompt                                                                                               |
-| **8** | 📁 fastfetch 配置 / fastfetch Config     | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                                 |
-| **9** | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
+| Step         | Content                                  | Description                                                                                                                                  |
+| ------------ | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1**  | 🎨 Kitty 字体选择 / Font Selector        | 使用 Kitty 字体选择器交互式选择 JetBrains Mono Nerd 字体 / Interactively select JetBrains Mono Nerd Font via Kitty font selector             |
+| **2**  | 💻 KVM 虚拟化 / KVM Virtualization       | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network                  |
+| **3**  | 📦 AUR 助手 / AUR Helper                 | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                  |
+| **4**  | 🎮 NVIDIA 驱动 / NVIDIA Driver           | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                                       |
+| **5**  | 🎨 启用 Zsh 终端 / Enable Zsh Shell      | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                                      |
+| **6**  | ⚡ Antidote 插件管理器 / Antidote Plugin | 安装 Antidote 插件管理器，加载自动建议、语法高亮等插件 / Install Antidote plugin manager, load autosuggestions & syntax highlighting plugins |
+| **7**  | 🚀 Starship 提示符 / Starship Prompt     | 安装 Starship 提示符 / Install Starship prompt                                                                                               |
+| **8**  | 📁 fastfetch 配置 / fastfetch Config     | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                                 |
+| **9**  | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
 | **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
 | **11** | 🀄 雾凇拼音 / Rime-ice Input Method      | 安装雾凇拼音输入法并复制 Fcitx5 配置 / Install Rime-ice input method and copy Fcitx5 config                                                  |
 
 ### [`universal.sh`](universal.sh) — 通用工具 / Universal Tools
 
-| Step        | Content                                            | Description                                                                                                                                                                                                    |
-| ----------- | -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 🎮 UU 加速器安装（SteamDeck）/ UU Accelerator Install | 创建 /home/deck 目录并安装 UU 加速器 SteamDeck 版 / Create /home/deck directory and install UU Accelerator for SteamDeck                                                                                       |
+| Step        | Content                                               | Description                                                                                                              |
+| ----------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **1** | 🎮 UU 加速器安装（SteamDeck）/ UU Accelerator Install | 创建 /home/deck 目录并安装 UU 加速器 SteamDeck 版 / Create /home/deck directory and install UU Accelerator for SteamDeck |
 
 ---
 
@@ -98,8 +98,8 @@ chmod +x niri_init.sh niri_append.sh universal.sh
 
 #### Step 1: 核心桌面环境 / Core Desktop Environment (Niri)
 
-| 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter）、`power-profiles-daemon`（电源管理 / power management）、`kimageformats`（KDE 图像格式插件 / KDE image format plugins） |
 
 #### Step 2: 注册 DMS 服务 / Register DMS Service
@@ -110,11 +110,11 @@ chmod +x niri_init.sh niri_append.sh universal.sh
 
 #### Step 3: 基础初始化 / Basic Initialization
 
-| 操作 / Action                      | 说明 / Description                                                                                                                                                                         |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 安装基础包 / Install base packages | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`             |
-| 配置 locale / Configure locale     | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale |
-| 安装字体 / Install fonts           | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts |
+| 操作 / Action                      | 说明 / Description                                                                                                                                                                                                                         |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 安装基础包 / Install base packages | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                             |
+| 配置 locale / Configure locale     | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                 |
+| 安装字体 / Install fonts           | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji` |
 
 #### Step 4: 显示管理器 / Display Manager (LightDM)
 
@@ -176,10 +176,10 @@ chmod +x niri_init.sh niri_append.sh universal.sh
 
 #### Step 7: Starship 提示符 / Starship Prompt
 
-| 操作 / Action                              | 说明 / Description                                                                                        |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| 安装 Starship / Install Starship           | 通过 pacman 安装 Starship / Install Starship via pacman                                                   |
-| 复制配置 / Copy config                     | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config                     |
+| 操作 / Action                              | 说明 / Description                                                                                                                                                       |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 安装 Starship / Install Starship           | 通过 pacman 安装 Starship / Install Starship via pacman                                                                                                                  |
+| 复制配置 / Copy config                     | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config                                                                                    |
 | 配置 `~/.zshrc` / Configure `~/.zshrc` | 在 `.zshrc` 末尾追加 `eval "$(starship init zsh)"`（在 Antidote 配置块之后）/ Append `eval "$(starship init zsh)"` at end of `.zshrc` (after the Antidote block) |
 
 > 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main)，默认使用 **Macchiato** 配色。提示符：`󰄛 ❯`（成功绿色，错误红色），目录淡紫色，Git 分支紫色。
@@ -192,22 +192,22 @@ chmod +x niri_init.sh niri_append.sh universal.sh
 
 #### Step 9: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
 
-| 操作 / Action                              | 说明 / Description                                                                                                                                                         |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 操作 / Action                              | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                         |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
 
 #### Step 10: Kitty 背景透明度 / Kitty Background Opacity
 
-| 操作 / Action                          | 说明 / Description                                                                                             |
-| -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| 调整背景透明度 / Adjust opacity        | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
+| 操作 / Action                   | 说明 / Description                                                                                                                                                                                                                           |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 调整背景透明度 / Adjust opacity | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
 
 #### Step 11: 雾凇拼音 / Rime-ice Input Method
 
-| 操作 / Action                          | 说明 / Description                                                                                                                                                          |
-| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装雾凇拼音 / Install Rime-ice        | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                        |
-| 复制 Fcitx5 配置 / Copy Fcitx5 config  | 将仓库中的 [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
+| 操作 / Action                         | 说明 / Description                                                                                                                                                                                                                                                                                                                          |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 安装雾凇拼音 / Install Rime-ice       | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                                                                                                                                                                                    |
+| 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
 ---
 
@@ -216,19 +216,21 @@ chmod +x niri_init.sh niri_append.sh universal.sh
 #### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install
 
 > **手机用户注意**：
+>
 > 1. 先在手机上安装 **UU 加速器主机版**
 > 2. 在 SteamDeck 上运行此脚本安装 UU 加速器
 > 3. 然后在手机 App 中按 **SteamDeck 安装方法** 指引完成后续配置
 >
 > **For phone users**:
+>
 > 1. Install the **UU Accelerator console version** on your phone first.
 > 2. Run this script on SteamDeck to install the UU Accelerator client.
 > 3. Then follow the **SteamDeck installation guide** in the phone app to complete the setup.
 
-| 操作 / Action                          | 说明 / Description                                                                                          |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| 创建 /home/deck 目录 / Create directory | 创建 `/home/deck` 并设置当前用户为所有者 / Create `/home/deck` and set ownership to current user          |
-| 下载安装脚本 / Download install script | 从 `uudeck.com` 下载并执行 UU 加速器安装脚本 / Download and run the UU Accelerator install script from `uudeck.com` |
+| 操作 / Action                           | 说明 / Description                                                                                                      |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| 创建 /home/deck 目录 / Create directory | 创建 `/home/deck` 并设置当前用户为所有者 / Create `/home/deck` and set ownership to current user                    |
+| 下载安装脚本 / Download install script  | 从 `uudeck.com` 下载并执行 UU 加速器安装脚本 / Download and run the UU Accelerator install script from `uudeck.com` |
 
 ---
 
