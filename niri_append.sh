@@ -456,7 +456,7 @@ step_10_kitty_opacity() {
     fi
 
     echo -e "${GREEN}    ✅ 已更新 Kitty 背景透明度为 ${new_opacity}${RESET}"
-    echo "    💡 重启 Kitty 终端即可生效 / Restart Kitty terminal to apply"
+    echo "    重启 Kitty 终端即可生效 / Restart Kitty terminal to apply"
 
     echo "[Step 10 completed]"
     return 0
@@ -482,10 +482,10 @@ step_11_rime_ice() {
     fi
 
     echo ""
-    echo "    💡 请重新登录或重启 Fcitx5 以加载雾凇拼音"
-    echo "    💡 如果词库未生效，可尝试在 Fcitx5 中重新部署（右键托盘图标 → 重新部署）"
-    echo "    💡 Log out and back in, or restart Fcitx5 to load Rime-ice."
-    echo "    💡 If the schema does not appear, try re-deploying from Fcitx5 tray."
+    echo "    请重新登录或重启 Fcitx5 以加载雾凇拼音"
+    echo "    如果词库未生效，可尝试在 Fcitx5 中重新部署（右键托盘图标 → 重新部署）"
+    echo "    Log out and back in, or restart Fcitx5 to load Rime-ice."
+    echo "    If the schema does not appear, try re-deploying from Fcitx5 tray."
 
     echo "[Step 11 completed]"
     return 0
