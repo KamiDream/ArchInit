@@ -85,8 +85,11 @@ echo ""
 echo "========================================================================================================================="
 echo " Step 1: Core Desktop (Niri)"
 echo "========================================================================================================================="
+echo ">>> Running system update..."
+sudo pacman -Syu --noconfirm
+echo ""
 echo ">>> Installing Niri and related components..."
-sudo pacman -Syu --needed --noconfirm niri xwayland-satellite xdg-desktop-portal-gnome \
+sudo pacman -S --needed --noconfirm niri xwayland-satellite xdg-desktop-portal-gnome \
     xdg-desktop-portal-gtk kitty matugen cava \
     qt6-multimedia-ffmpeg power-profiles-daemon kimageformats greetd
 
