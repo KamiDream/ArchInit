@@ -12,7 +12,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 ## 📋 功能概览 / Feature Overview
 
-### [`niri_init.sh`](niri_init.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
+### [`niri_dms.sh`](niri_dms.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
 
 | Step        | Content                              | Description                                                                                                                                 |
 | ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -21,14 +21,13 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **3** | 🧰 基础初始化 / Basic Initialization | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts |
 | **4** | 🖥️ 显示管理器 / Display Manager    | 启用并启动 LightDM 显示管理器 / Enable and start LightDM display manager                                                                    |
 
-### [`niri_noctalia.sh`](niri_noctalia.sh) — 核心安装（Noctalia 版）/ Core Setup (Noctalia Edition)
+### [`niri_tty.sh`](niri_tty.sh) — 核心安装（TTY 版）/ Core Setup (TTY Edition)
 
-| Step        | Content                                       | Description                                                                                                                                                           |
-| ----------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 🖥️ 核心桌面 / Core Desktop                  | 安装 Niri 平铺窗口管理器、Kitty 等核心组件 / Install Niri tiling WM, Kitty and other core components                                                                |
-| **2** | 🧩 安装 AUR 助手与 Noctalia Shell / AUR & Noctalia | 配置 archlinuxcn 源，安装 yay/paru；通过 AUR 安装 Noctalia v5 桌面 Shell（noctalia-git）；自动配置 Niri 启动 Noctalia（窗口规则、快捷键）/ Configure archlinuxcn repo, install yay/paru; install Noctalia v5 desktop shell from AUR; auto-configure Niri to launch Noctalia (window rules, keybinds) |
-| **3** | 🧰 基础初始化 / Basic Initialization          | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts                         |
-| **4** | 🔐 显示管理器 / Display Manager (Noctalia Greeter) | 安装 Noctalia Greeter（基于 greetd 的登录管理器），配置 greetd，取代 LightDM / Install Noctalia Greeter (greetd-based login manager), configure greetd, replace LightDM |
+| Step        | Content                                       | Description                                                                                                                                                        |
+| ----------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **1** | 🧰 基础初始化 / Basic Initialization          | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts                      |
+| **2** | 📦 AUR 助手 / AUR Helper                     | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                                       |
+| **3** | 🔐 SSH 服务器 / SSH Server                   | 安装 OpenSSH 并启用 sshd 服务 / Install OpenSSH and enable sshd service                                                                                           |
 
 ### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
 
@@ -83,28 +82,28 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 ```bash
 git clone https://github.com/KamiDream/ArchInit.git
 cd ArchInit
-./niri_dms.sh 或者 ./niri_noctalia
+./niri_dms.sh    # 或 ./niri_tty.sh
 ```
 
 > ⚠️ **注意 / Note**：
 >
-> - **`niri_init.sh`** / **`niri_noctalia.sh`**：**全自动一键安装**。运行后只需输入 sudo 密码，即可依次完成所有步骤。无需任何手动操作。
+> - **`niri_dms.sh`** / **`niri_tty.sh`**：**全自动一键安装**。运行后只需输入 sudo 密码，即可依次完成所有步骤。
 >   **Fully automated one-click setup** — enter your sudo password and all steps run sequentially.
->   - `niri_init.sh`：使用 **DMS Shell + LightDM**
->   - `niri_noctalia.sh`：使用 **Noctalia Shell + Noctalia Greeter (greetd)**
+>   - `niri_dms.sh`：使用 **DMS Shell + LightDM**（完整桌面环境）
+>   - `niri_tty.sh`：**TTY 轻量版**，基础初始化 + AUR 助手 + SSH 服务器（适合无桌面/远程场景）
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
 > - **`universal.sh`**：**通用工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装等通用工具。
 >   **Universal tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation and other general-purpose tools.
 >
-> 先运行 `niri_init.sh` 或 `niri_noctalia.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`universal.sh` 可随时运行。
-> Run either `niri_init.sh` or `niri_noctalia.sh` first for the core setup, then run `niri_append.sh` for optional extras. `universal.sh` can be run at any time.
+> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`universal.sh` 可随时运行。
+> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `universal.sh` can be run at any time.
 
 ---
 
 ## 📦 各步骤详解 / Step Details
 
-### [`niri_init.sh`](niri_init.sh) — 核心步骤 / Core Steps
+### [`niri_dms.sh`](niri_dms.sh) — 核心步骤 / Core Steps
 
 #### Step 1: 核心桌面环境 / Core Desktop Environment (Niri)
 
@@ -133,25 +132,19 @@ cd ArchInit
 | 启用 LightDM / Enable LightDM | 设置 LightDM 开机自启 / Enable LightDM to start on boot                 |
 | 启动 LightDM / Start LightDM  | 立即启动 LightDM 显示管理器 / Start LightDM display manager immediately |
 
-### [`niri_noctalia.sh`](niri_noctalia.sh) — 核心步骤（Noctalia 版）/ Core Steps (Noctalia Edition)
 
-#### Step 1: 核心桌面环境 / Core Desktop Environment (Niri)
 
-| 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`greetd`（登录管理器守护进程 / login manager daemon）、`power-profiles-daemon`（电源管理 / power management）、`kimageformats`（KDE 图像格式插件 / KDE image format plugins）<br>**不再安装** DMS Shell、LightDM |
 
-#### Step 2: 安装 AUR 助手与 Noctalia Shell / Install AUR Helper & Noctalia Shell
 
-| 操作 / Action                                           | 说明 / Description                                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 配置 archlinuxcn 源 / Configure archlinuxcn repo        | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud)                                                                                                                            |
-| 安装 AUR 助手 / Install AUR helpers                     | 安装 `archlinuxcn-keyring`、`base-devel`、`yay`、`paru` / Install `archlinuxcn-keyring`, `base-devel`, `yay`, `paru`                                                                                                               |
-| 安装 Noctalia Shell / Install Noctalia Shell            | 通过 AUR 安装 `noctalia-git`（v5，纯 Wayland + OpenGL ES 构建）/ Install `noctalia-git` from AUR (v5, built directly on Wayland and OpenGL ES)                                                                                    |
-| 配置 Niri 自动启动 / Configure Niri autostart            | 创建 `~/.config/niri/config.kdl`，添加 `spawn-at-startup "noctalia"`、窗口规则（圆角、浮动设置窗口）、Noctalia 快捷键（`Mod+Space` 启动器、`Mod+S` 控制中心、`Mod+,` 设置、音量/亮度快捷键）/ Create Niri config with Noctalia autostart, window rules, and keybinds |
-| 创建 Noctalia 默认配置 / Create Noctalia default config | 创建 `~/.config/noctalia/config.toml`，包含 Shell、面板、动画、壁纸、主题等基本设置 / Create default Noctalia TOML config with shell, panel, animation, wallpaper, and theme settings                                             |
 
-#### Step 3: 基础初始化 / Basic Initialization
+
+
+
+
+
+### [`niri_tty.sh`](niri_tty.sh) — 核心步骤（TTY 版）/ Core Steps (TTY Edition)
+
+#### Step 1: 基础初始化 / Basic Initialization
 
 | 操作 / Action                      | 说明 / Description                                                                                                                                                                                                                         |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -159,13 +152,19 @@ cd ArchInit
 | 配置 locale / Configure locale     | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                 |
 | 安装字体 / Install fonts           | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji` |
 
-#### Step 4: 显示管理器 / Display Manager (Noctalia Greeter)
+#### Step 2: AUR 助手 / AUR Helper (yay / paru)
 
-| 操作 / Action                              | 说明 / Description                                                                                                                                                                                                    |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 Noctalia Greeter / Install Greeter    | 通过 AUR 安装 `noctalia-greeter`（基于 greetd 的迷你登录管理器）/ Install `noctalia-greeter` from AUR (minimal greetd-based login greeter)                                                                      |
-| 配置 greetd / Configure greetd             | 自动查找 `noctalia-greeter-session` 路径，写入 `/etc/greetd/config.toml`，默认会话设为 `niri` / Auto-detect `noctalia-greeter-session` path, write `/etc/greetd/config.toml` with default session set to `niri` |
-| 启用 greetd / Enable greetd                | 设置 greetd 开机自启并立即启动 / Enable and start greetd.service                                                                                                                                                      |
+| 操作 / Action                           | 说明 / Description                                                                                                                                                            |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
+| 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
+
+#### Step 3: SSH 服务器 / SSH Server
+
+| 操作 / Action                              | 说明 / Description                                                                                                               |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| 安装 OpenSSH / Install OpenSSH             | `openssh`                                                                                                                  |
+| 启用 SSH 服务 / Enable SSH service         | 启用并启动 `sshd.service`，配置防火墙放行 SSH（如 firewalld 已激活）/ Enable and start `sshd.service`, allow SSH in firewall if active |
 
 ---
 
@@ -280,9 +279,9 @@ cd ArchInit
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`niri_init.sh`](niri_init.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_init.sh`](niri_init.sh) runs fully automated; [`niri_append.sh`](niri_append.sh) provides an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
+- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh) 与 [`niri_tty.sh`](niri_tty.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh) and [`niri_tty.sh`](niri_tty.sh) run fully automated; [`niri_append.sh`](niri_append.sh) provides an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
-- **添加自己的包 / Add your own packages**：可直接修改 `niri_init.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
+- **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh`、`niri_tty.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
 ---
 
