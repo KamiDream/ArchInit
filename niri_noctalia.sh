@@ -182,18 +182,46 @@ binds {
 NIRIEOF
     echo "    ✅ Minimal Niri config created at ~/.config/niri/config.kdl"
 else
-    # Check if noctalia autostart is already configured
+    # Append spawn-at-startup if not already present
     if grep -q 'spawn-at-startup.*noctalia' "$NIRI_CONFIG" 2>/dev/null; then
         echo "    Noctalia autostart already present in Niri config, skipping."
     else
-        echo ""
-        echo "    ⚠️  Existing Niri config found at ~/.config/niri/config.kdl"
-        echo "    Please manually add the following line to autostart Noctalia:"
-        echo ""
-        echo '      spawn-at-startup "noctalia"'
-        echo ""
-        echo "    See https://docs.noctalia.dev/v5/compositor-settings/niri/ for"
-        echo "    recommended window rules and keybinds."
+        echo "    Existing Niri config found — appending Noctalia autostart..."
+        cat >> "$NIRI_CONFIG" << 'NIRIAPPEND'
+
+# ─── Noctalia desktop shell (appended by ArchInit) ───────────────────────
+spawn-at-startup "noctalia"
+
+# Window rules for Noctalia
+window-rule {
+    geometry-corner-radius 20
+    clip-to-geometry true
+}
+window-rule {
+    match app-id="dev.noctalia.Noctalia"
+    open-floating true
+    default-column-width { fixed 1080; }
+    default-window-height { fixed 920; }
+}
+
+debug {
+    honor-xdg-activation-with-invalid-serial
+}
+
+# Noctalia keybinds (binds blocks merge automatically in Niri)
+binds {
+    Mod+Space          { spawn-sh "noctalia msg panel-toggle launcher"; }
+    Mod+S              { spawn-sh "noctalia msg panel-toggle control-center"; }
+    Mod+Comma          { spawn-sh "noctalia msg settings-toggle"; }
+    XF86AudioRaiseVolume   { spawn-sh "noctalia msg volume-up"; }
+    XF86AudioLowerVolume   { spawn-sh "noctalia msg volume-down"; }
+    XF86AudioMute          { spawn-sh "noctalia msg volume-mute"; }
+    XF86MonBrightnessUp    { spawn-sh "noctalia msg brightness-up"; }
+    XF86MonBrightnessDown  { spawn-sh "noctalia msg brightness-down"; }
+}
+NIRIAPPEND
+        echo "    ✅ Noctalia autostart, window rules, and keybinds appended."
+        echo "    (Niri merges multiple binds blocks automatically.)"
     fi
 fi
 
