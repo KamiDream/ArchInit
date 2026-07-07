@@ -91,7 +91,8 @@ echo ""
 echo ">>> Installing Niri and related components..."
 sudo pacman -S --needed --noconfirm niri xwayland-satellite xdg-desktop-portal-gnome \
     xdg-desktop-portal-gtk kitty matugen cava \
-    qt6-multimedia-ffmpeg power-profiles-daemon kimageformats greetd
+    qt6-multimedia-ffmpeg power-profiles-daemon kimageformats greetd \
+    tomlplusplus
 
 echo "[Step 1 completed]"
 echo ""
@@ -168,14 +169,35 @@ debug {
     honor-xdg-activation-with-invalid-serial
 }
 
+// ─── Alt+Tab window switching ───────────────────────────────────────────
+recent-windows {
+    binds {
+        Alt+Tab         { next-window scope="output"; }
+        Alt+Shift+Tab   { previous-window scope="output"; }
+        Alt+grave       { next-window filter="app-id"; }
+        Alt+Shift+grave { previous-window filter="app-id"; }
+    }
+}
+
 // ─── Keybinds ───────────────────────────────────────────────────────────
 binds {
     // Terminal
-    Mod+Shift+T          { spawn "kitty"; }
+    Mod+T                { spawn "kitty"; }
 
     // Window management
-    Mod+Shift+Q          { close-window; }
-    Mod+Shift+E          { quit; }
+    Mod+Q                { close-window; }
+    Mod+C                { center-column; }
+    Mod+F                { fullscreen; }
+    Mod+R                { switch-preset-column-width; }
+    Mod+Shift+R          { switch-preset-window-height; }
+    Mod+Up               { focus-column-left; }
+    Mod+Down             { focus-column-right; }
+    Mod+Left             { focus-workspace-up; }
+    Mod+Right            { focus-workspace-down; }
+    Mod+Shift+Up         { move-column-left; }
+    Mod+Shift+Down       { move-column-right; }
+    Mod+Shift+Left       { move-workspace-up; }
+    Mod+Shift+Right      { move-workspace-down; }
 
     // Workspace switching
     Mod+1                { focus-workspace 1; }
@@ -240,14 +262,35 @@ debug {
     honor-xdg-activation-with-invalid-serial
 }
 
+// Alt+Tab window switching (matches DMS config behavior)
+recent-windows {
+    binds {
+        Alt+Tab         { next-window scope="output"; }
+        Alt+Shift+Tab   { previous-window scope="output"; }
+        Alt+grave       { next-window filter="app-id"; }
+        Alt+Shift+grave { previous-window filter="app-id"; }
+    }
+}
+
 // Noctalia keybinds (binds blocks merge automatically in Niri)
 binds {
     // Terminal
-    Mod+Shift+T          { spawn "kitty"; }
+    Mod+T                { spawn "kitty"; }
 
     // Window management
-    Mod+Shift+Q          { close-window; }
-    Mod+Shift+E          { quit; }
+    Mod+Q                { close-window; }
+    Mod+C                { center-column; }
+    Mod+F                { fullscreen; }
+    Mod+R                { switch-preset-column-width; }
+    Mod+Shift+R          { switch-preset-window-height; }
+    Mod+Up               { focus-column-left; }
+    Mod+Down             { focus-column-right; }
+    Mod+Left             { focus-workspace-up; }
+    Mod+Right            { focus-workspace-down; }
+    Mod+Shift+Up         { move-column-left; }
+    Mod+Shift+Down       { move-column-right; }
+    Mod+Shift+Left       { move-workspace-up; }
+    Mod+Shift+Right      { move-workspace-down; }
 
     // Workspace switching
     Mod+1                { focus-workspace 1; }
@@ -316,9 +359,10 @@ enabled = true
 speed   = 1.0
 
 [wallpaper]
-enabled   = true
-fill_mode = "crop"
-directory = "~/Pictures/Wallpapers"
+enabled     = true
+fill_mode   = "crop"
+fill_color  = "#1e1e2e"     # fallback background when no wallpaper found
+directory   = "~/Pictures/Wallpapers"
 
 [wallpaper.automation]
 enabled          = false
@@ -334,6 +378,14 @@ NOCTOML
 else
     echo "    Noctalia config already exists, skipping."
 fi
+
+# 2e. Create wallpaper directory and add a notice
+echo ""
+echo ">>> Setting up wallpaper directory..."
+mkdir -p "$HOME/Pictures/Wallpapers"
+echo "    ✅ Created ~/Pictures/Wallpapers/ (place your wallpaper images here)"
+echo "    ℹ️  Noctalia picks wallpapers from ~/Pictures/Wallpapers/ automatically."
+echo "       Until you add images there, a dark fallback color (#1e1e2e) will be used."
 
 echo "[Step 2 completed]"
 echo ""
