@@ -170,17 +170,46 @@ debug {
 
 # ─── Keybinds ────────────────────────────────────────────────────────────
 binds {
+    # Terminal
+    Mod+Shift+T          { spawn "kitty"; }
+
+    # Window management
+    Mod+Shift+Q          { close-window; }
+    Mod+Shift+E          { quit; }
+
+    # Workspace switching
+    Mod+1                { focus-workspace 1; }
+    Mod+2                { focus-workspace 2; }
+    Mod+3                { focus-workspace 3; }
+    Mod+4                { focus-workspace 4; }
+    Mod+5                { focus-workspace 5; }
+    Mod+6                { focus-workspace 6; }
+    Mod+7                { focus-workspace 7; }
+    Mod+8                { focus-workspace 8; }
+    Mod+9                { focus-workspace 9; }
+
+    # Move windows between workspaces
+    Mod+Shift+1          { move-window-to-workspace 1; }
+    Mod+Shift+2          { move-window-to-workspace 2; }
+    Mod+Shift+3          { move-window-to-workspace 3; }
+    Mod+Shift+4          { move-window-to-workspace 4; }
+    Mod+Shift+5          { move-window-to-workspace 5; }
+    Mod+Shift+6          { move-window-to-workspace 6; }
+    Mod+Shift+7          { move-window-to-workspace 7; }
+    Mod+Shift+8          { move-window-to-workspace 8; }
+    Mod+Shift+9          { move-window-to-workspace 9; }
+
     # Core Noctalia binds
-    Mod+Space          { spawn-sh "noctalia msg panel-toggle launcher"; }
-    Mod+S              { spawn-sh "noctalia msg panel-toggle control-center"; }
-    Mod+Comma          { spawn-sh "noctalia msg settings-toggle"; }
+    Mod+Space            { spawn-sh "noctalia msg panel-toggle launcher"; }
+    Mod+S                { spawn-sh "noctalia msg panel-toggle control-center"; }
+    Mod+Comma            { spawn-sh "noctalia msg settings-toggle"; }
 
     # Audio & Brightness
-    XF86AudioRaiseVolume   { spawn-sh "noctalia msg volume-up"; }
-    XF86AudioLowerVolume   { spawn-sh "noctalia msg volume-down"; }
-    XF86AudioMute          { spawn-sh "noctalia msg volume-mute"; }
-    XF86MonBrightnessUp    { spawn-sh "noctalia msg brightness-up"; }
-    XF86MonBrightnessDown  { spawn-sh "noctalia msg brightness-down"; }
+    XF86AudioRaiseVolume     { spawn-sh "noctalia msg volume-up"; }
+    XF86AudioLowerVolume     { spawn-sh "noctalia msg volume-down"; }
+    XF86AudioMute            { spawn-sh "noctalia msg volume-mute"; }
+    XF86MonBrightnessUp      { spawn-sh "noctalia msg brightness-up"; }
+    XF86MonBrightnessDown    { spawn-sh "noctalia msg brightness-down"; }
 }
 NIRIEOF
     echo "    ✅ Minimal Niri config created at ~/.config/niri/config.kdl"
@@ -213,14 +242,44 @@ debug {
 
 # Noctalia keybinds (binds blocks merge automatically in Niri)
 binds {
-    Mod+Space          { spawn-sh "noctalia msg panel-toggle launcher"; }
-    Mod+S              { spawn-sh "noctalia msg panel-toggle control-center"; }
-    Mod+Comma          { spawn-sh "noctalia msg settings-toggle"; }
-    XF86AudioRaiseVolume   { spawn-sh "noctalia msg volume-up"; }
-    XF86AudioLowerVolume   { spawn-sh "noctalia msg volume-down"; }
-    XF86AudioMute          { spawn-sh "noctalia msg volume-mute"; }
-    XF86MonBrightnessUp    { spawn-sh "noctalia msg brightness-up"; }
-    XF86MonBrightnessDown  { spawn-sh "noctalia msg brightness-down"; }
+    # Terminal
+    Mod+Shift+T          { spawn "kitty"; }
+
+    # Window management
+    Mod+Shift+Q          { close-window; }
+    Mod+Shift+E          { quit; }
+
+    # Workspace switching
+    Mod+1                { focus-workspace 1; }
+    Mod+2                { focus-workspace 2; }
+    Mod+3                { focus-workspace 3; }
+    Mod+4                { focus-workspace 4; }
+    Mod+5                { focus-workspace 5; }
+    Mod+6                { focus-workspace 6; }
+    Mod+7                { focus-workspace 7; }
+    Mod+8                { focus-workspace 8; }
+    Mod+9                { focus-workspace 9; }
+
+    # Move windows between workspaces
+    Mod+Shift+1          { move-window-to-workspace 1; }
+    Mod+Shift+2          { move-window-to-workspace 2; }
+    Mod+Shift+3          { move-window-to-workspace 3; }
+    Mod+Shift+4          { move-window-to-workspace 4; }
+    Mod+Shift+5          { move-window-to-workspace 5; }
+    Mod+Shift+6          { move-window-to-workspace 6; }
+    Mod+Shift+7          { move-window-to-workspace 7; }
+    Mod+Shift+8          { move-window-to-workspace 8; }
+    Mod+Shift+9          { move-window-to-workspace 9; }
+
+    # Core Noctalia binds
+    Mod+Space            { spawn-sh "noctalia msg panel-toggle launcher"; }
+    Mod+S                { spawn-sh "noctalia msg panel-toggle control-center"; }
+    Mod+Comma            { spawn-sh "noctalia msg settings-toggle"; }
+    XF86AudioRaiseVolume     { spawn-sh "noctalia msg volume-up"; }
+    XF86AudioLowerVolume     { spawn-sh "noctalia msg volume-down"; }
+    XF86AudioMute            { spawn-sh "noctalia msg volume-mute"; }
+    XF86MonBrightnessUp      { spawn-sh "noctalia msg brightness-up"; }
+    XF86MonBrightnessDown    { spawn-sh "noctalia msg brightness-down"; }
 }
 NIRIAPPEND
         echo "    ✅ Noctalia autostart, window rules, and keybinds appended."
