@@ -186,8 +186,7 @@ binds {
 
     // Window management
     Mod+Q                { close-window; }
-    Mod+C                { center-column; }
-    Mod+F                { fullscreen; }
+    Mod+F                { maximize-column; }
     Mod+R                { switch-preset-column-width; }
     Mod+Shift+R          { switch-preset-window-height; }
     Mod+Up               { focus-column-left; }
@@ -279,8 +278,7 @@ binds {
 
     // Window management
     Mod+Q                { close-window; }
-    Mod+C                { center-column; }
-    Mod+F                { fullscreen; }
+    Mod+F                { maximize-column; }
     Mod+R                { switch-preset-column-width; }
     Mod+Shift+R          { switch-preset-window-height; }
     Mod+Up               { focus-column-left; }
