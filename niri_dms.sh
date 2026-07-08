@@ -79,7 +79,7 @@ echo "==========================================================================
 echo ">>> Installing Niri and related components..."
 sudo pacman -Syu --needed --noconfirm niri xwayland-satellite xdg-desktop-portal-gnome \
     xdg-desktop-portal-gtk kitty dms-shell-niri matugen cava \
-    qt6-multimedia-ffmpeg lightdm lightdm-gtk-greeter power-profiles-daemon kimageformats
+    qt6-multimedia-ffmpeg lightdm lightdm-gtk-greeter kimageformats power-profiles-daemon cups-pk-helper
 
 echo "[Step 1 completed]"
 echo ""
