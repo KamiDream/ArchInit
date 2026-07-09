@@ -119,7 +119,8 @@ sudo localectl set-locale LANG=zh_CN.UTF-8
 
 echo ">>> Installing Chinese fonts & Nerd fonts..."
 sudo pacman -S --needed --noconfirm wqy-microhei wqy-microhei-lite wqy-bitmapfont wqy-zenhei \
-    ttf-arphic-ukai ttf-arphic-uming noto-fonts-cjk ttf-jetbrains-mono-nerd noto-fonts-emoji
+    ttf-arphic-ukai ttf-arphic-uming noto-fonts-cjk ttf-jetbrains-mono-nerd noto-fonts-emoji \
+    ttf-fira-code inter-font
 
 echo "[Step 3 completed]"
 echo ""
