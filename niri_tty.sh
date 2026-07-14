@@ -100,9 +100,26 @@ echo ""
 echo ">>> Configuring XDG user directories with English names..."
 # Install xdg-user-dirs if not already present
 sudo pacman -S --needed --noconfirm xdg-user-dirs
-# Run with English locale so directory names are English (Desktop, Downloads, etc.)
-# even though system locale remains zh_CN.UTF-8
-LANG=en_US.UTF-8 xdg-user-dirs-update
+# Directly write config with English paths — more reliable than LANG override
+mkdir -p ~/.config
+cat > ~/.config/user-dirs.dirs << 'EOF'
+# This file is written by ArchInit (niri_tty.sh)
+# XDG user directories with English names
+# System locale remains Chinese (zh_CN.UTF-8)
+#
+XDG_DESKTOP_DIR="$HOME/Desktop"
+XDG_DOWNLOAD_DIR="$HOME/Downloads"
+XDG_TEMPLATES_DIR="$HOME/Templates"
+XDG_PUBLICSHARE_DIR="$HOME/Public"
+XDG_DOCUMENTS_DIR="$HOME/Documents"
+XDG_MUSIC_DIR="$HOME/Music"
+XDG_PICTURES_DIR="$HOME/Pictures"
+XDG_VIDEOS_DIR="$HOME/Videos"
+EOF
+# Create the English directories if they don't exist
+mkdir -p ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
+# Sync with xdg-user-dirs-update (respects existing config)
+xdg-user-dirs-update 2>/dev/null || true
 echo "    XDG user directories configured with English names."
 echo "    (Desktop, Downloads, Documents, Pictures, Music, Videos, Public, Templates)"
 
