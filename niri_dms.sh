@@ -122,6 +122,16 @@ sudo pacman -S --needed --noconfirm wqy-microhei wqy-microhei-lite wqy-bitmapfon
     ttf-arphic-ukai ttf-arphic-uming noto-fonts-cjk ttf-jetbrains-mono-nerd noto-fonts-emoji \
     ttf-fira-code inter-font
 
+echo ""
+echo ">>> Configuring XDG user directories with English names..."
+# Install xdg-user-dirs if not already present
+sudo pacman -S --needed --noconfirm xdg-user-dirs
+# Run with English locale so directory names are English (Desktop, Downloads, etc.)
+# even though system locale remains zh_CN.UTF-8
+LANG=en_US.UTF-8 xdg-user-dirs-update
+echo "    XDG user directories configured with English names."
+echo "    (Desktop, Downloads, Documents, Pictures, Music, Videos, Public, Templates)"
+
 echo "[Step 3 completed]"
 echo ""
 

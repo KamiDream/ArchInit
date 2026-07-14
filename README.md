@@ -18,25 +18,25 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | **1** | 🖥️ 核心桌面 / Core Desktop         | 安装 Niri 平铺窗口管理器、Kitty、DMS Shell 等核心组件 / Install Niri tiling WM, Kitty, DMS Shell and other core components                  |
 | **2** | 🔗 注册 DMS 服务 / Register DMS      | 将 DMS 注册为 Niri 的 user service 依赖 / Register DMS as a user service dependency of Niri                                                 |
-| **3** | 🧰 基础初始化 / Basic Initialization | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts |
+| **3** | 🧰 基础初始化 / Basic Initialization | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体，配置 XDG 用户目录为英文名（locale 保持中文）/ Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts, set XDG user dirs to English names (locale stays Chinese) |
 | **4** | 🖥️ 显示管理器 / Display Manager    | 启用并启动 LightDM 显示管理器 / Enable and start LightDM display manager                                                                    |
 
 ### [`niri_tty.sh`](niri_tty.sh) — 核心安装（TTY 版）/ Core Setup (TTY Edition)
 
-| Step        | Content                                       | Description                                                                                                                                                        |
-| ----------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **1** | 🧰 基础初始化 / Basic Initialization          | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体 / Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts                      |
+| Step        | Content                                       | Description                                                                                                                                                                                                           |
+| ----------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1** | 🧰 基础初始化 / Basic Initialization          | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体，配置 XDG 用户目录为英文名（locale 保持中文）/ Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts, set XDG user dirs to English names (locale stays Chinese) |
 | **2** | 📦 AUR 助手 / AUR Helper                     | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                                       |
 | **3** | 🔐 SSH 服务器 / SSH Server                   | 安装 OpenSSH 并启用 sshd 服务 / Install OpenSSH and enable sshd service                                                                                           |
 
 ### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
 
-| Step         | Content                                  | Description                                                                                                                                  |
-| ------------ | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1**  | 🎨 Kitty 字体选择 / Font Selector        | 使用 Kitty 字体选择器交互式选择 JetBrains Mono Nerd 字体 / Interactively select JetBrains Mono Nerd Font via Kitty font selector             |
-| **2**  | 💻 KVM 虚拟化 / KVM Virtualization       | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network                  |
-| **3**  | 📦 AUR 助手 / AUR Helper                 | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                  |
-| **4**  | 🎮 NVIDIA 驱动 / NVIDIA Driver           | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                                       |
+| Step          | Content                                        | Description                                                                                                                                  |
+| ------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1**   | 🎨 Kitty 字体选择 / Font Selector              | 使用 Kitty 字体选择器交互式选择 JetBrains Mono Nerd 字体 / Interactively select JetBrains Mono Nerd Font via Kitty font selector             |
+| **2**   | 💻 KVM 虚拟化 / KVM Virtualization             | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network                  |
+| **3**   | 📦 AUR 助手 / AUR Helper                       | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                  |
+| **4**   | 🎮 NVIDIA 驱动 / NVIDIA Driver                 | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                                       |
 | **5**  | 🎨 启用 Zsh 终端 / Enable Zsh Shell      | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                                      |
 | **6**  | ⚡ Antidote 插件管理器 / Antidote Plugin | 安装 Antidote 插件管理器，加载自动建议、语法高亮等插件 / Install Antidote plugin manager, load autosuggestions & syntax highlighting plugins |
 | **7**  | 🚀 Starship 提示符 / Starship Prompt     | 安装 Starship 提示符 / Install Starship prompt                                                                                               |
@@ -44,6 +44,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **9**  | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
 | **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
 | **11** | 🀄 雾凇拼音 / Rime-ice Input Method      | 安装雾凇拼音输入法并复制 Fcitx5 配置 / Install Rime-ice input method and copy Fcitx5 config                                                  |
+| **12** | 📁 XDG 用户目录转英文 / Migrate XDG Dirs | 将已有的中文 XDG 用户目录（桌面、下载等）迁移为英文名（Desktop、Downloads 等），并转移内容 / Migrate existing Chinese XDG user dirs to English names and move their contents |
 
 ### [`universal.sh`](universal.sh) — 通用工具 / Universal Tools
 
@@ -119,11 +120,12 @@ cd ArchInit
 
 #### Step 3: 基础初始化 / Basic Initialization
 
-| 操作 / Action                      | 说明 / Description                                                                                                                                                                                                                         |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 安装基础包 / Install base packages | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                             |
-| 配置 locale / Configure locale     | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                 |
-| 安装字体 / Install fonts           | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji` |
+| 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                                                             |
+| 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
+| 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
+| 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
 
 #### Step 4: 显示管理器 / Display Manager (LightDM)
 
@@ -146,11 +148,12 @@ cd ArchInit
 
 #### Step 1: 基础初始化 / Basic Initialization
 
-| 操作 / Action                      | 说明 / Description                                                                                                                                                                                                                         |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 安装基础包 / Install base packages | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                             |
-| 配置 locale / Configure locale     | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                 |
-| 安装字体 / Install fonts           | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji` |
+| 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                                                             |
+| 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
+| 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
+| 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
 
 #### Step 2: AUR 助手 / AUR Helper (yay / paru)
 
@@ -252,8 +255,17 @@ cd ArchInit
 | 安装雾凇拼音 / Install Rime-ice       | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                                                                                                                                                                                    |
 | 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
----
+#### Step 12: XDG 用户目录转英文 / Migrate XDG Dirs to English
 
+| 操作 / Action                                         | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 安装 xdg-user-dirs / Install xdg-user-dirs            | 确保 `xdg-user-dirs` 已安装 / Ensure `xdg-user-dirs` is installed                                                                                                                                                                                                                                                                                                                                                                                              |
+| 备份原配置 / Backup old config                        | 将当前 `~/.config/user-dirs.dirs` 备份为 `user-dirs.dirs.bak.<timestamp>` / Backup current `~/.config/user-dirs.dirs` to `user-dirs.dirs.bak.<timestamp>`                                                                                                                                                                                                                                                                                                                 |
+| 生成英文配置 / Generate English config                | 以 `LANG=en_US.UTF-8` 运行 `xdg-user-dirs-update`，生成英文路径的配置文件 / Run `xdg-user-dirs-update` with `LANG=en_US.UTF-8` to generate English-path config                                                                                                                                                                                                                                                                                                       |
+| 迁移目录内容 / Migrate directory contents             | 对比新旧配置，对每个路径变化的目录：创建英文目录 → 移动所有内容（含隐藏文件）→ 删除旧的中文目录 / Compare old vs new config; for each changed directory: create English dir → move all contents (including hidden files) → remove old Chinese dir                                                                                                                                                                                                       |
+| 完成提示 / Completion notice                          | 显示迁移统计，告知备份文件位置，提示重新登录生效 / Show migration stats, backup location, re-login hint                                                                                                                                                                                                                                                                                                                                                             |
+
+---
 ### [`universal.sh`](universal.sh) — 通用工具步骤 / Universal Tool Steps
 
 #### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install

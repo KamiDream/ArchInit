@@ -59,10 +59,11 @@ STEPS=(
     "配置 fastfetch 启动 / Configure fastfetch on startup"
     "Kitty 背景透明度 / Kitty Background Opacity"
     "雾凇拼音 / Rime-ice Input Method"
+    "XDG 用户目录转英文 / Migrate XDG Dirs to English"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -556,6 +557,140 @@ EOF
             echo "    Log out and back in, or restart Fcitx5 to load Rime-ice."
             echo "    If the schema does not appear, try re-deploying from Fcitx5 tray."
             echo "[Step 11 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        12) # XDG 用户目录转英文 / Migrate XDG Dirs to English
+        # ─────────────────────────────────────
+            step_header 12
+            echo ">>> 安装 xdg-user-dirs（如未安装）/ Installing xdg-user-dirs (if not present)..."
+            sudo pacman -S --needed --noconfirm xdg-user-dirs
+
+            # Backup old config
+            local old_dirs="$HOME/.config/user-dirs.dirs"
+            local old_dirs_bak="$HOME/.config/user-dirs.dirs.bak.$(date +%s)"
+            if [[ -f "$old_dirs" ]]; then
+                cp "$old_dirs" "$old_dirs_bak"
+                echo "    原配置已备份到 / Old config backed up to: ${old_dirs_bak}"
+            fi
+
+            echo ""
+            echo ">>> 以英文 locale 重新生成 XDG 用户目录配置..."
+            echo "    Regenerating XDG user dirs config with English locale..."
+            LANG=en_US.UTF-8 xdg-user-dirs-update
+
+            # Source both old (backup) and new configs to compare paths
+            if [[ -f "$old_dirs_bak" ]]; then
+                echo ""
+                echo ">>> 检测中文目录并迁移内容..."
+                echo "    Detecting Chinese-named directories and migrating contents..."
+
+                # Define Chinese→English name mapping for display/fallback
+                # Read old and new configs into temporary variables
+                local old_xdg_desktop new_xdg_desktop
+                local old_xdg_download new_xdg_download
+                local old_xdg_templates new_xdg_templates
+                local old_xdg_publicshare new_xdg_publicshare
+                local old_xdg_documents new_xdg_documents
+                local old_xdg_music new_xdg_music
+                local old_xdg_pictures new_xdg_pictures
+                local old_xdg_videos new_xdg_videos
+
+                # Source old config (backup)
+                source "$old_dirs_bak"
+                old_xdg_desktop="$XDG_DESKTOP_DIR"
+                old_xdg_download="$XDG_DOWNLOAD_DIR"
+                old_xdg_templates="$XDG_TEMPLATES_DIR"
+                old_xdg_publicshare="$XDG_PUBLICSHARE_DIR"
+                old_xdg_documents="$XDG_DOCUMENTS_DIR"
+                old_xdg_music="$XDG_MUSIC_DIR"
+                old_xdg_videos="$XDG_VIDEOS_DIR"
+                old_xdg_pictures="$XDG_PICTURES_DIR"
+
+                # Source new config
+                source "$old_dirs"
+                new_xdg_desktop="$XDG_DESKTOP_DIR"
+                new_xdg_download="$XDG_DOWNLOAD_DIR"
+                new_xdg_templates="$XDG_TEMPLATES_DIR"
+                new_xdg_publicshare="$XDG_PUBLICSHARE_DIR"
+                new_xdg_documents="$XDG_DOCUMENTS_DIR"
+                new_xdg_music="$XDG_MUSIC_DIR"
+                new_xdg_videos="$XDG_VIDEOS_DIR"
+                new_xdg_pictures="$XDG_PICTURES_DIR"
+
+                # Migrate function: move contents from old dir to new dir
+                local migrated_count=0
+                local pair
+
+                for pair in \
+                    "old_xdg_desktop:new_xdg_desktop" \
+                    "old_xdg_download:new_xdg_download" \
+                    "old_xdg_templates:new_xdg_templates" \
+                    "old_xdg_publicshare:new_xdg_publicshare" \
+                    "old_xdg_documents:new_xdg_documents" \
+                    "old_xdg_music:new_xdg_music" \
+                    "old_xdg_pictures:new_xdg_pictures" \
+                    "old_xdg_videos:new_xdg_videos"; do
+
+                    local old_var="${pair%%:*}"
+                    local new_var="${pair##*:}"
+                    local old_path="${!old_var}"
+                    local new_path="${!new_var}"
+
+                    # Skip if paths are the same, or old path doesn't exist
+                    if [[ "$old_path" == "$new_path" ]]; then
+                        continue
+                    fi
+                    if [[ ! -d "$old_path" ]]; then
+                        continue
+                    fi
+
+                    echo ""
+                    echo "  发现中文目录 / Found Chinese dir: ${old_path}"
+                    echo "  目标英文目录 / Target English dir: ${new_path}"
+
+                    # Create new directory
+                    mkdir -p "$new_path"
+
+                    # Move contents (hidden files too)
+                    if ls -A "$old_path" &>/dev/null; then
+                        echo "    迁移内容中 / Migrating contents..."
+                        shopt -s dotglob
+                        mv "$old_path"/* "$new_path"/ 2>/dev/null || true
+                        shopt -u dotglob
+                        echo "    ✅ 内容已迁移 / Contents migrated."
+                    else
+                        echo "    目录为空，无需迁移 / Directory empty, no migration needed."
+                    fi
+
+                    # Remove old directory
+                    rmdir "$old_path" 2>/dev/null && \
+                        echo "    ✅ 旧目录已删除 / Old directory removed: ${old_path}" || \
+                        echo "    ⚠️  旧目录未能删除（可能仍有内容）/ Old dir not removed (may still have content): ${old_path}"
+
+                    ((migrated_count++))
+                done
+
+                if [[ $migrated_count -eq 0 ]]; then
+                    echo "    无需迁移，目录名未改变 / No migration needed — directory names unchanged."
+                else
+                    echo ""
+                    echo "    ✅ 共迁移 ${migrated_count} 个目录 / Total ${migrated_count} directories migrated."
+                fi
+            else
+                echo ""
+                echo "    未发现旧的 user-dirs.dirs 配置，仅生成了英文配置。"
+                echo "    No previous user-dirs.dirs config found; English config generated."
+            fi
+
+            echo ""
+            echo "    系统 locale 仍为中文（zh_CN.UTF-8），仅用户目录为英文名。"
+            echo "    System locale remains Chinese (zh_CN.UTF-8); only user directories are English."
+            echo ""
+            echo "    如未生效，请重新登录后检查。备份文件可手动删除："
+            echo "    If not effective, re-login and check. Backup files can be removed manually:"
+            echo "      rm \"${old_dirs_bak}\""
+            echo "[Step 12 completed]"
             ;;
     esac
 
