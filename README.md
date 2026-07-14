@@ -45,6 +45,15 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
 | **11** | 🀄 雾凇拼音 / Rime-ice Input Method            | 安装雾凇拼音输入法并复制 Fcitx5 配置 / Install Rime-ice input method and copy Fcitx5 config                                                  |
 
+### [`niri_awww.sh`](niri_awww.sh) — awww 壁纸守护程序 / awww Wallpaper Daemon
+
+| Step   | Content                                                     | Description                                                                                                    |
+| ------ | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| **1** | 🖼️ 安装 awww + 设置自启 / Install awww + Enable autostart | 安装 awww 壁纸守护程序，创建 Systemd 服务文件并启用自启 / Install awww wallpaper daemon, create service & enable |
+| **2** | 🛑 取消自启（保留服务文件） / Disable autostart (keep service) | 停止并禁用服务，保留服务文件供后续启用 / Stop and disable service, keep service file for later reuse         |
+| **3** | ▶️ 启用自启 / Enable autostart                              | 重新启用并启动 awww-daemon 服务 / Re-enable and start awww-daemon service                                      |
+| **4** | 🗑️ 彻底删除 awww / Completely remove awww                   | 停止/禁用服务 → 删除服务文件 → daemon-reload → 卸载软件包 / Stop/disable → remove service file → remove package |
+
 ### [`patch.sh`](patch.sh) — 修补工具 / Patch Tools
 
 | Step        | Content                                               | Description                                                                                                              |
@@ -94,11 +103,13 @@ cd ArchInit
 >   - `niri_tty.sh`：**TTY 轻量版**，基础初始化 + AUR 助手 + SSH 服务器（适合无桌面/远程场景）
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
+> - **`niri_awww.sh`**：**awww 壁纸守护程序管理器**，同样提供交互式菜单。支持安装、开关自启、彻底删除 awww 壁纸守护程序。
+>   **awww wallpaper daemon manager**, also with an interactive menu. Supports install, toggle autostart, and completely remove awww.
 > - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文等修补工具。
 >   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, and other patching tools.
 >
-> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`patch.sh` 可随时运行修补。
-> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `patch.sh` can be run at any time for fixes.
+> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`niri_awww.sh` 可随时管理壁纸守护程序，`patch.sh` 可随时运行修补。
+> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `niri_awww.sh` manages the wallpaper daemon. `patch.sh` can be run at any time for fixes.
 
 ---
 
@@ -256,6 +267,43 @@ cd ArchInit
 | 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
 ---
+### [`niri_awww.sh`](niri_awww.sh) — awww 壁纸守护程序步骤 / awww Wallpaper Daemon Steps
+
+#### Step 1: 安装 awww + 设置自启 / Install awww + Enable Autostart
+
+| 操作 / Action                                    | 说明 / Description                                                                                                                                            |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 安装 awww / Install awww                         | `sudo pacman -Syu awww` — 安装 awww 壁纸守护程序 / Install awww wallpaper daemon                                                                             |
+| 创建 Systemd 服务文件 / Create systemd service   | 写入 `~/.config/systemd/user/awww-daemon.service`，Type=simple，Restart=on-failure / Write awww-daemon.service with Type=simple, Restart=on-failure          |
+| 重新加载用户配置 / Reload user config            | `systemctl --user daemon-reload` — 使 Systemd 识别新服务 / Reload Systemd user configuration to recognize new service                                          |
+| 启用并启动服务 / Enable & start service          | `systemctl --user enable --now awww-daemon.service` — 设置开机自启并立即启动 / Enable and start the service immediately                                        |
+
+#### Step 2: 取消自启（保留服务文件） / Disable Autostart (Keep Service File)
+
+| 操作 / Action                        | 说明 / Description                                                                |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| 停止服务 / Stop service              | `systemctl --user stop awww-daemon.service` — 立即停止守护进程 / Stop the daemon immediately |
+| 禁用服务 / Disable service           | `systemctl --user disable awww-daemon.service` — 取消开机自启 / Disable auto-start on boot |
+| 保留服务文件 / Keep service file     | 服务文件 `awww-daemon.service` **保留不动**，方便后续重新启用 / Service file is kept for later reuse |
+
+#### Step 3: 启用自启 / Enable Autostart
+
+| 操作 / Action                        | 说明 / Description                                                                |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| 启用服务 / Enable service            | `systemctl --user enable awww-daemon.service` — 设置开机自启 / Enable auto-start on boot |
+| 启动服务 / Start service             | `systemctl --user start awww-daemon.service` — 立即启动守护进程 / Start the daemon immediately |
+| 服务文件检查 / Service file check    | 自动检测 `awww-daemon.service` 是否存在，若缺失则提示先执行 Step 1 / Auto-check if service file exists; prompt to run Step 1 if missing |
+
+#### Step 4: 彻底删除 awww / Completely Remove awww
+
+| 操作 / Action                              | 说明 / Description                                                                                                                          |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 停止并禁用服务 / Stop & disable service    | `systemctl --user stop` + `disable` — 先停止运行并取消自启 / Stop the running service and disable auto-start                               |
+| 删除服务文件 / Remove service file         | `rm ~/.config/systemd/user/awww-daemon.service` — 清理 Systemd 服务文件 / Remove the systemd service file                                   |
+| 重新加载 Systemd 配置 / Reload Systemd     | `systemctl --user daemon-reload` — 使 Systemd 清理已删除服务的状态 / Reload Systemd to clean up the removed service's state               |
+| 卸载 awww 软件包 / Remove awww package     | `sudo pacman -Rns awww` — 彻底卸载 awww 及其依赖和配置文件 / Completely remove awww package, its dependencies, and config files              |
+
+---
 ### [`patch.sh`](patch.sh) — 修补工具步骤 / Patch Tool Steps
 
 #### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install
@@ -291,9 +339,9 @@ cd ArchInit
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh) 与 [`niri_tty.sh`](niri_tty.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh) and [`niri_tty.sh`](niri_tty.sh) run fully automated; [`niri_append.sh`](niri_append.sh) provides an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
+- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh) 与 [`niri_tty.sh`](niri_tty.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 与 [`niri_awww.sh`](niri_awww.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh) and [`niri_tty.sh`](niri_tty.sh) run fully automated; [`niri_append.sh`](niri_append.sh) and [`niri_awww.sh`](niri_awww.sh) provide interactive menus — use ↑/↓ arrows to select, Enter to execute, q to quit.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
-- **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh`、`niri_tty.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
+- **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh`、`niri_tty.sh`、`niri_append.sh` 或 `niri_awww.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
 ---
 
