@@ -8,63 +8,6 @@
 适用于新装 Arch Linux 后，快速搭建包含中文输入、虚拟化、NVIDIA 驱动、终端美化等完整开发工作环境。
 Designed for a fresh Arch Linux installation to quickly set up a complete development environment.
 
----
-
-## 📋 功能概览 / Feature Overview
-
-### [`niri_dms.sh`](niri_dms.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
-
-| Step        | Content                              | Description                                                                                                                                 |
-| ----------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 🖥️ 核心桌面 / Core Desktop         | 安装 Niri 平铺窗口管理器、Kitty、DMS Shell 等核心组件 / Install Niri tiling WM, Kitty, DMS Shell and other core components                  |
-| **2** | 🔗 注册 DMS 服务 / Register DMS      | 将 DMS 注册为 Niri 的 user service 依赖 / Register DMS as a user service dependency of Niri                                                 |
-| **3** | 🧰 基础初始化 / Basic Initialization | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体，配置 XDG 用户目录为英文名（locale 保持中文）/ Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts, set XDG user dirs to English names (locale stays Chinese) |
-| **4** | 🖥️ 显示管理器 / Display Manager    | 启用并启动 LightDM 显示管理器 / Enable and start LightDM display manager                                                                    |
-
-### [`niri_tty.sh`](niri_tty.sh) — 核心安装（TTY 版）/ Core Setup (TTY Edition)
-
-| Step        | Content                                       | Description                                                                                                                                                                                                           |
-| ----------- | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1** | 🧰 基础初始化 / Basic Initialization          | 安装常用软件、配置中文 locale、安装中英文与 Nerd 字体，配置 XDG 用户目录为英文名（locale 保持中文）/ Install common packages, configure zh_CN.UTF-8 locale, install Chinese & Nerd fonts, set XDG user dirs to English names (locale stays Chinese) |
-| **2** | 📦 AUR 助手 / AUR Helper                     | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                                       |
-| **3** | 🔐 SSH 服务器 / SSH Server                   | 安装 OpenSSH 并启用 sshd 服务 / Install OpenSSH and enable sshd service                                                                                           |
-
-### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
-
-| Step          | Content                                        | Description                                                                                                                                  |
-| ------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1**   | 🎨 Kitty 字体选择 / Font Selector              | 使用 Kitty 字体选择器交互式选择 JetBrains Mono Nerd 字体 / Interactively select JetBrains Mono Nerd Font via Kitty font selector             |
-| **2**   | 💻 KVM 虚拟化 / KVM Virtualization             | 安装 QEMU/virt-manager，启用 libvirtd，配置虚拟网络 / Install QEMU/virt-manager, enable libvirtd, configure virtual network                  |
-| **3**   | 📦 AUR 助手 / AUR Helper                       | 配置 archlinuxcn 源，安装 yay / paru 等 AUR 助手 / Configure archlinuxcn repo, install yay/paru AUR helpers                                  |
-| **4**   | 🎮 NVIDIA 驱动 / NVIDIA Driver                 | 安装 NVIDIA 闭源驱动 (nvidia-dkms) / Install NVIDIA proprietary driver                                                                       |
-| **5**  | 🎨 启用 Zsh 终端 / Enable Zsh Shell      | 安装 Zsh、切换默认 Shell、配置 Kitty 终端 / Install Zsh, change default shell, configure Kitty terminal                                      |
-| **6**  | ⚡ Antidote 插件管理器 / Antidote Plugin | 安装 Antidote 插件管理器，加载自动建议、语法高亮等插件 / Install Antidote plugin manager, load autosuggestions & syntax highlighting plugins |
-| **7**  | 🚀 Starship 提示符 / Starship Prompt     | 安装 Starship 提示符 / Install Starship prompt                                                                                               |
-| **8**  | 📁 fastfetch 配置 / fastfetch Config     | 复制 fastfetch 配置文件到 ~/.config/fastfetch / Copy fastfetch config to ~/.config/fastfetch                                                 |
-| **9**  | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
-| **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
-| **11** | 🀄 雾凇拼音 / Rime-ice Input Method            | 安装雾凇拼音输入法并复制 Fcitx5 配置 / Install Rime-ice input method and copy Fcitx5 config                                                  |
-
-### awww 壁纸守护程序 / awww Wallpaper Daemon
-
-> 💡 以下为 awww 壁纸守护程序的管理步骤，供手动参考执行。
-
-| Step   | Content                                                     | Description                                                                                                    |
-| ------ | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| **1** | 🖼️ 安装 awww + 设置自启 / Install awww + Enable autostart | 安装 awww 壁纸守护程序，创建 Systemd 服务文件并启用自启 / Install awww wallpaper daemon, create service & enable |
-| **2** | 🛑 取消自启（保留服务文件） / Disable autostart (keep service) | 停止并禁用服务，保留服务文件供后续启用 / Stop and disable service, keep service file for later reuse         |
-| **3** | ▶️ 启用自启 / Enable autostart                              | 重新启用并启动 awww-daemon 服务 / Re-enable and start awww-daemon service                                      |
-| **4** | 🗑️ 彻底删除 awww / Completely remove awww                   | 停止/禁用服务 → 删除服务文件 → daemon-reload → 卸载软件包 / Stop/disable → remove service file → remove package |
-
-### [`patch.sh`](patch.sh) — 修补工具 / Patch Tools
-
-| Step        | Content                                               | Description                                                                                                              |
-| ----------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| **1** | 🎮 UU 加速器安装（SteamDeck）/ UU Accelerator Install | 创建 /home/deck 目录并安装 UU 加速器 SteamDeck 版 / Create /home/deck directory and install UU Accelerator for SteamDeck |
-| **2** | 📁 XDG迁移转换 | XDG 用户目录转英文 / Migrate XDG Dirs              | 将已有的中文 XDG 用户目录（桌面、下载、项目等）迁移为英文名（Desktop、Downloads、Projects 等），并转移内容 / Migrate existing Chinese XDG user dirs to English names and move their contents |
-
----
-
 ## 🖥️ 系统要求 / System Requirements
 
 - **Arch Linux**（已安装并正常启动 / installed and booted）（个人习惯是archinstall时桌面不安装）
@@ -113,37 +56,35 @@ cd ArchInit
 
 ---
 
-## 📦 各步骤详解 / Step Details
-
-### [`niri_dms.sh`](niri_dms.sh) — 核心步骤 / Core Steps
+### [`niri_dms.sh`](niri_dms.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
 
 #### Step 1: 核心桌面环境 / Core Desktop Environment (Niri)
 
 | 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter）、`kimageformats`（KDE 图像格式插件 / KDE image format plugins）、`power-profiles-daemon`（电源管理 / power management）、`cups-pk-helper`（CUPS 打印 PolicyKit 授权助手 / PolicyKit helper for CUPS printing） |
+| 🖥️ 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell-niri`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter）、`kimageformats`（KDE 图像格式插件 / KDE image format plugins）、`power-profiles-daemon`（电源管理 / power management）、`cups-pk-helper`（CUPS 打印 PolicyKit 授权助手 / PolicyKit helper for CUPS printing） |
 
 #### Step 2: 注册 DMS 服务 / Register DMS Service
 
 | 操作 / Action                        | 说明 / Description                                                                                                                                                                               |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 注册 DMS 服务 / Register DMS service | 通过官方脚本安装 DMS，并将其添加为 `niri.service` 的 user service 依赖，实现开机自启 / Install DMS via official script and add as a user service dependency of `niri.service` for auto-start |
+| 🔗 注册 DMS 服务 / Register DMS service | 通过官方脚本安装 DMS，并将其添加为 `niri.service` 的 user service 依赖，实现开机自启 / Install DMS via official script and add as a user service dependency of `niri.service` for auto-start |
 
 #### Step 3: 基础初始化 / Basic Initialization
 
 | 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                                                             |
-| 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
-| 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
-| 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
+| 📦 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                                                             |
+| 🌐 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
+| 🔤 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
+| 📁 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
 
 #### Step 4: 显示管理器 / Display Manager (LightDM)
 
 | 操作 / Action                 | 说明 / Description                                                      |
 | ----------------------------- | ----------------------------------------------------------------------- |
-| 启用 LightDM / Enable LightDM | 设置 LightDM 开机自启 / Enable LightDM to start on boot                 |
-| 启动 LightDM / Start LightDM  | 立即启动 LightDM 显示管理器 / Start LightDM display manager immediately |
+| ▶️ 启用 LightDM / Enable LightDM | 设置 LightDM 开机自启 / Enable LightDM to start on boot                 |
+| 🚀 启动 LightDM / Start LightDM  | 立即启动 LightDM 显示管理器 / Start LightDM display manager immediately |
 
 
 
@@ -155,89 +96,89 @@ cd ArchInit
 
 
 
-### [`niri_tty.sh`](niri_tty.sh) — 核心步骤（TTY 版）/ Core Steps (TTY Edition)
+### [`niri_tty.sh`](niri_tty.sh) — 核心安装（TTY 版）/ Core Setup (TTY Edition)
 
 #### Step 1: 基础初始化 / Basic Initialization
 
 | 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                                                             |
-| 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
-| 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
-| 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
+| 📦 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`git`、`quickshell`、`flatseal`、`dolphin`、`kate`、`firefox`                                                                                             |
+| 🌐 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
+| 🔤 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
+| 📁 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
 
 #### Step 2: AUR 助手 / AUR Helper (yay / paru)
 
 | 操作 / Action                           | 说明 / Description                                                                                                                                                            |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
-| 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
+| ⚙️ 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
+| 📦 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
 
 #### Step 3: SSH 服务器 / SSH Server
 
 | 操作 / Action                              | 说明 / Description                                                                                                               |
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 OpenSSH / Install OpenSSH             | `openssh`                                                                                                                  |
-| 启用 SSH 服务 / Enable SSH service         | 启用并启动 `sshd.service`，配置防火墙放行 SSH（如 firewalld 已激活）/ Enable and start `sshd.service`, allow SSH in firewall if active |
+| 🔐 安装 OpenSSH / Install OpenSSH             | `openssh`                                                                                                                  |
+| ▶️ 启用 SSH 服务 / Enable SSH service         | 启用并启动 `sshd.service`，配置防火墙放行 SSH（如 firewalld 已激活）/ Enable and start `sshd.service`, allow SSH in firewall if active |
 
 ---
 
-### [`niri_append.sh`](niri_append.sh) — 可选扩展步骤 / Optional Steps
+### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
 
 #### Step 1: Kitty 字体选择 / Kitty Font Selector
 
 | 操作 / Action          | 说明 / Description                                                                                                                                   |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font via `kitten choose-fonts` |
+| 🎨 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font via `kitten choose-fonts` |
 
 #### Step 2: KVM 虚拟化 / KVM Virtualization
 
 | 操作 / Action                        | 说明 / Description                                                                                         |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| 安装 KVM 组件 / Install KVM packages | `qemu-full`、`virt-manager`、`swtpm`、`dnsmasq`                                                    |
-| 启用服务 / Enable service            | 启用并启动 `libvirtd` 服务 / Enable and start `libvirtd`                                               |
-| 配置网络 / Configure network         | 启动并设置 `default` 虚拟网络为自动启动 / Start and autostart the `default` virtual network            |
-| 用户权限 / User permissions          | 将当前用户加入 `libvirt` 组（需重新登录生效）/ Add current user to `libvirt` group (re-login required) |
+| 💻 安装 KVM 组件 / Install KVM packages | `qemu-full`、`virt-manager`、`swtpm`、`dnsmasq`                                                    |
+| ▶️ 启用服务 / Enable service            | 启用并启动 `libvirtd` 服务 / Enable and start `libvirtd`                                               |
+| 🌐 配置网络 / Configure network         | 启动并设置 `default` 虚拟网络为自动启动 / Start and autostart the `default` virtual network            |
+| 👤 用户权限 / User permissions          | 将当前用户加入 `libvirt` 组（需重新登录生效）/ Add current user to `libvirt` group (re-login required) |
 
 #### Step 3: AUR 助手 / AUR Helper (yay / paru)
 
 | 操作 / Action                           | 说明 / Description                                                                                                                                                            |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
-| 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
+| ⚙️ 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
+| 📦 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
 
 #### Step 4: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
 | 操作 / Action                            | 说明 / Description                                                                                                                                                                                                                               |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 安装内核头文件 / Install kernel headers  | `linux-headers`、`linux-zen-headers`                                                                                                                                                                                                         |
-| 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                                                                                                                           |
-| 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs |
+| 📦 安装内核头文件 / Install kernel headers  | `linux-headers`、`linux-zen-headers`                                                                                                                                                                                                         |
+| 🎮 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                                                                                                                           |
+| ⚙️ 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs |
 
 #### Step 5: 启用 Zsh 终端 / Enable Zsh Shell
 
 | 操作 / Action                         | 说明 / Description                                                             |
 | ------------------------------------- | ------------------------------------------------------------------------------ |
-| 安装 Zsh / Install Zsh                | `zsh`、`zsh-completions`                                                   |
-| 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh |
-| 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                    |
+| 📦 安装 Zsh / Install Zsh                | `zsh`、`zsh-completions`                                                   |
+| 🔄 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh |
+| 🎨 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                    |
 
 #### Step 6: Antidote 插件管理器 / Antidote Plugin Manager
 
 | 操作 / Action                          | 说明 / Description                                                                                                                                              |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 清理旧配置 / Clean up old config       | 删除 `~/.antidote`（如有），清理 `.zshrc` 中的 Antidote 引用 / Remove `~/.antidote` if exists, clean Antidote references from `.zshrc`                  |
-| 安装 Antidote / Install Antidote       | 通过 `git clone` 安装 Antidote 到 `~/.antidote` / Install Antidote via `git clone`                                                                        |
-| 配置插件 / Configure plugins           | 创建 `~/.zsh_plugins.txt`，添加 `zsh-completions`、`zsh-autosuggestions`、`fast-syntax-highlighting` / Create plugin list file with recommended plugins |
-| 配置 `.zshrc` / Configure `.zshrc` | 添加 `source ~/.antidote/antidote.zsh`、`antidote load` 和 `compinit` / Add Antidote source, load and compinit to `.zshrc`                              |
+| 🧹 清理旧配置 / Clean up old config       | 删除 `~/.antidote`（如有），清理 `.zshrc` 中的 Antidote 引用 / Remove `~/.antidote` if exists, clean Antidote references from `.zshrc`                  |
+| 📦 安装 Antidote / Install Antidote       | 通过 `git clone` 安装 Antidote 到 `~/.antidote` / Install Antidote via `git clone`                                                                        |
+| ⚙️ 配置插件 / Configure plugins           | 创建 `~/.zsh_plugins.txt`，添加 `zsh-completions`、`zsh-autosuggestions`、`fast-syntax-highlighting` / Create plugin list file with recommended plugins |
+| ⚙️ 配置 `.zshrc` / Configure `.zshrc` | 添加 `source ~/.antidote/antidote.zsh`、`antidote load` 和 `compinit` / Add Antidote source, load and compinit to `.zshrc`                              |
 
 #### Step 7: Starship 提示符 / Starship Prompt
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                       |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 安装 Starship / Install Starship           | 通过 pacman 安装 Starship / Install Starship via pacman                                                                                                                  |
-| 复制配置 / Copy config                     | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config                                                                                    |
-| 配置 `~/.zshrc` / Configure `~/.zshrc` | 在 `.zshrc` 末尾追加 `eval "$(starship init zsh)"`（在 Antidote 配置块之后）/ Append `eval "$(starship init zsh)"` at end of `.zshrc` (after the Antidote block) |
+| 📦 安装 Starship / Install Starship           | 通过 pacman 安装 Starship / Install Starship via pacman                                                                                                                  |
+| 📋 复制配置 / Copy config                     | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config                                                                                    |
+| ⚙️ 配置 `~/.zshrc` / Configure `~/.zshrc` | 在 `.zshrc` 末尾追加 `eval "$(starship init zsh)"`（在 Antidote 配置块之后）/ Append `eval "$(starship init zsh)"` at end of `.zshrc` (after the Antidote block) |
 
 > 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main)，默认使用 **Macchiato** 配色。提示符：`󰄛 ❯`（成功绿色，错误红色），目录淡紫色，Git 分支紫色。
 
@@ -245,68 +186,29 @@ cd ArchInit
 
 | 操作 / Action          | 说明 / Description                                                                                                                                |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
+| 📋 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
 
 #### Step 9: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
+| 🔄 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
 
 #### Step 10: Kitty 背景透明度 / Kitty Background Opacity
 
 | 操作 / Action                   | 说明 / Description                                                                                                                                                                                                                           |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 调整背景透明度 / Adjust opacity | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
+| 🎨 调整背景透明度 / Adjust opacity | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
 
 #### Step 11: 雾凇拼音 / Rime-ice Input Method
 
 | 操作 / Action                         | 说明 / Description                                                                                                                                                                                                                                                                                                                          |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装雾凇拼音 / Install Rime-ice       | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                                                                                                                                                                                    |
-| 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
+| 🀄 安装雾凇拼音 / Install Rime-ice       | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                                                                                                                                                                                    |
+| 📋 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
 ---
-### awww 壁纸守护程序 / awww Wallpaper Daemon
-
-> 💡 以下为 awww 壁纸守护程序的手动管理步骤，可逐一复制执行。
-
-#### Step 1: 安装 awww + 设置自启 / Install awww + Enable Autostart
-
-| 操作 / Action                                    | 说明 / Description                                                                                                                                            |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 awww / Install awww                         | `sudo pacman -Syu awww` — 安装 awww 壁纸守护程序 / Install awww wallpaper daemon                                                                             |
-| 创建 Systemd 服务文件 / Create systemd service   | 写入 `~/.config/systemd/user/awww-daemon.service`，Type=simple，Restart=on-failure / Write awww-daemon.service with Type=simple, Restart=on-failure          |
-| 重新加载用户配置 / Reload user config            | `systemctl --user daemon-reload` — 使 Systemd 识别新服务 / Reload Systemd user configuration to recognize new service                                          |
-| 启用并启动服务 / Enable & start service          | `systemctl --user enable --now awww-daemon.service` — 设置开机自启并立即启动 / Enable and start the service immediately                                        |
-
-#### Step 2: 取消自启（保留服务文件） / Disable Autostart (Keep Service File)
-
-| 操作 / Action                        | 说明 / Description                                                                |
-| ------------------------------------ | --------------------------------------------------------------------------------- |
-| 停止服务 / Stop service              | `systemctl --user stop awww-daemon.service` — 立即停止守护进程 / Stop the daemon immediately |
-| 禁用服务 / Disable service           | `systemctl --user disable awww-daemon.service` — 取消开机自启 / Disable auto-start on boot |
-| 保留服务文件 / Keep service file     | 服务文件 `awww-daemon.service` **保留不动**，方便后续重新启用 / Service file is kept for later reuse |
-
-#### Step 3: 启用自启 / Enable Autostart
-
-| 操作 / Action                        | 说明 / Description                                                                |
-| ------------------------------------ | --------------------------------------------------------------------------------- |
-| 启用服务 / Enable service            | `systemctl --user enable awww-daemon.service` — 设置开机自启 / Enable auto-start on boot |
-| 启动服务 / Start service             | `systemctl --user start awww-daemon.service` — 立即启动守护进程 / Start the daemon immediately |
-| 服务文件检查 / Service file check    | 自动检测 `awww-daemon.service` 是否存在，若缺失则提示先执行 Step 1 / Auto-check if service file exists; prompt to run Step 1 if missing |
-
-#### Step 4: 彻底删除 awww / Completely Remove awww
-
-| 操作 / Action                              | 说明 / Description                                                                                                                          |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 停止并禁用服务 / Stop & disable service    | `systemctl --user stop` + `disable` — 先停止运行并取消自启 / Stop the running service and disable auto-start                               |
-| 删除服务文件 / Remove service file         | `rm ~/.config/systemd/user/awww-daemon.service` — 清理 Systemd 服务文件 / Remove the systemd service file                                   |
-| 重新加载 Systemd 配置 / Reload Systemd     | `systemctl --user daemon-reload` — 使 Systemd 清理已删除服务的状态 / Reload Systemd to clean up the removed service's state               |
-| 卸载 awww 软件包 / Remove awww package     | `sudo pacman -Rns awww` — 彻底卸载 awww 及其依赖和配置文件 / Completely remove awww package, its dependencies, and config files              |
-
----
-### [`patch.sh`](patch.sh) — 修补工具步骤 / Patch Tool Steps
+### [`patch.sh`](patch.sh) — 修补工具 / Patch Tools
 
 #### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install
 
@@ -324,18 +226,18 @@ cd ArchInit
 
 | 操作 / Action                           | 说明 / Description                                                                                                      |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| 创建 /home/deck 目录 / Create directory | 创建 `/home/deck` 并设置当前用户为所有者 / Create `/home/deck` and set ownership to current user                    |
-| 下载安装脚本 / Download install script  | 从 `uudeck.com` 下载并执行 UU 加速器安装脚本 / Download and run the UU Accelerator install script from `uudeck.com` |
+| 📁 创建 /home/deck 目录 / Create directory | 创建 `/home/deck` 并设置当前用户为所有者 / Create `/home/deck` and set ownership to current user                    |
+| 📥 下载安装脚本 / Download install script  | 从 `uudeck.com` 下载并执行 UU 加速器安装脚本 / Download and run the UU Accelerator install script from `uudeck.com` |
 
 #### Step 2: XDG 用户目录转英文 / Migrate XDG Dirs to English
 
 | 操作 / Action                                         | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| | 安装 xdg-user-dirs / Install xdg-user-dirs            | 确保 `xdg-user-dirs` 已安装 / Ensure `xdg-user-dirs` is installed                                                                                                                                                                                                                                                                                                                                                                                              |
-| | 备份原配置 / Backup old config                        | 将当前 `~/.config/user-dirs.dirs` 备份为 `user-dirs.dirs.bak.<timestamp>` / Backup current `~/.config/user-dirs.dirs` to `user-dirs.dirs.bak.<timestamp>`                                                                                                                                                                                                                                                                                                                 |
-| | 写入英文配置 / Write English config                   | 直接写入 `~/.config/user-dirs.dirs`，所有路径为英文（Desktop、Downloads、Projects 等），不依赖 locale / Directly write `~/.config/user-dirs.dirs` with all English paths (Desktop, Downloads, Projects, etc.), locale-independent                                                                                                                                                                                                                                                                                              |
-| | 迁移目录内容 / Migrate directory contents             | 对比新旧配置，对每个路径变化的目录：创建英文目录 → 移动所有内容（含隐藏文件）→ 删除旧的中文目录 / Compare old vs new config; for each changed directory: create English dir → move all contents (including hidden files) -> remove old Chinese dir                                                                                                                                                                                                       |
-| | 完成提示 / Completion notice                          | 显示迁移统计，告知备份文件位置，提示重新登录生效 / Show migration stats, backup location, re-login hint                                                                                                                                                                                                                                                                                                                                                             |
+| | 📦 安装 xdg-user-dirs / Install xdg-user-dirs            | 确保 `xdg-user-dirs` 已安装 / Ensure `xdg-user-dirs` is installed                                                                                                                                                                                                                                                                                                                                                                                              |
+| | 💾 备份原配置 / Backup old config                        | 将当前 `~/.config/user-dirs.dirs` 备份为 `user-dirs.dirs.bak.<timestamp>` / Backup current `~/.config/user-dirs.dirs` to `user-dirs.dirs.bak.<timestamp>`                                                                                                                                                                                                                                                                                                                 |
+| | ✏️ 写入英文配置 / Write English config                   | 直接写入 `~/.config/user-dirs.dirs`，所有路径为英文（Desktop、Downloads、Projects 等），不依赖 locale / Directly write `~/.config/user-dirs.dirs` with all English paths (Desktop, Downloads, Projects, etc.), locale-independent                                                                                                                                                                                                                                                                                              |
+| | 📂 迁移目录内容 / Migrate directory contents             | 对比新旧配置，对每个路径变化的目录：创建英文目录 → 移动所有内容（含隐藏文件）→ 删除旧的中文目录 / Compare old vs new config; for each changed directory: create English dir → move all contents (including hidden files) -> remove old Chinese dir                                                                                                                                                                                                       |
+| | ✅ 完成提示 / Completion notice                          | 显示迁移统计，告知备份文件位置，提示重新登录生效 / Show migration stats, backup location, re-login hint                                                                                                                                                                                                                                                                                                                                                             |
 
 ---
 
@@ -409,6 +311,60 @@ starship preset tokyo-night -o ~/.config/starship.toml
 常用预设：`tokyo-night`、`pastel-powerline`、`gruvbox-rainbow`。完整列表见 [Starship Presets](https://starship.rs/presets/)。
 
 你也可以手动编辑配置文件，参考 [Starship 配置文档](https://starship.rs/config/)。
+
+---
+
+## 🖼️ awww 壁纸守护程序管理 / awww Wallpaper Daemon Management
+
+> awww 壁纸守护程序的管理步骤，可逐一复制执行。
+
+### 安装 awww + 设置自启 / Install awww + Enable Autostart
+
+| 操作 / Action                                    | 说明 / Description                                                                                                                                            |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🖼️ 安装 awww / Install awww                         | `sudo pacman -Syu awww` — 安装 awww 壁纸守护程序 / Install awww wallpaper daemon                                                                             |
+| 📄 创建 Systemd 服务文件 / Create systemd service   | 写入 `~/.config/systemd/user/awww-daemon.service`，内容如下 / Write the following content to `~/.config/systemd/user/awww-daemon.service`:          |
+
+```ini
+[Unit]
+Description=awww wallpaper daemon
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/awww-daemon
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+```
+
+| 🔄 重新加载用户配置 / Reload user config            | `systemctl --user daemon-reload` — 使 Systemd 识别新服务 / Reload Systemd user configuration to recognize new service                                          |
+| ▶️ 启用并启动服务 / Enable & start service          | `systemctl --user enable --now awww-daemon.service` — 设置开机自启并立即启动 / Enable and start the service immediately                                        |
+
+### 取消自启（保留服务文件） / Disable Autostart (Keep Service File)
+
+| 操作 / Action                        | 说明 / Description                                                                |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| 🛑 停止服务 / Stop service              | `systemctl --user stop awww-daemon.service` — 立即停止守护进程 / Stop the daemon immediately |
+| 🔌 禁用服务 / Disable service           | `systemctl --user disable awww-daemon.service` — 取消开机自启 / Disable auto-start on boot |
+| 💾 保留服务文件 / Keep service file     | 服务文件 `awww-daemon.service` **保留不动**，方便后续重新启用 / Service file is kept for later reuse |
+
+### 启用自启 / Enable Autostart
+
+| 操作 / Action                        | 说明 / Description                                                                |
+| ------------------------------------ | --------------------------------------------------------------------------------- |
+| ▶️ 启用服务 / Enable service            | `systemctl --user enable awww-daemon.service` — 设置开机自启 / Enable auto-start on boot |
+| 🚀 启动服务 / Start service             | `systemctl --user start awww-daemon.service` — 立即启动守护进程 / Start the daemon immediately |
+| ✅ 服务文件检查 / Service file check    | 确保 `awww-daemon.service` 存在（若缺失则先执行安装步骤）/ Ensure service file exists (run install step first if missing) |
+
+### 彻底删除 awww / Completely Remove awww
+
+| 操作 / Action                              | 说明 / Description                                                                                                                          |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🛑 停止并禁用服务 / Stop & disable service    | `systemctl --user stop && systemctl --user disable awww-daemon.service` — 先停止运行并取消自启 / Stop the running service and disable auto-start |
+| 🗑️ 删除服务文件 / Remove service file         | `rm ~/.config/systemd/user/awww-daemon.service` — 清理 Systemd 服务文件 / Remove the systemd service file                                   |
+| 🔄 重新加载 Systemd 配置 / Reload Systemd     | `systemctl --user daemon-reload` — 使 Systemd 清理已删除服务的状态 / Reload Systemd to clean up the removed service's state               |
+| 📦 卸载 awww 软件包 / Remove awww package     | `sudo pacman -Rns awww` — 彻底卸载 awww 及其依赖和配置文件 / Completely remove awww package, its dependencies, and config files              |
 
 ---
 
