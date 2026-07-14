@@ -50,7 +50,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | Step        | Content                                               | Description                                                                                                              |
 | ----------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | **1** | 🎮 UU 加速器安装（SteamDeck）/ UU Accelerator Install | 创建 /home/deck 目录并安装 UU 加速器 SteamDeck 版 / Create /home/deck directory and install UU Accelerator for SteamDeck |
-| | **2** | 📁 XDG 用户目录转英文 / Migrate XDG Dirs              | 将已有的中文 XDG 用户目录（桌面、下载、项目等）迁移为英文名（Desktop、Downloads、Projects 等），并转移内容 / Migrate existing Chinese XDG user dirs to English names and move their contents |
+| **2** | XDG迁移转换 | 📁 XDG 用户目录转英文 / Migrate XDG Dirs              | 将已有的中文 XDG 用户目录（桌面、下载、项目等）迁移为英文名（Desktop、Downloads、Projects 等），并转移内容 / Migrate existing Chinese XDG user dirs to English names and move their contents |
 
 ---
 
