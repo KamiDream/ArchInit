@@ -45,7 +45,9 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
 | **11** | 🀄 雾凇拼音 / Rime-ice Input Method            | 安装雾凇拼音输入法并复制 Fcitx5 配置 / Install Rime-ice input method and copy Fcitx5 config                                                  |
 
-### [`niri_awww.sh`](niri_awww.sh) — awww 壁纸守护程序 / awww Wallpaper Daemon
+### awww 壁纸守护程序 / awww Wallpaper Daemon
+
+> 💡 以下为 awww 壁纸守护程序的管理步骤，供手动参考执行。
 
 | Step   | Content                                                     | Description                                                                                                    |
 | ------ | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -103,13 +105,11 @@ cd ArchInit
 >   - `niri_tty.sh`：**TTY 轻量版**，基础初始化 + AUR 助手 + SSH 服务器（适合无桌面/远程场景）
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
-> - **`niri_awww.sh`**：**awww 壁纸守护程序管理器**，同样提供交互式菜单。支持安装、开关自启、彻底删除 awww 壁纸守护程序。
->   **awww wallpaper daemon manager**, also with an interactive menu. Supports install, toggle autostart, and completely remove awww.
 > - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文等修补工具。
 >   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, and other patching tools.
 >
-> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`niri_awww.sh` 可随时管理壁纸守护程序，`patch.sh` 可随时运行修补。
-> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `niri_awww.sh` manages the wallpaper daemon. `patch.sh` can be run at any time for fixes.
+> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
+> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `patch.sh` can be run at any time for fixes. See the awww wallpaper daemon section below for manual reference.
 
 ---
 
@@ -267,7 +267,9 @@ cd ArchInit
 | 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
 ---
-### [`niri_awww.sh`](niri_awww.sh) — awww 壁纸守护程序步骤 / awww Wallpaper Daemon Steps
+### awww 壁纸守护程序 / awww Wallpaper Daemon
+
+> 💡 以下为 awww 壁纸守护程序的手动管理步骤，可逐一复制执行。
 
 #### Step 1: 安装 awww + 设置自启 / Install awww + Enable Autostart
 
@@ -339,9 +341,9 @@ cd ArchInit
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh) 与 [`niri_tty.sh`](niri_tty.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 与 [`niri_awww.sh`](niri_awww.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh) and [`niri_tty.sh`](niri_tty.sh) run fully automated; [`niri_append.sh`](niri_append.sh) and [`niri_awww.sh`](niri_awww.sh) provide interactive menus — use ↑/↓ arrows to select, Enter to execute, q to quit.
+- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh) 与 [`niri_tty.sh`](niri_tty.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh) and [`niri_tty.sh`](niri_tty.sh) run fully automated; [`niri_append.sh`](niri_append.sh) provides an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
-- **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh`、`niri_tty.sh`、`niri_append.sh` 或 `niri_awww.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
+- **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh`、`niri_tty.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
 ---
 
