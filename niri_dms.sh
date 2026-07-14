@@ -141,13 +141,14 @@ XDG_DOCUMENTS_DIR="$HOME/Documents"
 XDG_MUSIC_DIR="$HOME/Music"
 XDG_PICTURES_DIR="$HOME/Pictures"
 XDG_VIDEOS_DIR="$HOME/Videos"
+XDG_PROJECTS_DIR="$HOME/Projects"
 EOF
 # Create the English directories if they don't exist
-mkdir -p ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos
+mkdir -p ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos ~/Projects
 # Sync with xdg-user-dirs-update (respects existing config)
 xdg-user-dirs-update 2>/dev/null || true
 echo "    XDG user directories configured with English names."
-echo "    (Desktop, Downloads, Documents, Pictures, Music, Videos, Public, Templates)"
+echo "    (Desktop, Downloads, Documents, Pictures, Music, Videos, Public, Templates, Projects)"
 
 echo "[Step 3 completed]"
 echo ""

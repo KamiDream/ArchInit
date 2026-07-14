@@ -590,6 +590,7 @@ EOF
             local EN_MUSIC="$HOME/Music"
             local EN_PICTURES="$HOME/Pictures"
             local EN_VIDEOS="$HOME/Videos"
+            local EN_PROJECTS="$HOME/Projects"
 
             # ── 4. Write new config file directly with English paths ──
             echo ""
@@ -610,18 +611,9 @@ XDG_DOCUMENTS_DIR="$HOME/Documents"
 XDG_MUSIC_DIR="$HOME/Music"
 XDG_PICTURES_DIR="$HOME/Pictures"
 XDG_VIDEOS_DIR="$HOME/Videos"
+XDG_PROJECTS_DIR="$HOME/Projects"
 USERDIRSEOF
             echo "    ✅ 配置文件已写入 / Config written: ${user_dirs_conf}"
-
-            # If old config had XDG_PROJECTS_DIR, preserve it
-            if [[ -n "${XDG_PROJECTS_DIR:-}" ]]; then
-                echo "    🔍 检测到自定义目录 / Custom dir detected: XDG_PROJECTS_DIR=${XDG_PROJECTS_DIR}"
-                # Extract just the folder name from the path
-                local proj_name
-                proj_name="$(basename "${XDG_PROJECTS_DIR}")"
-                echo "XDG_PROJECTS_DIR=\"\$HOME/${proj_name}\"" >> "$user_dirs_conf"
-                echo "    ✅ 已保留自定义目录 / Custom dir preserved: XDG_PROJECTS_DIR=\$HOME/${proj_name}"
-            fi
 
             # ── 5. Migrate contents from old Chinese dirs to new English dirs ──
             echo ""
@@ -639,7 +631,8 @@ USERDIRSEOF
                 "XDG_DOCUMENTS_DIR:${EN_DOCUMENTS}" \
                 "XDG_MUSIC_DIR:${EN_MUSIC}" \
                 "XDG_PICTURES_DIR:${EN_PICTURES}" \
-                "XDG_VIDEOS_DIR:${EN_VIDEOS}"; do
+                "XDG_VIDEOS_DIR:${EN_VIDEOS}" \
+                "XDG_PROJECTS_DIR:${EN_PROJECTS}"; do
 
                 local var_name="${migrator%%:*}"
                 local en_path="${migrator##*:}"
