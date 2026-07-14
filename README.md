@@ -44,13 +44,13 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **9**  | 🚀 fastfetch 自启 / Startup              | 将 fastfetch 设为 .zshrc 第一行，开机显示系统信息 / Add fastetch as the first line in .zshrc for system info on startup                      |
 | **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
 | **11** | 🀄 雾凇拼音 / Rime-ice Input Method            | 安装雾凇拼音输入法并复制 Fcitx5 配置 / Install Rime-ice input method and copy Fcitx5 config                                                  |
-| **12** | 📁 XDG 用户目录转英文 / Migrate XDG Dirs       | 将已有的中文 XDG 用户目录（桌面、下载、项目等）迁移为英文名（Desktop、Downloads、Projects 等），并转移内容 / Migrate existing Chinese XDG user dirs to English names and move their contents |
 
 ### [`universal.sh`](universal.sh) — 通用工具 / Universal Tools
 
 | Step        | Content                                               | Description                                                                                                              |
 | ----------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
 | **1** | 🎮 UU 加速器安装（SteamDeck）/ UU Accelerator Install | 创建 /home/deck 目录并安装 UU 加速器 SteamDeck 版 / Create /home/deck directory and install UU Accelerator for SteamDeck |
+| | **2** | 📁 XDG 用户目录转英文 / Migrate XDG Dirs              | 将已有的中文 XDG 用户目录（桌面、下载、项目等）迁移为英文名（Desktop、Downloads、Projects 等），并转移内容 / Migrate existing Chinese XDG user dirs to English names and move their contents |
 
 ---
 
@@ -94,8 +94,8 @@ cd ArchInit
 >   - `niri_tty.sh`：**TTY 轻量版**，基础初始化 + AUR 助手 + SSH 服务器（适合无桌面/远程场景）
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
-> - **`universal.sh`**：**通用工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装等通用工具。
->   **Universal tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation and other general-purpose tools.
+> - **`universal.sh`**：**通用工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文等通用工具。
+>   **Universal tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, and other general-purpose tools.
 >
 > 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`universal.sh` 可随时运行。
 > Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `universal.sh` can be run at any time.
@@ -255,16 +255,6 @@ cd ArchInit
 | 安装雾凇拼音 / Install Rime-ice       | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                                                                                                                                                                                    |
 | 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
-#### Step 12: XDG 用户目录转英文 / Migrate XDG Dirs to English
-
-| 操作 / Action                                         | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 安装 xdg-user-dirs / Install xdg-user-dirs            | 确保 `xdg-user-dirs` 已安装 / Ensure `xdg-user-dirs` is installed                                                                                                                                                                                                                                                                                                                                                                                              |
-| 备份原配置 / Backup old config                        | 将当前 `~/.config/user-dirs.dirs` 备份为 `user-dirs.dirs.bak.<timestamp>` / Backup current `~/.config/user-dirs.dirs` to `user-dirs.dirs.bak.<timestamp>`                                                                                                                                                                                                                                                                                                                 |
-| 写入英文配置 / Write English config                   | 直接写入 `~/.config/user-dirs.dirs`，所有路径为英文（Desktop、Downloads、Projects 等），不依赖 locale / Directly write `~/.config/user-dirs.dirs` with all English paths (Desktop, Downloads, Projects, etc.), locale-independent                                                                                                                                                                                                                                                                                              |
-| 迁移目录内容 / Migrate directory contents             | 对比新旧配置，对每个路径变化的目录：创建英文目录 → 移动所有内容（含隐藏文件）→ 删除旧的中文目录 / Compare old vs new config; for each changed directory: create English dir → move all contents (including hidden files) → remove old Chinese dir                                                                                                                                                                                                       |
-| 完成提示 / Completion notice                          | 显示迁移统计，告知备份文件位置，提示重新登录生效 / Show migration stats, backup location, re-login hint                                                                                                                                                                                                                                                                                                                                                             |
-
 ---
 ### [`universal.sh`](universal.sh) — 通用工具步骤 / Universal Tool Steps
 
@@ -286,6 +276,16 @@ cd ArchInit
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | 创建 /home/deck 目录 / Create directory | 创建 `/home/deck` 并设置当前用户为所有者 / Create `/home/deck` and set ownership to current user                    |
 | 下载安装脚本 / Download install script  | 从 `uudeck.com` 下载并执行 UU 加速器安装脚本 / Download and run the UU Accelerator install script from `uudeck.com` |
+
+#### Step 2: XDG 用户目录转英文 / Migrate XDG Dirs to English
+
+| 操作 / Action                                         | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| | 安装 xdg-user-dirs / Install xdg-user-dirs            | 确保 `xdg-user-dirs` 已安装 / Ensure `xdg-user-dirs` is installed                                                                                                                                                                                                                                                                                                                                                                                              |
+| | 备份原配置 / Backup old config                        | 将当前 `~/.config/user-dirs.dirs` 备份为 `user-dirs.dirs.bak.<timestamp>` / Backup current `~/.config/user-dirs.dirs` to `user-dirs.dirs.bak.<timestamp>`                                                                                                                                                                                                                                                                                                                 |
+| | 写入英文配置 / Write English config                   | 直接写入 `~/.config/user-dirs.dirs`，所有路径为英文（Desktop、Downloads、Projects 等），不依赖 locale / Directly write `~/.config/user-dirs.dirs` with all English paths (Desktop, Downloads, Projects, etc.), locale-independent                                                                                                                                                                                                                                                                                              |
+| | 迁移目录内容 / Migrate directory contents             | 对比新旧配置，对每个路径变化的目录：创建英文目录 → 移动所有内容（含隐藏文件）→ 删除旧的中文目录 / Compare old vs new config; for each changed directory: create English dir → move all contents (including hidden files) -> remove old Chinese dir                                                                                                                                                                                                       |
+| | 完成提示 / Completion notice                          | 显示迁移统计，告知备份文件位置，提示重新登录生效 / Show migration stats, backup location, re-login hint                                                                                                                                                                                                                                                                                                                                                             |
 
 ---
 
