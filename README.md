@@ -45,7 +45,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 | **10** | 🎨 Kitty 背景透明度 / Background Opacity | 交互式调整 Kitty 终端背景透明度 / Interactively adjust Kitty terminal background opacity                                                     |
 | **11** | 🀄 雾凇拼音 / Rime-ice Input Method            | 安装雾凇拼音输入法并复制 Fcitx5 配置 / Install Rime-ice input method and copy Fcitx5 config                                                  |
 
-### [`universal.sh`](universal.sh) — 通用工具 / Universal Tools
+### [`patch.sh`](patch.sh) — 修补工具 / Patch Tools
 
 | Step        | Content                                               | Description                                                                                                              |
 | ----------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
@@ -94,11 +94,11 @@ cd ArchInit
 >   - `niri_tty.sh`：**TTY 轻量版**，基础初始化 + AUR 助手 + SSH 服务器（适合无桌面/远程场景）
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
-> - **`universal.sh`**：**通用工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文等通用工具。
->   **Universal tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, and other general-purpose tools.
+> - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文等修补工具。
+>   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, and other patching tools.
 >
-> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`universal.sh` 可随时运行。
-> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `universal.sh` can be run at any time.
+> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`patch.sh` 可随时运行修补。
+> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `patch.sh` can be run at any time for fixes.
 
 ---
 
@@ -256,7 +256,7 @@ cd ArchInit
 | 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
 ---
-### [`universal.sh`](universal.sh) — 通用工具步骤 / Universal Tool Steps
+### [`patch.sh`](patch.sh) — 修补工具步骤 / Patch Tool Steps
 
 #### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install
 
