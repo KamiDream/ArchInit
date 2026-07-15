@@ -369,14 +369,14 @@ autoload -Uz compinit && compinit -C
 
 # ─── 补全系统配置：启用方向键菜单选择 ─────────────────────
 # 核心：按 Tab 后使用 ↑/↓ 方向键自由选择补全项
-# （"menu select" 是让用户能用方向键导航的关键配置）
+# ("menu select" 是让用户能用方向键导航的关键配置）
 zstyle ':completion:*' menu select
 
 # 补全列表颜色
 zstyle ':completion:*' list-colors ''
 zstyle ':completion:*' list-prompt '%S%l 个匹配项 %s'
 
-# 智能大小写匹配（例：README 输入 readme 也能匹配）
+# 智能大小写匹配(例:README 输入 readme 也能匹配）
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
 
 # 补全描述美化

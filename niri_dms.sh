@@ -104,8 +104,8 @@ echo "==========================================================================
 echo " Step 3: Basic Initialization"
 echo "========================================================================================================================="
 echo ">>> Installing base packages..."
-sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g git \
-    quickshell flatseal dolphin kate firefox
+sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g git vim \
+    quickshell firefox
 
 echo ""
 echo ">>> Uncommenting zh_CN.UTF-8 in /etc/locale.gen..."
