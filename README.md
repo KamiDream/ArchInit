@@ -360,8 +360,8 @@ WantedBy=default.target
 
 ## 📝 许可证 / License
 
-本项目仅供学习和个人使用。如有问题或建议，欢迎提交 Issue 或 PR。
-This project is for personal and educational use. Feel free to open issues or PRs.
+本项目仅供学习和个人使用。造成的损失概不负责
+This project is for personal and educational use. We are not responsible for any losses incurred.
 
 ---
 
