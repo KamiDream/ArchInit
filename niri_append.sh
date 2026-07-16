@@ -268,27 +268,36 @@ EOF
         4) # NVIDIA 显卡驱动 / NVIDIA Graphics Driver
         # ─────────────────────────────────────
             step_header 4
-            echo ">>> Installing kernel headers..."
-            sudo pacman -S --needed --noconfirm linux-headers linux-zen-headers
-            echo ">>> Installing NVIDIA drivers..."
-            sudo pacman -S --needed --noconfirm nvidia-dkms nvidia-utils nvidia-settings
-            echo ""
-            echo ">>> Adding nvidia modules to /etc/mkinitcpio.conf..."
-            # Replace existing MODULES=() or #MODULES=() with nvidia modules
-            sudo sed -i 's/^MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
-            sudo sed -i 's/^#MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
-            echo "    MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm) set."
-            # Remove kms from HOOKS if present — kms conflicts with NVIDIA proprietary driver on Wayland
-            if grep -q '^HOOKS=' /etc/mkinitcpio.conf && grep '^HOOKS=' /etc/mkinitcpio.conf | grep -q 'kms'; then
-                echo "    Found kms in HOOKS, removing it (conflicts with NVIDIA proprietary driver)..."
-                sudo sed -i '/^HOOKS=/ s/ *kms *//' /etc/mkinitcpio.conf
-                echo "    kms removed from HOOKS."
+            echo ">>> Installing kernel headers (detecting installed kernels)..."
+            HEADERS=()
+            pacman -Q linux >/dev/null 2>&1 && HEADERS+=(linux-headers) && echo "    linux kernel detected -> linux-headers"
+            pacman -Q linux-zen >/dev/null 2>&1 && HEADERS+=(linux-zen-headers) && echo "    linux-zen kernel detected -> linux-zen-headers"
+
+            if [[ ${#HEADERS[@]} -gt 0 ]]; then
+                sudo pacman -S --needed --noconfirm "${HEADERS[@]}"
+                echo ">>> Installing NVIDIA drivers..."
+                sudo pacman -S --needed --noconfirm nvidia-dkms nvidia-utils nvidia-settings
+                echo ""
+                echo ">>> Adding nvidia modules to /etc/mkinitcpio.conf..."
+                # Replace existing MODULES=() or #MODULES=() with nvidia modules
+                sudo sed -i 's/^MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+                sudo sed -i 's/^#MODULES=()/MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)/' /etc/mkinitcpio.conf
+                echo "    MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm) set."
+                # Remove kms from HOOKS if present — kms conflicts with NVIDIA proprietary driver on Wayland
+                if grep -q '^HOOKS=' /etc/mkinitcpio.conf && grep '^HOOKS=' /etc/mkinitcpio.conf | grep -q 'kms'; then
+                    echo "    Found kms in HOOKS, removing it (conflicts with NVIDIA proprietary driver)..."
+                    sudo sed -i '/^HOOKS=/ s/ *kms *//' /etc/mkinitcpio.conf
+                    echo "    kms removed from HOOKS."
+                else
+                    echo "    kms not found in HOOKS, no change needed."
+                fi
+                echo ">>> Regenerating initramfs..."
+                sudo mkinitcpio -P
+                echo "[Step 4 completed]"
             else
-                echo "    kms not found in HOOKS, no change needed."
+                echo -e "${YELLOW}    ⚠️  No supported kernel found (linux/linux-zen). This step requires at least one kernel installed. Aborting.${RESET}"
+                ret_val=1
             fi
-            echo ">>> Regenerating initramfs..."
-            sudo mkinitcpio -P
-            echo "[Step 4 completed]"
             ;;
 
         # ─────────────────────────────────────

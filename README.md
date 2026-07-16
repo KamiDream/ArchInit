@@ -139,11 +139,11 @@ cd ArchInit
 
 #### Step 4: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
-| 操作 / Action                            | 说明 / Description                                                                                                                                                                                                                               |
-| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 📦 安装内核头文件 / Install kernel headers  | `linux-headers`、`linux-zen-headers`                                                                                                                                                                                                         |
-| 🎮 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                                                                                                                           |
-| ⚙️ 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs |
+| 操作 / Action                            | 说明 / Description                                                                                                                                                                                                                                                                                        |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📦 安装内核头文件 / Install kernel headers  | **自动检测**已安装的内核（`linux` / `linux-zen`），按需安装对应的 headers；若未检测到任何内核则跳过并返回菜单 / **Auto-detect** installed kernels (`linux` / `linux-zen`), install matching headers only; skip with menu return if no kernel found |
+| 🎮 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                                                                                                                                                                                    |
+| ⚙️ 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs          |
 
 #### Step 5: 启用 Zsh 终端 / Enable Zsh Shell
 
@@ -259,7 +259,7 @@ Check the `MODULES` line in `/etc/mkinitcpio.conf`, then run `sudo mkinitcpio -P
 
 ### Q：编译 NVIDIA 驱动时出现 LTS 内核报错？/ LTS kernel error when compiling NVIDIA driver?
 
-这是因为脚本未安装 `linux-lts-headers`，而 `mkinitcpio -P` 会为系统中**所有**已安装的内核生成 initramfs，缺少 LTS 头文件会导致编译报错。
+脚本默认只检测 `linux` 和 `linux-zen` 内核并安装对应 headers，不会自动安装 `linux-lts-headers` 或 `linux-hardened-headers`。如果系统中安装了 LTS 内核，`mkinitcpio -P` 会为**所有**已安装的内核生成 initramfs，缺少 LTS 头文件会导致编译报错。
 
 - **不影响正常使用**：报错仅针对 LTS 内核，而你日常使用的并非 LTS 内核。
 - **LTS 内核定位**：仅作为紧急情况下的备用内核，正常情况下不会使用。
@@ -268,7 +268,7 @@ Check the `MODULES` line in `/etc/mkinitcpio.conf`, then run `sudo mkinitcpio -P
   2. 重新运行 [`niri_append.sh`](niri_append.sh) 的 **Step 4**（NVIDIA 显卡驱动脚本）
   3. 重启系统
 
-This error occurs because `linux-lts-headers` is not installed, but `mkinitcpio -P` builds initramfs for **all** installed kernels. Missing LTS headers cause compilation warnings/errors.
+This error occurs because the script only auto-detects `linux` and `linux-zen` kernels — it does not install `linux-lts-headers` or `linux-hardened-headers`. If you have the LTS kernel installed, `mkinitcpio -P` builds initramfs for **all** installed kernels, and missing LTS headers cause compilation warnings/errors.
 
 - **No impact on normal use**: The error only affects the LTS kernel, which is not your daily driver.
 - **LTS kernel role**: Emergency backup only — not used under normal circumstances.
