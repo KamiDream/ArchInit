@@ -217,7 +217,7 @@ cd ArchInit
 | 操作 / Action                                             | 说明 / Description                                                                                                                                                                 |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🧹 清理旧主题 / Clean up old theme                          | 若 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` 已存在则删除 / Remove existing theme directory if present                                                                |
-| 📥 克隆主题 / Clone theme                                   | `git clone https://github.com/KamiDream/LdmKw2Theme` 到 `~/LdmKw2Theme` 并移动到 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` / Clone to `~/LdmKw2Theme` then move to target |
+| 📥 克隆主题 / Clone theme                                   | `git clone https://github.com/KamiDream/LdmWk2Theme` 到 `~/LdmWk2Theme` 并移动到 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` / Clone to `~/LdmWk2Theme` then move to target |
 | 🔄 更新主题 / Update theme                                  | 重复执行 Step 2 即可自动删除旧主题并下载最新版 / Re-run Step 2 to delete the old theme and download the latest version                                                           |
 | 🖼️ 替换背景图片 / Replace background image                  | 替换 `/usr/share/lightdm-webkit/themes/KamiDream_Theme/assets/background.png` 为你自己的图片即可 / Replace the image at that path with your own                                |
 

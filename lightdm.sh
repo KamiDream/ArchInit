@@ -214,11 +214,11 @@ execute_step() {
             echo ""
             echo ">>> 克隆 KamiDream LightDM WebKit2 主题..."
             echo "    Cloning KamiDream LightDM WebKit2 theme..."
-            local theme_dir="$HOME/LdmKw2Theme"
+            local theme_dir="$HOME/LdmWk2Theme"
             if [[ -d "$theme_dir" ]]; then
                 rm -rf "$theme_dir"
             fi
-            git clone https://github.com/KamiDream/LdmKw2Theme.git "$theme_dir"
+            git clone https://github.com/KamiDream/LdmWk2Theme.git "$theme_dir"
             echo ""
             echo ">>> 创建目标目录并移动主题..."
             echo "    Creating target directory and moving theme..."
