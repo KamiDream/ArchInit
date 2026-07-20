@@ -48,11 +48,13 @@ cd ArchInit
 >   - `niri_tty.sh`：**TTY 轻量版**，基础初始化 + AUR 助手 + SSH 服务器（适合无桌面/远程场景）
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
+> - **`lightdm.sh`**：**LightDM WebKit2 Greeter 配置脚本**，交互式菜单，可用于替换默认的 LightDM 主题为 KamiDream WebKit2 主题。
+>   **LightDM WebKit2 Greeter setup script**, interactive menu — replaces default LightDM greeter with the KamiDream WebKit2 theme.
 > - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文等修补工具。
 >   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, and other patching tools.
 >
-> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
-> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras. `patch.sh` can be run at any time for fixes. See the awww wallpaper daemon section below for manual reference.
+> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
+> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
 
 ---
 
@@ -198,6 +200,36 @@ cd ArchInit
 | 📋 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
 ---
+### [`lightdm.sh`](lightdm.sh) — LightDM WebKit2 Greeter 配置 / LightDM WebKit2 Greeter Setup
+
+> 用于替换默认的 LightDM GTK Greeter，安装 `lightdm-webkit2-greeter` 并启用 KamiDream WebKit2 主题。
+> Use this script to replace the default LightDM GTK greeter with `lightdm-webkit2-greeter` and the KamiDream WebKit2 theme.
+
+#### Step 1: 安装 LightDM WebKit2 Greeter / Install LightDM WebKit2 Greeter
+
+| 操作 / Action                                           | 说明 / Description                                                                                   |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| 📦 安装 lightdm-webkit2-greeter / Install package          | `sudo pacman -S lightdm lightdm-webkit2-greeter` 并启用 `lightdm` 服务 / Install and enable LightDM  |
+| ▶️ 启用 LightDM 服务 / Enable LightDM service              | `sudo systemctl enable lightdm` — 设置 LightDM 开机自启 / Enable LightDM on boot                     |
+
+#### Step 2: 安装/更新 KamiDream 主题 / Install / Update KamiDream Theme
+
+| 操作 / Action                                             | 说明 / Description                                                                                                                                                                 |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧹 清理旧主题 / Clean up old theme                          | 若 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` 已存在则删除 / Remove existing theme directory if present                                                                |
+| 📥 克隆主题 / Clone theme                                   | `git clone https://github.com/KamiDream/LdmKw2Theme` 到 `~/LdmKw2Theme` 并移动到 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` / Clone to `~/LdmKw2Theme` then move to target |
+| 🔄 更新主题 / Update theme                                  | 重复执行 Step 2 即可自动删除旧主题并下载最新版 / Re-run Step 2 to delete the old theme and download the latest version                                                           |
+| 🖼️ 替换背景图片 / Replace background image                  | 替换 `/usr/share/lightdm-webkit/themes/KamiDream_Theme/assets/background.png` 为你自己的图片即可 / Replace the image at that path with your own                                |
+
+#### Step 3: 启用 LightDM 配置 / Enable LightDM Configuration
+
+| 操作 / Action                                                      | 说明 / Description                                                                                                             |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
+| ⚙️ 配置 `/etc/lightdm/lightdm.conf` / Configure lightdm.conf          | 在 `[Seat:*]` 段设置 `greeter-session=lightdm-webkit2-greeter` / Set greeter session to lightdm-webkit2-greeter              |
+| ⚙️ 配置 `/etc/lightdm/lightdm-webkit2-greeter.conf` / Configure conf | 将 `webkit_theme` 设置为 `KamiDream_Theme`（替换原值） / Set `webkit_theme` to `KamiDream_Theme` (replaces existing value) |
+| 🔄 重启提示 / Reboot prompt                                         | 配置完成后提示用户重启系统以应用 LightDM / Prompt user to reboot to apply LightDM                                             |
+
+---
 ### [`patch.sh`](patch.sh) — 修补工具 / Patch Tools
 
 #### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install
@@ -233,7 +265,7 @@ cd ArchInit
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh) 与 [`niri_tty.sh`](niri_tty.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh) and [`niri_tty.sh`](niri_tty.sh) run fully automated; [`niri_append.sh`](niri_append.sh) provides an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
+- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh) 与 [`niri_tty.sh`](niri_tty.sh) 为全自动一键安装，所有步骤依次执行；[`niri_append.sh`](niri_append.sh) 和 [`lightdm.sh`](lightdm.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh) and [`niri_tty.sh`](niri_tty.sh) run fully automated; [`niri_append.sh`](niri_append.sh) and [`lightdm.sh`](lightdm.sh) provide an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
 - **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh`、`niri_tty.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
