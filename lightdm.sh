@@ -50,10 +50,11 @@ STEPS=(
     "安装 LightDM WebKit2 Greeter / Install LightDM WebKit2 Greeter"
     "安装 KamiDream 主题 / Install KamiDream Theme"
     "启用 LightDM 配置 / Enable LightDM Configuration"
+    "黑屏救急 / Black Screen Emergency Fix"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0)
+COMPLETED=(0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -98,6 +99,10 @@ render_menu() {
     echo "========================================================================================================================="
     echo "                     ArchInit — LightDM WebKit2 Greeter 配置"
     echo "========================================================================================================================="
+    echo ""
+    echo -e "  ${YELLOW}${BOLD}⚠️  警告 / WARNING${RESET}"
+    echo -e "  ${YELLOW}  单 N 卡独显或开启了独显直连的用户（纯 N 卡用户）请勿使用此配置！${RESET}"
+    echo -e "  ${YELLOW}  Do NOT use this configuration if you have a single/primary NVIDIA GPU!${RESET}"
     echo ""
 
     for i in "${!STEPS[@]}"; do
@@ -185,17 +190,11 @@ execute_step() {
         1) # 安装 LightDM WebKit2 Greeter
         # ─────────────────────────────────────
             step_header 1
-            echo ">>> 安装 LightDM 和 lightdm-webkit2-greeter..."
-            echo "    Installing LightDM and lightdm-webkit2-greeter..."
-            sudo pacman -S --needed --noconfirm lightdm lightdm-webkit2-greeter
+            echo ">>> 安装 lightdm-webkit2-greeter..."
+            echo "    Installing lightdm-webkit2-greeter..."
+            sudo pacman -S --needed --noconfirm lightdm-webkit2-greeter
             echo ""
-            echo ">>> 启用 LightDM 服务..."
-            echo "    Enabling LightDM service..."
-            sudo systemctl enable lightdm
-            echo ""
-            echo -e "${GREEN}    ✅ LightDM 和 lightdm-webkit2-greeter 安装完成 / installed successfully.${RESET}"
-            echo "    （如果之前使用了其他 DM，请手动禁用后再启用 LightDM）"
-            echo "    (If you used another DM before, disable it manually and enable LightDM)"
+            echo -e "${GREEN}    ✅ lightdm-webkit2-greeter 安装完成 / installed successfully.${RESET}"
             echo "[Step 1 completed]"
             ;;
 
@@ -282,6 +281,27 @@ execute_step() {
                 ret_val=1
             fi
             echo "[Step 3 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        4) # 黑屏救急 — 注释 WebKit2 Greeter 配置并重启 LightDM
+        # ─────────────────────────────────────
+            step_header 4
+            echo ">>> 注释 /etc/lightdm/lightdm.conf 中的 greeter-session=lightdm-webkit2-greeter..."
+            echo "    Commenting out greeter-session=lightdm-webkit2-greeter in /etc/lightdm/lightdm.conf..."
+            if grep -q '^greeter-session=lightdm-webkit2-greeter' /etc/lightdm/lightdm.conf 2>/dev/null; then
+                sudo sed -i 's/^greeter-session=lightdm-webkit2-greeter/#greeter-session=lightdm-webkit2-greeter/' /etc/lightdm/lightdm.conf
+                echo -e "${GREEN}    ✅ 已注释 greeter-session 行 / Commented out.${RESET}"
+            else
+                echo -e "${YELLOW}    ⏭️  未找到 greeter-session=lightdm-webkit2-greeter，可能已被注释 / Not found, may already be commented.${RESET}"
+            fi
+            echo ""
+            echo ">>> 重启 LightDM 服务..."
+            echo "    Restarting LightDM service..."
+            sudo systemctl restart lightdm
+            echo ""
+            echo -e "${GREEN}    ✅ LightDM 已重启，已恢复默认 Greeter / LightDM restarted, default greeter restored.${RESET}"
+            echo "[Step 4 completed]"
             ;;
     esac
 

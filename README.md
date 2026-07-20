@@ -202,6 +202,9 @@ cd ArchInit
 ---
 ### [`lightdm.sh`](lightdm.sh) — LightDM WebKit2 Greeter 配置 / LightDM WebKit2 Greeter Setup
 
+> ⚠️ **单 N 卡独显或开启了独显直连的用户（纯 N 卡用户）请勿使用此配置！**
+> **Do NOT use this configuration if you have a single/primary NVIDIA GPU!**
+>
 > 用于替换默认的 LightDM GTK Greeter，安装 `lightdm-webkit2-greeter` 并启用 KamiDream WebKit2 主题。
 > Use this script to replace the default LightDM GTK greeter with `lightdm-webkit2-greeter` and the KamiDream WebKit2 theme.
 
@@ -209,8 +212,7 @@ cd ArchInit
 
 | 操作 / Action                                           | 说明 / Description                                                                                   |
 | ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 📦 安装 lightdm-webkit2-greeter / Install package          | `sudo pacman -S lightdm lightdm-webkit2-greeter` 并启用 `lightdm` 服务 / Install and enable LightDM  |
-| ▶️ 启用 LightDM 服务 / Enable LightDM service              | `sudo systemctl enable lightdm` — 设置 LightDM 开机自启 / Enable LightDM on boot                     |
+| 📦 安装 lightdm-webkit2-greeter / Install package          | `sudo pacman -S --needed --noconfirm lightdm-webkit2-greeter` / Install lightdm-webkit2-greeter only |
 
 #### Step 2: 安装/更新 KamiDream 主题 / Install / Update KamiDream Theme
 
@@ -228,6 +230,16 @@ cd ArchInit
 | ⚙️ 配置 `/etc/lightdm/lightdm.conf` / Configure lightdm.conf          | 在 `[Seat:*]` 段设置 `greeter-session=lightdm-webkit2-greeter` / Set greeter session to lightdm-webkit2-greeter              |
 | ⚙️ 配置 `/etc/lightdm/lightdm-webkit2-greeter.conf` / Configure conf | 将 `webkit_theme` 设置为 `KamiDream_Theme`（替换原值） / Set `webkit_theme` to `KamiDream_Theme` (replaces existing value) |
 | 🔄 重启提示 / Reboot prompt                                         | 配置完成后提示用户重启系统以应用 LightDM / Prompt user to reboot to apply LightDM                                             |
+
+#### Step 4: 黑屏救急 / Black Screen Emergency Fix
+
+> 如果配置 LightDM WebKit2 Greeter 后出现黑屏无法进入图形界面，运行此步骤可快速恢复默认 Greeter。
+> If you encounter a black screen after configuring LightDM WebKit2 Greeter, run this step to quickly restore the default greeter.
+
+| 操作 / Action                                                         | 说明 / Description                                                                                          |
+| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| #️⃣ 注释 WebKit2 Greeter 配置 / Comment out WebKit2 Greeter config       | 在 `/etc/lightdm/lightdm.conf` 中将 `greeter-session=lightdm-webkit2-greeter` 行前加 `#` 注释掉 / Comment out the line |
+| 🔄 重启 LightDM 服务 / Restart LightDM service                        | `sudo systemctl restart lightdm` — 立即重启 LightDM，恢复默认 GTK Greeter / Restart to restore default greeter        |
 
 ---
 ### [`patch.sh`](patch.sh) — 修补工具 / Patch Tools
