@@ -296,11 +296,15 @@ execute_step() {
                 echo -e "${YELLOW}    ⏭️  未找到 greeter-session=lightdm-webkit2-greeter，可能已被注释 / Not found, may already be commented.${RESET}"
             fi
             echo ""
-            echo ">>> 重启 LightDM 服务..."
-            echo "    Restarting LightDM service..."
-            sudo systemctl restart lightdm
+            echo "========================================================================================================================="
+            echo -e " ${YELLOW}${BOLD}  ⚠️  请重启系统以恢复默认 LightDM Greeter / Please reboot to restore default LightDM greeter${RESET}"
+            echo "     重启命令 / Reboot command: sudo reboot"
+            echo "     或 / Or: sudo systemctl reboot"
+            echo "========================================================================================================================="
             echo ""
-            echo -e "${GREEN}    ✅ LightDM 已重启，已恢复默认 Greeter / LightDM restarted, default greeter restored.${RESET}"
+            if ! prompt_enter_or_quit "按 Enter 继续 / Press Enter to continue"; then
+                ret_val=1
+            fi
             echo "[Step 4 completed]"
             ;;
     esac

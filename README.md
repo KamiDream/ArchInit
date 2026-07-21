@@ -239,7 +239,7 @@ cd ArchInit
 | 操作 / Action                                                         | 说明 / Description                                                                                          |
 | --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | #️⃣ 注释 WebKit2 Greeter 配置 / Comment out WebKit2 Greeter config       | 在 `/etc/lightdm/lightdm.conf` 中将 `greeter-session=lightdm-webkit2-greeter` 行前加 `#` 注释掉 / Comment out the line |
-| 🔄 重启 LightDM 服务 / Restart LightDM service                        | `sudo systemctl restart lightdm` — 立即重启 LightDM，恢复默认 GTK Greeter / Restart to restore default greeter        |
+| 🔄 重启系统 / Reboot system                                           | 重启系统以恢复默认 GTK Greeter / Reboot to restore default greeter                                                 |
 
 ---
 ### [`patch.sh`](patch.sh) — 修补工具 / Patch Tools
