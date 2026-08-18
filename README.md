@@ -172,7 +172,7 @@ cd ArchInit
 | 📋 复制配置 / Copy config                     | 将 `starship/starship.toml` 复制到 `~/.config/starship.toml` / Copy preset config                                                                                    |
 | ⚙️ 配置 `~/.zshrc` / Configure `~/.zshrc` | 在 `.zshrc` 末尾追加 `eval "$(starship init zsh)"`（在 Antidote 配置块之后）/ Append `eval "$(starship init zsh)"` at end of `.zshrc` (after the Antidote block) |
 
-> 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main)，默认使用 **Macchiato** 配色。提示符：`󰄛 ❯`（成功绿色，错误红色），目录淡紫色，Git 分支紫色。
+> 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main) 与 [TaouMou/starship-presets](https://github.com/TaouMou/starship-presets)，本人将这两个按照自己的喜好合并了一下。
 
 #### Step 8: fastfetch 配置 / fastfetch Configuration
 
