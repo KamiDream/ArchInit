@@ -378,10 +378,9 @@ USERDIRSEOF
             # ── 2. Write environment variables ──
             mkdir -p "$fcitx_conf_dir"
             cat > "$fcitx_conf" << 'FCITXEOF'
-# This file is written by ArchInit (patch.sh)
 # Fcitx5 input method environment variables
 XMODIFIERS=@im=fcitx5
-GTK_IM_MODULE=fcitx5
+#GTK_IM_MODULE=fcitx5
 QT_IM_MODULE=fcitx5
 SDL_IM_MODULE=fcitx5
 FCITXEOF
