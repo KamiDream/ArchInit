@@ -7,6 +7,7 @@
 # Currently includes:
 #   - UU Accelerator install for SteamDeck
 #   - XDG user dirs migration to English names
+#   - Fcitx5 input method environment variables setup
 #
 # For phone users (UU Accelerator):
 #   1. Install UU Accelerator console version on your phone first.
@@ -58,10 +59,11 @@ LOGO
 STEPS=(
     "UU 加速器安装 / UU Accelerator Install"
     "XDG 用户目录转英文 / Migrate XDG Dirs to English"
+    "Fcitx5 输入法环境变量 / Fcitx5 IM Environment Variables"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0)
+COMPLETED=(0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -352,6 +354,45 @@ USERDIRSEOF
             echo "    Re-login to verify. Backup can be removed manually:"
             echo "      rm \"${user_dirs_bak}\""
             echo "[Step 2 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        3) # Fcitx5 输入法环境变量 / Fcitx5 IM Environment Variables
+        # ─────────────────────────────────────
+            step_header 3
+
+            local fcitx_conf_dir="$HOME/.config/environment.d"
+            local fcitx_conf="$fcitx_conf_dir/fcitx.conf"
+
+            echo ">>> 写入 Fcitx5 输入法环境变量..."
+            echo "    Writing Fcitx5 input method environment variables..."
+            echo "    目标文件 / Target file: ${fcitx_conf}"
+            echo ""
+
+            # ── 1. Backup old config if it exists ──
+            if [[ -f "$fcitx_conf" ]]; then
+                cp "$fcitx_conf" "${fcitx_conf}.bak.$(date +%s)"
+                echo "    原配置已备份 / Old config backed up: ${fcitx_conf}.bak.*"
+            fi
+
+            # ── 2. Write environment variables ──
+            mkdir -p "$fcitx_conf_dir"
+            cat > "$fcitx_conf" << 'FCITXEOF'
+# This file is written by ArchInit (patch.sh)
+# Fcitx5 input method environment variables
+XMODIFIERS=@im=fcitx5
+GTK_IM_MODULE=fcitx5
+QT_IM_MODULE=fcitx5
+SDL_IM_MODULE=fcitx5
+FCITXEOF
+            echo "    ✅ 配置文件已写入 / Config written: ${fcitx_conf}"
+
+            # ── 3. Done ──
+            echo ""
+            echo "    ✅ Fcitx5 环境变量已配置 / Fcitx5 environment variables configured."
+            echo "    重新登录后生效（environment.d 由 systemd 用户会话加载）。"
+            echo "    Re-login to take effect (environment.d is loaded by systemd user session)."
+            echo "[Step 3 completed]"
             ;;
     esac
 

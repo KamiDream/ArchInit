@@ -50,8 +50,8 @@ cd ArchInit
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
 > - **`lightdm.sh`**：**LightDM WebKit2 Greeter 配置脚本**，交互式菜单，可用于替换默认的 LightDM 主题为 KamiDream WebKit2 主题。
 >   **LightDM WebKit2 Greeter setup script**, interactive menu — replaces default LightDM greeter with the KamiDream WebKit2 theme.
-> - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文等修补工具。
->   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, and other patching tools.
+> - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文、Fcitx5 输入法环境变量配置等修补工具。
+>   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, Fcitx5 IM environment variables setup, and other patching tools.
 >
 > 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
 > Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
@@ -272,6 +272,14 @@ cd ArchInit
 | | ✏️ 写入英文配置 / Write English config                   | 直接写入 `~/.config/user-dirs.dirs`，所有路径为英文（Desktop、Downloads、Projects 等），不依赖 locale / Directly write `~/.config/user-dirs.dirs` with all English paths (Desktop, Downloads, Projects, etc.), locale-independent                                                                                                                                                                                                                                                                                              |
 | | 📂 迁移目录内容 / Migrate directory contents             | 对比新旧配置，对每个路径变化的目录：创建英文目录 → 移动所有内容（含隐藏文件）→ 删除旧的中文目录 / Compare old vs new config; for each changed directory: create English dir → move all contents (including hidden files) -> remove old Chinese dir                                                                                                                                                                                                       |
 | | ✅ 完成提示 / Completion notice                          | 显示迁移统计，告知备份文件位置，提示重新登录生效 / Show migration stats, backup location, re-login hint                                                                                                                                                                                                                                                                                                                                                             |
+
+#### Step 3: Fcitx5 输入法环境变量 / Fcitx5 IM Environment Variables
+
+| 操作 / Action                                   | 说明 / Description                                                                                                                                                                                                                                                                              |
+| ----------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| | 💾 备份原配置 / Backup old config                 | 若 `~/.config/environment.d/fcitx.conf` 已存在则备份为 `fcitx.conf.bak.<timestamp>` / Backup existing `~/.config/environment.d/fcitx.conf` to `fcitx.conf.bak.<timestamp>`                                                                                                            |
+| | ✏️ 写入环境变量 / Write environment variables     | 在 `~/.config/environment.d/fcitx.conf` 写入 `XMODIFIERS=@im=fcitx5`、`GTK_IM_MODULE=fcitx5`、`QT_IM_MODULE=fcitx5`、`SDL_IM_MODULE=fcitx5` / Write `XMODIFIERS=@im=fcitx5`, `GTK_IM_MODULE=fcitx5`, `QT_IM_MODULE=fcitx5`, `SDL_IM_MODULE=fcitx5` to `~/.config/environment.d/fcitx.conf` |
+| | ✅ 完成提示 / Completion notice                    | 提示重新登录后生效（environment.d 由 systemd 用户会话加载）/ Re-login to take effect (environment.d is loaded by systemd user session)                                                                                                                                                   |
 
 ---
 
