@@ -199,6 +199,13 @@ cd ArchInit
 | 🀄 安装雾凇拼音 / Install Rime-ice       | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                                                                                                                                                                                    |
 | 📋 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
+#### Step 12: 安装密钥库 / Install Keyring
+
+| 操作 / Action                              | 说明 / Description                                                                                                                                                                       |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📦 安装密钥库 / Install keyring packages      | `sudo pacman -S gnome-keyring libsecret seahorse`（密钥环守护进程、Secret Service API 库、图形化管理工具 / keyring daemon, Secret Service API library, and GUI keyring manager） |
+| ▶️ 查看服务状态 / Check service status        | `systemctl --user status gnome-keyring-daemon.service` 查看 gnome-keyring-daemon 用户服务运行状态 / Check the status of the `gnome-keyring-daemon` user service                       |
+
 ---
 ### [`lightdm.sh`](lightdm.sh) — LightDM WebKit2 Greeter 配置 / LightDM WebKit2 Greeter Setup
 

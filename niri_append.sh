@@ -59,10 +59,11 @@ STEPS=(
     "配置 fastfetch 启动 / Configure fastfetch on startup"
     "Kitty 背景透明度 / Kitty Background Opacity"
     "雾凇拼音 / Rime-ice Input Method"
+    "安装密钥库 / Install Keyring"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -565,6 +566,22 @@ EOF
             echo "    Log out and back in, or restart Fcitx5 to load Rime-ice."
             echo "    If the schema does not appear, try re-deploying from Fcitx5 tray."
             echo "[Step 11 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        12) # 安装密钥库 / Install Keyring
+        # ─────────────────────────────────────
+            step_header 12
+            echo ">>> 安装密钥库 / Installing keyring packages..."
+            sudo pacman -S --needed --noconfirm gnome-keyring libsecret seahorse
+            echo "    gnome-keyring libsecret seahorse 安装完成 / installed."
+            echo ""
+            echo ">>> 查看 gnome-keyring-daemon 服务状态 / Checking gnome-keyring-daemon service status..."
+            systemctl --user status gnome-keyring-daemon.service --no-pager || true
+            echo ""
+            echo "    提示：如服务未运行，重新登录后 systemd 用户会话会自动启动 gnome-keyring-daemon"
+            echo "    Tip: if the service is not running, re-login so the systemd user session starts it automatically."
+            echo "[Step 12 completed]"
             ;;
 
     esac
