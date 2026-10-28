@@ -188,7 +188,7 @@ execute_step() {
             step_header 1
             echo ">>> Installing Niri and related components..."
             sudo pacman -Syu --needed --noconfirm niri xwayland-satellite xdg-desktop-portal-gnome \
-                xdg-desktop-portal-gtk kitty dux-shell matugen cava \
+                xdg-desktop-portal-gtk kitty matugen cava \
                 qt6-multimedia-ffmpeg lightdm lightdm-gtk-greeter kimageformats power-profiles-daemon cups-pk-helper
             echo "[Step 1 completed]"
             ;;
