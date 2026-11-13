@@ -195,7 +195,11 @@ execute_step() {
         # ─────────────────────────────────────
             step_header 2
             echo ">>> Installing base packages..."
-            sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g vim firefox
+            sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g vim firefox \
+                pcmanfm-qt udisks2
+            echo ">>> Setting pcmanfm-qt as default file manager..."
+            xdg-mime default pcmanfm-qt.desktop inode/directory 2>/dev/null || true
+            echo "    pcmanfm-qt set as default for inode/directory."
 
             echo ""
             echo ">>> Uncommenting zh_CN.UTF-8 in /etc/locale.gen..."
