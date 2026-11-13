@@ -207,6 +207,31 @@ execute_step() {
             echo "    Usage: sudo ntfsfix -d /dev/sdXN"
 
             echo ""
+            echo ">>> [Root Cause 2: missing auto-mount daemon]"
+            echo "    pcmanfm-qt's [Volume] MountRemovable=true relies on the LXQt session"
+            echo "    (lxqt-session + pcmanfm-qt desktop mode), which is inactive under niri."
+            echo "    Installing udiskie as a lightweight auto-mounter..."
+            sudo pacman -S --needed --noconfirm udiskie gvfs
+            echo "    (gvfs provides the GIO virtual filesystem mounts — trash, network, MTP, etc.)"
+            echo "    Enabling udiskie as a systemd user service (WM-independent)..."
+            mkdir -p ~/.config/systemd/user
+            cat > ~/.config/systemd/user/udiskie.service << 'EOF'
+[Unit]
+Description=udiskie auto-mounter
+
+[Service]
+ExecStart=/usr/bin/udiskie
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+            systemctl --user daemon-reload
+            systemctl --user enable --now udiskie.service
+            systemctl --user status udiskie --no-pager || true
+            echo "    udiskie auto-mount daemon enabled."
+
+            echo ""
             echo ">>> Uncommenting zh_CN.UTF-8 in /etc/locale.gen..."
             sudo sed -i 's/^#zh_CN.UTF-8/zh_CN.UTF-8/' /etc/locale.gen
             echo "    zh_CN.UTF-8 enabled."
