@@ -60,31 +60,26 @@ cd ArchInit
 
 ### [`niri_dms.sh`](niri_dms.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
 
-#### Step 1: 核心桌面环境 / Core Desktop Environment (Niri)
-
-| 操作 / Action                                          | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🖥️ 安装 Niri 及周边组件 / Install Niri & related packages | `niri`（平铺窗口管理器 / tiling WM）、`xwayland-satellite`（XWayland 支持）、`xdg-desktop-portal-gnome` / `xdg-desktop-portal-gtk`（桌面门户 / desktop portals）、`kitty`（GPU 加速终端 / GPU-accelerated terminal）、`dms-shell`（DMS Shell）、`matugen`（Material You 配色生成器 / color generator）、`cava`（终端音频可视化 / audio visualizer）、`qt6-multimedia-ffmpeg`（Qt6 多媒体后端 / multimedia backend）、`lightdm` / `lightdm-gtk-greeter`（显示管理器 / display manager & greeter）、`kimageformats`（KDE 图像格式插件 / KDE image format plugins）、`power-profiles-daemon`（电源管理 / power management）、`cups-pk-helper`（CUPS 打印 PolicyKit 授权助手 / PolicyKit helper for CUPS printing） |
-
-#### Step 2: 注册 DMS 服务 / Register DMS Service
+#### Step 1: 注册 DMS 服务 / Register DMS Service
 
 | 操作 / Action            | 说明 / Description                                                                                                                                          |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🔗 安装 DMS / Install DMS | 通过官方脚本安装 DMS / Install DMS via the official script：`curl -fsSL https://install.danklinux.com \| sh`                                              |
 
-#### Step 3: 基础初始化 / Basic Initialization
+#### Step 2: 基础初始化 / Basic Initialization
 
 | 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 📦 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`vim`、`quickshell`、`firefox`                                                                                             |
+| 📦 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`vim`、`firefox`                                                                                             |
 | 🌐 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
 | 🔤 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd`、`ttf-fira-code`、`inter-font` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
 | 📁 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
 
-#### Step 4: 显示管理器 / Display Manager (LightDM)
+#### Step 3: 显示管理器 / Display Manager (LightDM)
 
-| 操作 / Action                 | 说明 / Description                                                      |
-| ----------------------------- | ----------------------------------------------------------------------- |
+| 操作 / Action                     | 说明 / Description                                                      |
+| --------------------------------- | ----------------------------------------------------------------------- |
+| 📦 安装 LightDM / Install LightDM   | 安装 `lightdm` 与 `lightdm-gtk-greeter` / Install `lightdm` and `lightdm-gtk-greeter` |
 | ▶️ 启用 LightDM / Enable LightDM | 设置 LightDM 开机自启 / Enable LightDM to start on boot                 |
 | 🚀 启动 LightDM / Start LightDM  | 立即启动 LightDM 显示管理器 / Start LightDM display manager immediately |
 

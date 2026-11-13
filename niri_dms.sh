@@ -47,14 +47,13 @@ LOGO
 # Step definitions
 # ─────────────────────────────────────────────
 STEPS=(
-    "Core Desktop (Niri)"
     "Register DMS Service"
     "Basic Initialization"
     "Display Manager (LightDM)"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0)
+COMPLETED=(0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -183,31 +182,20 @@ execute_step() {
 
     case $step_num in
         # ─────────────────────────────────────
-        1) # Core Desktop (Niri)
+        1) # Register DMS Service
         # ─────────────────────────────────────
             step_header 1
-            echo ">>> Installing Niri and related components..."
-            sudo pacman -Syu --needed --noconfirm niri xwayland-satellite xdg-desktop-portal-gnome \
-                xdg-desktop-portal-gtk kitty matugen cava \
-                qt6-multimedia-ffmpeg lightdm lightdm-gtk-greeter kimageformats power-profiles-daemon cups-pk-helper
+            echo ">>> Registering DMS as a user service dependency of Niri..."
+            curl -fsSL https://install.danklinux.com | sh
             echo "[Step 1 completed]"
             ;;
 
         # ─────────────────────────────────────
-        2) # Register DMS Service
+        2) # Basic Initialization
         # ─────────────────────────────────────
             step_header 2
-            echo ">>> Registering DMS as a user service dependency of Niri..."
-            curl -fsSL https://install.danklinux.com | sh
-            echo "[Step 2 completed]"
-            ;;
-
-        # ─────────────────────────────────────
-        3) # Basic Initialization
-        # ─────────────────────────────────────
-            step_header 3
             echo ">>> Installing base packages..."
-            sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g vim quickshell firefox
+            sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g vim firefox
 
             echo ""
             echo ">>> Uncommenting zh_CN.UTF-8 in /etc/locale.gen..."
@@ -252,18 +240,20 @@ EOF
             echo "    XDG user directories configured with English names."
             echo "    (Desktop, Downloads, Documents, Pictures, Music, Videos, Public, Templates, Projects)"
 
-            echo "[Step 3 completed]"
+            echo "[Step 2 completed]"
             ;;
 
         # ─────────────────────────────────────
-        4) # Display Manager (LightDM)
+        3) # Display Manager (LightDM)
         # ─────────────────────────────────────
-            step_header 4
+            step_header 3
+            echo ">>> Installing LightDM and greeter..."
+            sudo pacman -S --needed --noconfirm lightdm lightdm-gtk-greeter
             echo ">>> Enabling LightDM display manager..."
             sudo systemctl enable lightdm
             echo ">>> Starting LightDM..."
             sudo systemctl start lightdm
-            echo "[Step 4 completed]"
+            echo "[Step 3 completed]"
             ;;
 
     esac
