@@ -118,7 +118,13 @@ cd ArchInit
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🎨 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font via `kitten choose-fonts` |
 
-#### Step 2: KVM 虚拟化 / KVM Virtualization
+#### Step 2: 核心组件 / Core Components
+
+| 操作 / Action                        | 说明 / Description                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| 📦 安装核心组件 / Install core packages | `kimageformats`（KDE 图像格式插件 / KDE image format plugins）、`power-profiles-daemon`（电源管理 / power management）、`cava`（终端音频可视化 / audio visualizer） |
+
+#### Step 3: KVM 虚拟化 / KVM Virtualization
 
 | 操作 / Action                        | 说明 / Description                                                                                         |
 | ------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
@@ -127,14 +133,14 @@ cd ArchInit
 | 🌐 配置网络 / Configure network         | 启动并设置 `default` 虚拟网络为自动启动 / Start and autostart the `default` virtual network            |
 | 👤 用户权限 / User permissions          | 将当前用户加入 `libvirt` 组（需重新登录生效）/ Add current user to `libvirt` group (re-login required) |
 
-#### Step 3: AUR 助手 / AUR Helper (yay / paru)
+#### Step 4: AUR 助手 / AUR Helper (yay / paru)
 
 | 操作 / Action                           | 说明 / Description                                                                                                                                                            |
 | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ⚙️ 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
 | 📦 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
 
-#### Step 4: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
+#### Step 5: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
 | 操作 / Action                            | 说明 / Description                                                                                                                                                                                                                                                                                        |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -142,7 +148,7 @@ cd ArchInit
 | 🎮 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                                                                                                                                                                                    |
 | ⚙️ 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs          |
 
-#### Step 5: 启用 Zsh 终端 / Enable Zsh Shell
+#### Step 6: 启用 Zsh 终端 / Enable Zsh Shell
 
 | 操作 / Action                         | 说明 / Description                                                             |
 | ------------------------------------- | ------------------------------------------------------------------------------ |
@@ -150,7 +156,7 @@ cd ArchInit
 | 🔄 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh |
 | 🎨 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                    |
 
-#### Step 6: Antidote 插件管理器 / Antidote Plugin Manager
+#### Step 7: Antidote 插件管理器 / Antidote Plugin Manager
 
 | 操作 / Action                          | 说明 / Description                                                                                                                                              |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -159,7 +165,7 @@ cd ArchInit
 | ⚙️ 配置插件 / Configure plugins           | 创建 `~/.zsh_plugins.txt`，添加 `zsh-completions`、`zsh-autosuggestions`、`fast-syntax-highlighting` / Create plugin list file with recommended plugins |
 | ⚙️ 配置 `.zshrc` / Configure `.zshrc` | 添加 `source ~/.antidote/antidote.zsh`、`antidote load` 和 `compinit` / Add Antidote source, load and compinit to `.zshrc`                              |
 
-#### Step 7: Starship 提示符 / Starship Prompt
+#### Step 8: Starship 提示符 / Starship Prompt
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                       |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -169,32 +175,32 @@ cd ArchInit
 
 > 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main) 与 [TaouMou/starship-presets](https://github.com/TaouMou/starship-presets)，本人将这两个按照自己的喜好合并了一下。
 
-#### Step 8: fastfetch 配置 / fastfetch Configuration
+#### Step 9: fastfetch 配置 / fastfetch Configuration
 
 | 操作 / Action          | 说明 / Description                                                                                                                                |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 📋 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
 
-#### Step 9: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
+#### Step 10: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🔄 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
 
-#### Step 10: Kitty 背景透明度 / Kitty Background Opacity
+#### Step 11: Kitty 背景透明度 / Kitty Background Opacity
 
 | 操作 / Action                   | 说明 / Description                                                                                                                                                                                                                           |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🎨 调整背景透明度 / Adjust opacity | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
 
-#### Step 11: 雾凇拼音 / Rime-ice Input Method
+#### Step 12: 雾凇拼音 / Rime-ice Input Method
 
 | 操作 / Action                         | 说明 / Description                                                                                                                                                                                                                                                                                                                          |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🀄 安装雾凇拼音 / Install Rime-ice       | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                                                                                                                                                                                    |
 | 📋 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
-#### Step 12: 安装密钥库 / Install Keyring
+#### Step 13: 安装密钥库 / Install Keyring
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                                       |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -319,7 +325,7 @@ Check the `MODULES` line in `/etc/mkinitcpio.conf`, then run `sudo mkinitcpio -P
 - **LTS 内核定位**：仅作为紧急情况下的备用内核，正常情况下不会使用。
 - **如果不想看到报错**，按以下步骤操作：
   1. 安装 LTS 头文件：`sudo pacman -S linux-lts-headers`
-  2. 重新运行 [`niri_append.sh`](niri_append.sh) 的 **Step 4**（NVIDIA 显卡驱动脚本）
+  2. 重新运行 [`niri_append.sh`](niri_append.sh) 的 **Step 5**（NVIDIA 显卡驱动脚本）
   3. 重启系统
 
 This error occurs because the script only auto-detects `linux` and `linux-zen` kernels — it does not install `linux-lts-headers` or `linux-hardened-headers`. If you have the LTS kernel installed, `mkinitcpio -P` builds initramfs for **all** installed kernels, and missing LTS headers cause compilation warnings/errors.
@@ -328,7 +334,7 @@ This error occurs because the script only auto-detects `linux` and `linux-zen` k
 - **LTS kernel role**: Emergency backup only — not used under normal circumstances.
 - **To suppress the error**:
   1. Install LTS headers: `sudo pacman -S linux-lts-headers`
-  2. Re-run **Step 4** of [`niri_append.sh`](niri_append.sh) (NVIDIA driver script)
+  2. Re-run **Step 5** of [`niri_append.sh`](niri_append.sh) (NVIDIA driver script)
   3. Reboot
 
 ### Q：locales 未生效？/ Locales not working?

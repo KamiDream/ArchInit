@@ -49,6 +49,7 @@ LOGO
 # ─────────────────────────────────────────────
 STEPS=(
     "Kitty 字体选择 / Kitty Font Selector"
+    "核心组件 / Core Components"
     "KVM 虚拟化 / KVM Virtualization"
     "AUR 助手 / AUR Helper (yay / paru)"
     "NVIDIA 显卡驱动 / NVIDIA Graphics Driver"
@@ -63,7 +64,7 @@ STEPS=(
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -220,9 +221,18 @@ execute_step() {
             ;;
 
         # ─────────────────────────────────────
-        2) # KVM 虚拟化 / KVM Virtualization
+        2) # 核心组件 / Core Components
         # ─────────────────────────────────────
             step_header 2
+            echo ">>> Installing core desktop packages..."
+            sudo pacman -S --needed --noconfirm kimageformats power-profiles-daemon cava
+            echo "[Step 2 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        3) # KVM 虚拟化 / KVM Virtualization
+        # ─────────────────────────────────────
+            step_header 3
             echo ">>> Installing KVM packages..."
             sudo pacman -S --needed --noconfirm qemu-full virt-manager swtpm dnsmasq
             echo ">>> Enabling and starting libvirtd service..."
@@ -233,13 +243,13 @@ execute_step() {
             echo ">>> Adding current user to libvirt group..."
             sudo usermod -a -G libvirt "$(whoami)"
             echo "    Note: re-login is required for group changes to take effect."
-            echo "[Step 2 completed]"
+            echo "[Step 3 completed]"
             ;;
 
         # ─────────────────────────────────────
-        3) # AUR 助手 / AUR Helper (yay / paru)
+        4) # AUR 助手 / AUR Helper (yay / paru)
         # ─────────────────────────────────────
-            step_header 3
+            step_header 4
             echo ">>> Configuring /etc/pacman.conf..."
             # Uncomment [multilib] and its Include line
             sudo sed -i '/^#\[multilib\]/,/^#Include/ s/^#//' /etc/pacman.conf
@@ -262,13 +272,13 @@ EOF
             sudo pacman -Sy --needed --noconfirm archlinuxcn-keyring
             sudo pacman -S --needed --noconfirm base-devel yay paru flclash
             sudo pacman -Syu --noconfirm
-            echo "[Step 3 completed]"
+            echo "[Step 4 completed]"
             ;;
 
         # ─────────────────────────────────────
-        4) # NVIDIA 显卡驱动 / NVIDIA Graphics Driver
+        5) # NVIDIA 显卡驱动 / NVIDIA Graphics Driver
         # ─────────────────────────────────────
-            step_header 4
+            step_header 5
             echo ">>> Installing kernel headers (detecting installed kernels)..."
             HEADERS=()
             pacman -Q linux >/dev/null 2>&1 && HEADERS+=(linux-headers) && echo "    linux kernel detected -> linux-headers"
@@ -294,7 +304,7 @@ EOF
                 fi
                 echo ">>> Regenerating initramfs..."
                 sudo mkinitcpio -P
-                echo "[Step 4 completed]"
+                echo "[Step 5 completed]"
             else
                 echo -e "${YELLOW}    ⚠️  No supported kernel found (linux/linux-zen). This step requires at least one kernel installed. Aborting.${RESET}"
                 ret_val=1
@@ -302,9 +312,9 @@ EOF
             ;;
 
         # ─────────────────────────────────────
-        5) # 启用 Zsh 终端 / Enable Zsh Shell
+        6) # 启用 Zsh 终端 / Enable Zsh Shell
         # ─────────────────────────────────────
-            step_header 5
+            step_header 6
             echo ">>> Installing Zsh..."
             sudo pacman -S --needed --noconfirm zsh zsh-completions
             echo ">>> Listing available shells..."
@@ -326,13 +336,13 @@ EOF
             else
                 echo "    Kitty cursor settings already present, skipping."
             fi
-            echo "[Step 5 completed]"
+            echo "[Step 6 completed]"
             ;;
 
         # ─────────────────────────────────────
-        6) # Antidote 插件管理器 / Antidote Plugin Manager
+        7) # Antidote 插件管理器 / Antidote Plugin Manager
         # ─────────────────────────────────────
-            step_header 6
+            step_header 7
             if ! check_zsh; then
                 if ! prompt_enter_or_quit "Press Enter to skip"; then
                     ret_val=1
@@ -405,14 +415,14 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 # === Antidote End ===
 EOF
                 echo "    Antidote configuration written to ~/.zshrc."
-                echo "[Step 6 completed]"
+                echo "[Step 7 completed]"
             fi
             ;;
 
         # ─────────────────────────────────────
-        7) # Starship 提示符 / Starship Prompt
+        8) # Starship 提示符 / Starship Prompt
         # ─────────────────────────────────────
-            step_header 7
+            step_header 8
             if ! check_zsh; then
                 if ! prompt_enter_or_quit "Press Enter to skip"; then
                     ret_val=1
@@ -442,25 +452,25 @@ EOF
 eval "$(starship init zsh)"
 EOF
                 echo "    Starship init written to ~/.zshrc."
-                echo "[Step 7 completed]"
+                echo "[Step 8 completed]"
             fi
             ;;
 
         # ─────────────────────────────────────
-        8) # fastfetch 配置 / fastfetch Configuration
+        9) # fastfetch 配置 / fastfetch Configuration
         # ─────────────────────────────────────
-            step_header 8
+            step_header 9
             echo ">>> Copying fastfetch config to ~/.config/fastfetch..."
             mkdir -p ~/.config/fastfetch
             cp -r "$SCRIPT_DIR/fastfetch/"* ~/.config/fastfetch/
             echo "    fastfetch config copied successfully."
-            echo "[Step 8 completed]"
+            echo "[Step 9 completed]"
             ;;
 
         # ─────────────────────────────────────
-        9) # 配置 fastfetch 启动 / Configure fastfetch on startup
+        10) # 配置 fastfetch 启动 / Configure fastfetch on startup
         # ─────────────────────────────────────
-            step_header 9
+            step_header 10
             # Check if fastfetch (with or without leading space) is already the first line
             if [[ -f ~/.zshrc ]] && head -1 ~/.zshrc | grep -qE '^\s?fastfetch$'; then
                 echo ">>> fastfetch 已存在于 ~/.zshrc 第一行，正在移除（关闭自启）..."
@@ -478,17 +488,17 @@ EOF
                 echo "    fastfetch 已添加为 .zshrc 第一行（带前导空格，不记入历史）。"
                 echo "    ✅ 已开启 fastfetch 开机自启。"
             fi
-            echo "[Step 9 completed]"
+            echo "[Step 10 completed]"
             ;;
 
         # ─────────────────────────────────────
-        10) # Kitty 背景透明度 / Kitty Background Opacity
+        11) # Kitty 背景透明度 / Kitty Background Opacity
         # ─────────────────────────────────────
-            step_header 10
+            step_header 11
             kitty_conf="$HOME/.config/kitty/kitty.conf"
             if [[ ! -f "$kitty_conf" ]]; then
                 echo -e "${YELLOW}  ⚠️  Kitty 配置文件不存在 / Kitty config not found at ${kitty_conf}${RESET}"
-                echo "    请先执行 Step 5 (Kitty 终端配置) / Please run Step 5 first."
+                echo "    请先执行 Step 6 (Kitty 终端配置) / Please run Step 6 first."
                 if ! prompt_enter_or_quit "按 Enter 返回菜单 / Press Enter to return"; then
                     ret_val=1
                 fi
@@ -539,14 +549,14 @@ EOF
                 fi
                 echo -e "${GREEN}    ✅ 已更新 Kitty 背景透明度为 ${new_opacity}${RESET}"
                 echo "    重启 Kitty 终端即可生效 / Restart Kitty terminal to apply"
-                echo "[Step 10 completed]"
+                echo "[Step 11 completed]"
             fi
             ;;
 
         # ─────────────────────────────────────
-        11) # 雾凇拼音 / Rime-ice Input Method
+        12) # 雾凇拼音 / Rime-ice Input Method
         # ─────────────────────────────────────
-            step_header 11
+            step_header 12
             echo ">>> 安装雾凇拼音 / Installing Rime-ice input method..."
             yay -S --noconfirm rime-ice-pinyin-git
             echo "    rime-ice-pinyin-git 安装完成 / installed."
@@ -565,13 +575,13 @@ EOF
             echo "    如果词库未生效，可尝试在 Fcitx5 中重新部署（右键托盘图标 → 重新部署）"
             echo "    Log out and back in, or restart Fcitx5 to load Rime-ice."
             echo "    If the schema does not appear, try re-deploying from Fcitx5 tray."
-            echo "[Step 11 completed]"
+            echo "[Step 12 completed]"
             ;;
 
         # ─────────────────────────────────────
-        12) # 安装密钥库 / Install Keyring
+        13) # 安装密钥库 / Install Keyring
         # ─────────────────────────────────────
-            step_header 12
+            step_header 13
             echo ">>> 安装密钥库 / Installing keyring packages..."
             sudo pacman -S --needed --noconfirm gnome-keyring libsecret seahorse
             echo "    gnome-keyring libsecret seahorse 安装完成 / installed."
@@ -581,7 +591,7 @@ EOF
             echo ""
             echo "    提示：如服务未运行，重新登录后 systemd 用户会话会自动启动 gnome-keyring-daemon"
             echo "    Tip: if the service is not running, re-login so the systemd user session starts it automatically."
-            echo "[Step 12 completed]"
+            echo "[Step 13 completed]"
             ;;
 
     esac
