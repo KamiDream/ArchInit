@@ -202,6 +202,11 @@ execute_step() {
             echo "    pcmanfm-qt set as default for inode/directory."
 
             echo ""
+            echo ">>> Installing ntfsprogs (repair NTFS dirty flag with ntfsfix)..."
+            sudo pacman -S --needed --noconfirm ntfsprogs
+            echo "    Usage: sudo ntfsfix -d /dev/sdXN"
+
+            echo ""
             echo ">>> Uncommenting zh_CN.UTF-8 in /etc/locale.gen..."
             sudo sed -i 's/^#zh_CN.UTF-8/zh_CN.UTF-8/' /etc/locale.gen
             echo "    zh_CN.UTF-8 enabled."
