@@ -202,6 +202,11 @@ execute_step() {
             echo "    pcmanfm-qt set as default for inode/directory."
 
             echo ""
+            echo ">>> Installing xarchiver (archive extraction tool)..."
+            sudo pacman -S --needed --noconfirm xarchiver
+            echo "    (Double-clicking an archive in pcmanfm-qt does nothing without this.)"
+
+            echo ""
             echo ">>> Installing ntfsprogs (repair NTFS dirty flag with ntfsfix)..."
             sudo pacman -S --needed --noconfirm ntfsprogs
             echo "    Usage: sudo ntfsfix -d /dev/sdXN"
