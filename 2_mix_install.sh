@@ -51,6 +51,7 @@ STEPS=(
     "KVM 虚拟化 / KVM Virtualization"
     "NVIDIA 显卡驱动 / NVIDIA Graphics Driver"
     "Intel 核显驱动 / Intel Integrated Graphics"
+    "AMD 核显驱动 / AMD Integrated Graphics"
     "启用 Zsh 终端 / Enable Zsh Shell"
     "Antidote 插件管理器 / Antidote Plugin Manager"
     "Starship 提示符 / Starship Prompt"
@@ -60,7 +61,7 @@ STEPS=(
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -124,8 +125,8 @@ render_menu() {
         local mark=" "
 
         # 在指定分组边界前输出分隔线
-        # 分组：Step 1 | Step 2-3 | Step 4-9
-        if [[ $i -eq 1 ]] || [[ $i -eq 3 ]]; then
+        # 分组：Step 1 | Step 2-4 | Step 5-10
+        if [[ $i -eq 1 ]] || [[ $i -eq 4 ]]; then
             echo "  ──────────────────────────────────────────────────────────────────────────────────────────────────────"
         fi
 
@@ -272,9 +273,21 @@ execute_step() {
             ;;
 
         # ─────────────────────────────────────
-        4) # 启用 Zsh 终端 / Enable Zsh Shell
+        4) # AMD 核显驱动 / AMD Integrated Graphics
         # ─────────────────────────────────────
             step_header 4
+            echo ">>> Installing AMD integrated graphics drivers..."
+            sudo pacman -S --needed --noconfirm mesa vulkan-radeon libva-mesa-driver mesa-utils
+            echo "    (mesa: OpenGL/Vulkan 驱动基础; vulkan-radeon: AMD Vulkan 驱动(RADV);"
+            echo "     libva-mesa-driver: VA-API 硬件视频解码; mesa-utils: glxinfo 等诊断工具)"
+            echo "    --needed 已启用：已安装的包会自动跳过 / --needed skips already-installed packages."
+            echo "[Step 4 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        5) # 启用 Zsh 终端 / Enable Zsh Shell
+        # ─────────────────────────────────────
+            step_header 5
             echo ">>> Installing Zsh..."
             sudo pacman -S --needed --noconfirm zsh zsh-completions
             echo ">>> Listing available shells..."
@@ -296,13 +309,13 @@ EOF
             else
                 echo "    Kitty cursor settings already present, skipping."
             fi
-            echo "[Step 4 completed]"
+            echo "[Step 5 completed]"
             ;;
 
         # ─────────────────────────────────────
-        5) # Antidote 插件管理器 / Antidote Plugin Manager
+        6) # Antidote 插件管理器 / Antidote Plugin Manager
         # ─────────────────────────────────────
-            step_header 5
+            step_header 6
             if ! check_zsh; then
                 if ! prompt_enter_or_quit "Press Enter to skip"; then
                     ret_val=1
@@ -375,14 +388,14 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 # === Antidote End ===
 EOF
                 echo "    Antidote configuration written to ~/.zshrc."
-                echo "[Step 5 completed]"
+                echo "[Step 6 completed]"
             fi
             ;;
 
         # ─────────────────────────────────────
-        6) # Starship 提示符 / Starship Prompt
+        7) # Starship 提示符 / Starship Prompt
         # ─────────────────────────────────────
-            step_header 6
+            step_header 7
             if ! check_zsh; then
                 if ! prompt_enter_or_quit "Press Enter to skip"; then
                     ret_val=1
@@ -412,25 +425,25 @@ EOF
 eval "$(starship init zsh)"
 EOF
                 echo "    Starship init written to ~/.zshrc."
-                echo "[Step 6 completed]"
+                echo "[Step 7 completed]"
             fi
             ;;
 
         # ─────────────────────────────────────
-        7) # fastfetch 配置 / fastfetch Configuration
+        8) # fastfetch 配置 / fastfetch Configuration
         # ─────────────────────────────────────
-            step_header 7
+            step_header 8
             echo ">>> Copying fastfetch config to ~/.config/fastfetch..."
             mkdir -p ~/.config/fastfetch
             cp -r "$SCRIPT_DIR/fastfetch/"* ~/.config/fastfetch/
             echo "    fastfetch config copied successfully."
-            echo "[Step 7 completed]"
+            echo "[Step 8 completed]"
             ;;
 
         # ─────────────────────────────────────
-        8) # 配置 fastfetch 启动 / Configure fastfetch on startup
+        9) # 配置 fastfetch 启动 / Configure fastfetch on startup
         # ─────────────────────────────────────
-            step_header 8
+            step_header 9
             # Check if fastfetch (with or without leading space) is already the first line
             if [[ -f ~/.zshrc ]] && head -1 ~/.zshrc | grep -qE '^\s?fastfetch$'; then
                 echo ">>> fastfetch 已存在于 ~/.zshrc 第一行，正在移除（关闭自启）..."
@@ -448,17 +461,17 @@ EOF
                 echo "    fastfetch 已添加为 .zshrc 第一行（带前导空格，不记入历史）。"
                 echo "    ✅ 已开启 fastfetch 开机自启。"
             fi
-            echo "[Step 8 completed]"
+            echo "[Step 9 completed]"
             ;;
 
         # ─────────────────────────────────────
-        9) # Kitty 背景透明度 / Kitty Background Opacity
+        10) # Kitty 背景透明度 / Kitty Background Opacity
         # ─────────────────────────────────────
-            step_header 9
+            step_header 10
             kitty_conf="$HOME/.config/kitty/kitty.conf"
             if [[ ! -f "$kitty_conf" ]]; then
                 echo -e "${YELLOW}  ⚠️  Kitty 配置文件不存在 / Kitty config not found at ${kitty_conf}${RESET}"
-                echo "    请先执行 Step 4 (Kitty 终端配置) / Please run Step 4 first."
+                echo "    请先执行 Step 5 (Kitty 终端配置) / Please run Step 5 first."
                 if ! prompt_enter_or_quit "按 Enter 返回菜单 / Press Enter to return"; then
                     ret_val=1
                 fi
@@ -509,7 +522,7 @@ EOF
                 fi
                 echo -e "${GREEN}    ✅ 已更新 Kitty 背景透明度为 ${new_opacity}${RESET}"
                 echo "    重启 Kitty 终端即可生效 / Restart Kitty terminal to apply"
-                echo "[Step 9 completed]"
+                echo "[Step 10 completed]"
             fi
             ;;
 
