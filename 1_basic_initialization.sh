@@ -47,9 +47,9 @@ LOGO
 # Step definitions
 # ─────────────────────────────────────────────
 STEPS=(
-    "Kitty 字体选择 / Kitty Font Selector"
     "niri 核心组件 / Niri Core Components"
     "系统拓展组件 / System Extensions"
+    "Kitty 字体选择 / Kitty Font Selector"
     "AUR 助手 / AUR Helper (yay / paru)"
     "NTFS 增强工具 / NTFS Enhanced Tools"
     "雾凇拼音 / Rime-ice Input Method"
@@ -186,34 +186,18 @@ execute_step() {
 
     case $step_num in
         # ─────────────────────────────────────
-        1) # Kitty 字体选择 / Kitty Font Selector
+        1) # niri 核心组件 / Niri Core Components
         # ─────────────────────────────────────
             step_header 1
-            echo ">>> Running Kitty font selector, choose JetBrains Mono..."
-            if prompt_enter_or_quit "Press Enter to launch font selector"; then
-                kitten choose-fonts
-                # Restore terminal settings in case kitten choose-fonts left them modified
-                stty sane 2>/dev/null || true
-                prompt_enter_or_quit "Font selected. Press Enter to continue" || true
-                echo "[Step 1 completed]"
-            else
-                ret_val=1
-            fi
-            ;;
-
-        # ─────────────────────────────────────
-        2) # niri 核心组件 / Niri Core Components
-        # ─────────────────────────────────────
-            step_header 2
             echo ">>> Installing core desktop packages..."
             sudo pacman -S --needed --noconfirm kimageformats power-profiles-daemon cava
-            echo "[Step 2 completed]"
+            echo "[Step 1 completed]"
             ;;
 
         # ─────────────────────────────────────
-        3) # 系统拓展组件 / System Extensions
+        2) # 系统拓展组件 / System Extensions
         # ─────────────────────────────────────
-            step_header 3
+            step_header 2
             echo ">>> Installing base packages..."
             sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 vim firefox \
                 pcmanfm-qt udisks2
@@ -300,7 +284,23 @@ EOF
             echo "    XDG user directories configured with English names."
             echo "    (Desktop, Downloads, Documents, Pictures, Music, Videos, Public, Templates, Projects)"
 
-            echo "[Step 3 completed]"
+            echo "[Step 2 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        3) # Kitty 字体选择 / Kitty Font Selector
+        # ─────────────────────────────────────
+            step_header 3
+            echo ">>> Running Kitty font selector, choose JetBrains Mono..."
+            if prompt_enter_or_quit "Press Enter to launch font selector"; then
+                kitten choose-fonts
+                # Restore terminal settings in case kitten choose-fonts left them modified
+                stty sane 2>/dev/null || true
+                prompt_enter_or_quit "Font selected. Press Enter to continue" || true
+                echo "[Step 3 completed]"
+            else
+                ret_val=1
+            fi
             ;;
 
         # ─────────────────────────────────────

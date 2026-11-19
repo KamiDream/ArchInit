@@ -78,19 +78,13 @@ cd ArchInit
 
 ### [`1_basic_initialization.sh`](1_basic_initialization.sh) — 基础初始化 / Basic Initialization
 
-#### Step 1: Kitty 字体选择 / Kitty Font Selector
-
-| 操作 / Action          | 说明 / Description                                                                                                       |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| 🎨 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font |
-
-#### Step 2: niri 核心组件 / Niri Core Components
+#### Step 1: niri 核心组件 / Niri Core Components
 
 | 操作 / Action                        | 说明 / Description                                                              |
 | ------------------------------------ | ------------------------------------------------------------------------------- |
 | 📦 安装核心组件 / Install core packages | `kimageformats`（KDE 图像格式插件 / KDE image format plugins）、`power-profiles-daemon`（电源管理 / power management）、`cava`（终端音频可视化 / audio visualizer） |
 
-#### Step 3: 系统拓展组件 / System Extensions
+#### Step 2: 系统拓展组件 / System Extensions
 
 | 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
 | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -102,6 +96,12 @@ cd ArchInit
 | 🌐 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale |
 | 🔤 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd`、`ttf-fira-code`、`inter-font` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji` |
 | 📁 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English, system locale stays Chinese |
+
+#### Step 3: Kitty 字体选择 / Kitty Font Selector
+
+| 操作 / Action          | 说明 / Description                                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| 🎨 选择字体 / Select font | 使用 `kitten choose-fonts` 交互式选择 `JetBrains Mono` Nerd 字体 / Interactively select `JetBrains Mono` Nerd Font |
 
 #### Step 4: AUR 助手 / AUR Helper (yay / paru)
 
