@@ -207,9 +207,10 @@ execute_step() {
             echo "    (Double-clicking an archive in pcmanfm-qt does nothing without this.)"
 
             echo ""
-            echo ">>> Installing ntfsprogs (repair NTFS dirty flag with ntfsfix)..."
-            sudo pacman -S --needed --noconfirm ntfsprogs
+            echo ">>> Install NTFS tools..."
+            echo "    ntfs-3g (installed above) provides ntfsfix — no extra package needed."
             echo "    Usage: sudo ntfsfix -d /dev/sdXN"
+            echo "    (For the enhanced recovery toolset, install ntfsprogs-plus via niri_append.sh)"
 
             echo ""
             echo ">>> [Root Cause 2: missing auto-mount daemon]"

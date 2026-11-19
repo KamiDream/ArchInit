@@ -73,7 +73,7 @@ cd ArchInit
 | 📦 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`、`vim`、`firefox`、`pcmanfm-qt`（轻量 Qt6 文件管理器 / lightweight Qt6 file manager）、`udisks2`（可移动设备挂载 / removable media mounting） |
 | 🔧 设置默认文件管理器 / Set default file manager | 将 `pcmanfm-qt` 设为 `inode/directory` 的默认处理程序 / Set `pcmanfm-qt` as the default handler for `inode/directory` |
 | 📦 安装归档解压工具 / Install archive tool | 安装 `xarchiver`（图形化归档/解压缩工具）+ `7zip`（解压 .7z 等格式的后端）：没有它时，在 pcmanfm-qt 中双击压缩包无响应 / Install `xarchiver` (graphical archive tool) + `7zip` (backend for .7z etc.); without it, double-clicking an archive in pcmanfm-qt does nothing |
-| 🧹 安装 NTFS 修复工具 / Install NTFS repair tool | `ntfsprogs`（提供 `ntfsfix`）：Windows 未安全弹出导致 NTFS 脏盘被拒绝挂载时，可用 `sudo ntfsfix -d /dev/sdXN` 清除脏标志 / Provides `ntfsfix` to clear the dirty flag when Windows did not safely eject the NTFS volume |
+| 🧹 安装 NTFS 修复工具 / Install NTFS repair tool | `ntfs-3g`（基础包已含）自带 `ntfsfix`：Windows 未安全弹出导致 NTFS 脏盘被拒绝挂载时，可用 `sudo ntfsfix -d /dev/sdXN` 清除脏标志；增强版恢复工具集 `ntfsprogs-plus` 由 `niri_append.sh` 安装 / `ntfs-3g` (in base packages) provides `ntfsfix` to clear the dirty flag when Windows did not safely eject the NTFS volume; the enhanced `ntfsprogs-plus` toolset is installed by `niri_append.sh` |
 | 💾 自动挂载守护进程 / Auto-mount daemon          | 安装 `udiskie` 与 `gvfs`，并注册 systemd user 服务 `/usr/bin/udiskie`（`Restart=on-failure`）实现「插入即自动挂载」。niri 下 pcmanfm-qt 的 `[Volume] MountRemovable=true` 依赖 LXQt 会话而不生效，需由 udiskie 驱动 / Install `udiskie` & `gvfs`, enable a systemd user service for `/usr/bin/udiskie` (`Restart=on-failure`) for plug-and-play auto-mounting. Under niri, pcmanfm-qt's `[Volume] MountRemovable=true` relies on the LXQt session, so udiskie drives it instead |
 | 🌐 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
 | 🔤 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd`、`ttf-fira-code`、`inter-font` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
@@ -144,7 +144,13 @@ cd ArchInit
 | ⚙️ 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
 | 📦 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
 
-#### Step 5: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
+#### Step 5: NTFS 增强工具 / NTFS Enhanced Tools
+
+| 操作 / Action                            | 说明 / Description                                                                                                                                                                                                                  |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 🧹 安装 ntfsprogs-plus / Install toolset  | 通过 AUR 助手安装 `ntfsprogs-plus`（增强版 NTFS 修复/恢复工具集，含 `ntfsfix` 增强、`ntfsundelete`、`ntfsdump` 等）；需先完成 Step 4 的 AUR 助手 / Install `ntfsprogs-plus` via the AUR helper (enhanced NTFS repair/recovery tools); requires the AUR helper from Step 4 |
+
+#### Step 6: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
 | 操作 / Action                            | 说明 / Description                                                                                                                                                                                                                                                                                        |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -152,13 +158,13 @@ cd ArchInit
 | 🎮 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                                                                                                                                                                                    |
 | ⚙️ 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs          |
 
-#### Step 6: Intel 核显驱动 / Intel Integrated Graphics
+#### Step 7: Intel 核显驱动 / Intel Integrated Graphics
 
 | 操作 / Action                          | 说明 / Description                                                                                                                                                                                           |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🖥️ 安装 Intel 核显驱动 / Install drivers | `mesa`（OpenGL/Vulkan 驱动基础）、`vulkan-intel`（Intel Vulkan 驱动）、`intel-media-driver`（硬件视频编解码）、`mesa-utils`（`glxinfo` 等诊断工具）；已安装的包会自动跳过 / `mesa`, `vulkan-intel`, `intel-media-driver`, `mesa-utils`; already-installed packages are skipped |
 
-#### Step 7: 启用 Zsh 终端 / Enable Zsh Shell
+#### Step 8: 启用 Zsh 终端 / Enable Zsh Shell
 
 | 操作 / Action                         | 说明 / Description                                                             |
 | ------------------------------------- | ------------------------------------------------------------------------------ |
@@ -166,7 +172,7 @@ cd ArchInit
 | 🔄 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh |
 | 🎨 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                    |
 
-#### Step 8: Antidote 插件管理器 / Antidote Plugin Manager
+#### Step 9: Antidote 插件管理器 / Antidote Plugin Manager
 
 | 操作 / Action                          | 说明 / Description                                                                                                                                              |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -175,7 +181,7 @@ cd ArchInit
 | ⚙️ 配置插件 / Configure plugins           | 创建 `~/.zsh_plugins.txt`，添加 `zsh-completions`、`zsh-autosuggestions`、`fast-syntax-highlighting` / Create plugin list file with recommended plugins |
 | ⚙️ 配置 `.zshrc` / Configure `.zshrc` | 添加 `source ~/.antidote/antidote.zsh`、`antidote load` 和 `compinit` / Add Antidote source, load and compinit to `.zshrc`                              |
 
-#### Step 9: Starship 提示符 / Starship Prompt
+#### Step 10: Starship 提示符 / Starship Prompt
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                       |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -185,32 +191,32 @@ cd ArchInit
 
 > 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main) 与 [TaouMou/starship-presets](https://github.com/TaouMou/starship-presets)，本人将这两个按照自己的喜好合并了一下。
 
-#### Step 10: fastfetch 配置 / fastfetch Configuration
+#### Step 11: fastfetch 配置 / fastfetch Configuration
 
 | 操作 / Action          | 说明 / Description                                                                                                                                |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 📋 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
 
-#### Step 11: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
+#### Step 12: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🔄 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
 
-#### Step 12: Kitty 背景透明度 / Kitty Background Opacity
+#### Step 13: Kitty 背景透明度 / Kitty Background Opacity
 
 | 操作 / Action                   | 说明 / Description                                                                                                                                                                                                                           |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🎨 调整背景透明度 / Adjust opacity | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
 
-#### Step 13: 雾凇拼音 / Rime-ice Input Method
+#### Step 14: 雾凇拼音 / Rime-ice Input Method
 
 | 操作 / Action                         | 说明 / Description                                                                                                                                                                                                                                                                                                                          |
 | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🀄 安装雾凇拼音 / Install Rime-ice       | 通过 `yay -S rime-ice-pinyin-git` 安装雾凇拼音输入法词库 / Install Rime-ice input method dictionary via `yay -S rime-ice-pinyin-git`                                                                                                                                                                                                    |
 | 📋 复制 Fcitx5 配置 / Copy Fcitx5 config | 将仓库中的[`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) 复制到 `~/.local/share/fcitx5/rime/default.custom.yaml`，配置雾凇拼音为 Fcitx5 Rime 默认方案 / Copy [`fcitx5/default.custom.yaml`](fcitx5/default.custom.yaml) to `~/.local/share/fcitx5/rime/default.custom.yaml` to set Rime-ice as the default Fcitx5 Rime schema |
 
-#### Step 14: 安装密钥库 / Install Keyring
+#### Step 15: 安装密钥库 / Install Keyring
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                                       |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
