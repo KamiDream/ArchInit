@@ -37,26 +37,28 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 ```bash
 git clone https://github.com/KamiDream/ArchInit.git
 cd ArchInit
-./niri_dms.sh
+./0_niri_dms.sh
 ```
 
 > ⚠️ **注意 / Note**：
 >
-> - **`niri_dms.sh`**：使用 **DMS Shell + LightDM**（完整桌面环境）。提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
+> - **`0_niri_dms.sh`**：使用 **DMS Shell + LightDM**（完整桌面环境）。提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Uses **DMS Shell + LightDM** (full desktop environment). Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
-> - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
+> - **`1_basic_initialization.sh`**：**基础初始化**，安装基础包、文件管理器、归档工具、自动挂载守护进程、字体、XDG 目录等。提供**交互式菜单**。
+>   **Basic initialization** — base packages, file manager, archive tool, auto-mount daemon, fonts, XDG dirs. Provides an **interactive menu**.
+> - **`2_niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
 > - **`lightdm.sh`**：**LightDM WebKit2 Greeter 配置脚本**，交互式菜单，可用于替换默认的 LightDM 主题为 KamiDream WebKit2 主题。
 >   **LightDM WebKit2 Greeter setup script**, interactive menu — replaces default LightDM greeter with the KamiDream WebKit2 theme.
 > - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文、Fcitx5 输入法环境变量配置等修补工具。
 >   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, Fcitx5 IM environment variables setup, and other patching tools.
 >
-> 先运行 `niri_dms.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
-> Run `niri_dms.sh` first for the core setup, then run `niri_append.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
+> 先运行 `0_niri_dms.sh` 与 `1_basic_initialization.sh` 完成核心安装，再根据需要运行 `2_niri_append.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
+> Run `0_niri_dms.sh` and `1_basic_initialization.sh` first for the core setup, then run `2_niri_append.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
 
 ---
 
-### [`niri_dms.sh`](niri_dms.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
+### [`0_niri_dms.sh`](0_niri_dms.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
 
 #### Step 1: 注册 DMS 服务 / Register DMS Service
 
@@ -64,20 +66,7 @@ cd ArchInit
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🔗 安装 DMS / Install DMS | 通过官方脚本安装 DMS / Install DMS via the official script：`curl -fsSL https://install.danklinux.com \| sh`                                              |
 
-#### Step 2: 基础初始化 / Basic Initialization
-
-| 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
-| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 📦 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`vim`、`firefox`、`pcmanfm-qt`（轻量 Qt6 文件管理器 / lightweight Qt6 file manager）、`udisks2`（可移动设备挂载 / removable media mounting） |
-| 🔧 设置默认文件管理器 / Set default file manager | 将 `pcmanfm-qt` 设为 `inode/directory` 的默认处理程序 / Set `pcmanfm-qt` as the default handler for `inode/directory` |
-| 📦 安装归档解压工具 / Install archive tool | 安装 `xarchiver`（图形化归档/解压缩工具）+ `7zip`（解压 .7z 等格式的后端）：没有它时，在 pcmanfm-qt 中双击压缩包无响应 / Install `xarchiver` (graphical archive tool) + `7zip` (backend for .7z etc.); without it, double-clicking an archive in pcmanfm-qt does nothing |
-| 🧹 NTFS 工具说明 / NTFS tools note | NTFS 修复/恢复工具集由 `ntfsprogs-plus` 提供（`niri_append.sh` 安装），它与 `ntfs-3g` 冲突、只装其一；可用 `sudo ntfsfix -d /dev/sdXN` 清除 Windows 未安全弹出导致的脏盘标志 / NTFS repair/recovery tools are provided by `ntfsprogs-plus` (installed via `niri_append.sh`), which conflicts with `ntfs-3g` (install only one); use `sudo ntfsfix -d /dev/sdXN` to clear the dirty flag from an unsafe Windows eject |
-| 💾 自动挂载守护进程 / Auto-mount daemon          | 安装 `udiskie` 与 `gvfs`，并注册 systemd user 服务 `/usr/bin/udiskie`（`Restart=on-failure`）实现「插入即自动挂载」。niri 下 pcmanfm-qt 的 `[Volume] MountRemovable=true` 依赖 LXQt 会话而不生效，需由 udiskie 驱动 / Install `udiskie` & `gvfs`, enable a systemd user service for `/usr/bin/udiskie` (`Restart=on-failure`) for plug-and-play auto-mounting. Under niri, pcmanfm-qt's `[Volume] MountRemovable=true` relies on the LXQt session, so udiskie drives it instead |
-| 🌐 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
-| 🔤 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd`、`ttf-fira-code`、`inter-font` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
-| 📁 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
-
-#### Step 3: 显示管理器 / Display Manager (LightDM)
+#### Step 2: 显示管理器 / Display Manager (LightDM)
 
 | 操作 / Action                     | 说明 / Description                                                      |
 | --------------------------------- | ----------------------------------------------------------------------- |
@@ -87,7 +76,24 @@ cd ArchInit
 
 ---
 
-### [`niri_append.sh`](niri_append.sh) — 可选扩展 / Optional Extras
+### [`1_basic_initialization.sh`](1_basic_initialization.sh) — 基础初始化 / Basic Initialization
+
+#### Step 1: 基础初始化 / Basic Initialization
+
+| 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 📦 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`vim`、`firefox`、`pcmanfm-qt`（轻量 Qt6 文件管理器 / lightweight Qt6 file manager）、`udisks2`（可移动设备挂载 / removable media mounting） |
+| 🔧 设置默认文件管理器 / Set default file manager | 将 `pcmanfm-qt` 设为 `inode/directory` 的默认处理程序 / Set `pcmanfm-qt` as the default handler for `inode/directory` |
+| 📦 安装归档解压工具 / Install archive tool | 安装 `xarchiver`（图形化归档/解压缩工具）+ `7zip`（解压 .7z 等格式的后端）：没有它时，在 pcmanfm-qt 中双击压缩包无响应 / Install `xarchiver` (graphical archive tool) + `7zip` (backend for .7z etc.); without it, double-clicking an archive in pcmanfm-qt does nothing |
+| 🧹 NTFS 工具说明 / NTFS tools note | NTFS 修复/恢复工具集由 `ntfsprogs-plus` 提供（`2_niri_append.sh` 安装），它与 `ntfs-3g` 冲突、只装其一；可用 `sudo ntfsfix -d /dev/sdXN` 清除 Windows 未安全弹出导致的脏盘标志 / NTFS repair/recovery tools are provided by `ntfsprogs-plus` (installed via `2_niri_append.sh`), which conflicts with `ntfs-3g` (install only one); use `sudo ntfsfix -d /dev/sdXN` to clear the dirty flag from an unsafe Windows eject |
+| 💾 自动挂载守护进程 / Auto-mount daemon          | 安装 `udiskie` 与 `gvfs`，并注册 systemd user 服务 `/usr/bin/udiskie`（`Restart=on-failure`）实现「插入即自动挂载」。niri 下 pcmanfm-qt 的 `[Volume] MountRemovable=true` 依赖 LXQt 会话而不生效，需由 udiskie 驱动 / Install `udiskie` & `gvfs`, enable a systemd user service for `/usr/bin/udiskie` (`Restart=on-failure`) for plug-and-play auto-mounting. Under niri, pcmanfm-qt's `[Volume] MountRemovable=true` relies on the LXQt session, so udiskie drives it instead |
+| 🌐 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
+| 🔤 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd`、`ttf-fira-code`、`inter-font` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
+| 📁 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
+
+---
+
+### [`2_niri_append.sh`](2_niri_append.sh) — 可选扩展 / Optional Extras
 
 #### Step 1: Kitty 字体选择 / Kitty Font Selector
 
@@ -282,9 +288,9 @@ cd ArchInit
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh)、[`niri_append.sh`](niri_append.sh)、[`lightdm.sh`](lightdm.sh) 和 [`patch.sh`](patch.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh), [`niri_append.sh`](niri_append.sh), [`lightdm.sh`](lightdm.sh) and [`patch.sh`](patch.sh) provide an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
+- **选择步骤 / Choose steps**：[`0_niri_dms.sh`](0_niri_dms.sh)、[`1_basic_initialization.sh`](1_basic_initialization.sh)、[`2_niri_append.sh`](2_niri_append.sh)、[`lightdm.sh`](lightdm.sh) 和 [`patch.sh`](patch.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`0_niri_dms.sh`](0_niri_dms.sh), [`1_basic_initialization.sh`](1_basic_initialization.sh), [`2_niri_append.sh`](2_niri_append.sh), [`lightdm.sh`](lightdm.sh) and [`patch.sh`](patch.sh) provide an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
-- **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
+- **添加自己的包 / Add your own packages**：可直接修改 `1_basic_initialization.sh` 或 `2_niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
 ---
 
@@ -298,8 +304,8 @@ cd ArchInit
 
 ### Q：Kitty 字体选择器无法启动？/ Kitty font selector won't launch?
 
-确保已安装 Kitty：`sudo pacman -S kitty`，或在 [`niri_append.sh`](niri_append.sh) 的 **Step 1** 前手动安装。
-Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before **Step 1** of [`niri_append.sh`](niri_append.sh).
+确保已安装 Kitty：`sudo pacman -S kitty`，或在 [`2_niri_append.sh`](2_niri_append.sh) 的 **Step 1** 前手动安装。
+Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before **Step 1** of [`2_niri_append.sh`](2_niri_append.sh).
 
 ### Q：NVIDIA 驱动安装后黑屏？/ Black screen after NVIDIA driver install?
 
@@ -314,7 +320,7 @@ Check the `MODULES` line in `/etc/mkinitcpio.conf`, then run `sudo mkinitcpio -P
 - **LTS 内核定位**：仅作为紧急情况下的备用内核，正常情况下不会使用。
 - **如果不想看到报错**，按以下步骤操作：
   1. 安装 LTS 头文件：`sudo pacman -S linux-lts-headers`
-  2. 重新运行 [`niri_append.sh`](niri_append.sh) 的 **Step 5**（NVIDIA 显卡驱动脚本）
+  2. 重新运行 [`2_niri_append.sh`](2_niri_append.sh) 的 **Step 6**（NVIDIA 显卡驱动脚本）
   3. 重启系统
 
 This error occurs because the script only auto-detects `linux` and `linux-zen` kernels — it does not install `linux-lts-headers` or `linux-hardened-headers`. If you have the LTS kernel installed, `mkinitcpio -P` builds initramfs for **all** installed kernels, and missing LTS headers cause compilation warnings/errors.
@@ -323,7 +329,7 @@ This error occurs because the script only auto-detects `linux` and `linux-zen` k
 - **LTS kernel role**: Emergency backup only — not used under normal circumstances.
 - **To suppress the error**:
   1. Install LTS headers: `sudo pacman -S linux-lts-headers`
-  2. Re-run **Step 5** of [`niri_append.sh`](niri_append.sh) (NVIDIA driver script)
+  2. Re-run **Step 6** of [`2_niri_append.sh`](2_niri_append.sh) (NVIDIA driver script)
   3. Reboot
 
 ### Q：locales 未生效？/ Locales not working?

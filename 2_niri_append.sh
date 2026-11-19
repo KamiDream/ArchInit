@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Supplementary script for ArchInit — optional environment setup
-# Run after niri_init.sh if you need additional components.
+# Run after 0_niri_dms.sh / 1_basic_initialization.sh if you need additional components.
 # Interactive menu — use ↑/↓ to navigate, Enter to execute, q to quit.
 # Manual edits will pause the script until the editor is closed.
 

@@ -48,12 +48,11 @@ LOGO
 # ─────────────────────────────────────────────
 STEPS=(
     "Register DMS Service"
-    "Basic Initialization"
     "Display Manager (LightDM)"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0)
+COMPLETED=(0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -191,109 +190,16 @@ execute_step() {
             ;;
 
         # ─────────────────────────────────────
-        2) # Basic Initialization
+        2) # Display Manager (LightDM)
         # ─────────────────────────────────────
             step_header 2
-            echo ">>> Installing base packages..."
-            sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 vim firefox \
-                pcmanfm-qt udisks2
-            echo ">>> Setting pcmanfm-qt as default file manager..."
-            xdg-mime default pcmanfm-qt.desktop inode/directory 2>/dev/null || true
-            echo "    pcmanfm-qt set as default for inode/directory."
-
-            echo ""
-            echo ">>> Installing xarchiver (archive extraction tool) + 7zip backend..."
-            sudo pacman -S --needed --noconfirm xarchiver 7zip
-            echo "    (Double-clicking an archive in pcmanfm-qt does nothing without this.)"
-
-            echo ""
-            echo ">>> NTFS 工具说明 / NTFS tools note..."
-            echo "    NTFS 修复与恢复工具集由 ntfsprogs-plus 提供（niri_append.sh 安装）。"
-            echo "    注意：ntfsprogs-plus 与 ntfs-3g 冲突，二者只装其一。"
-            echo "    Usage: sudo ntfsfix -d /dev/sdXN"
-
-            echo ""
-            echo ">>> [Root Cause 2: missing auto-mount daemon]"
-            echo "    pcmanfm-qt's [Volume] MountRemovable=true relies on the LXQt session"
-            echo "    (lxqt-session + pcmanfm-qt desktop mode), which is inactive under niri."
-            echo "    Installing udiskie as a lightweight auto-mounter..."
-            sudo pacman -S --needed --noconfirm udiskie gvfs
-            echo "    (gvfs provides the GIO virtual filesystem mounts — trash, network, MTP, etc.)"
-            echo "    Enabling udiskie as a systemd user service (WM-independent)..."
-            mkdir -p ~/.config/systemd/user
-            cat > ~/.config/systemd/user/udiskie.service << 'EOF'
-[Unit]
-Description=udiskie auto-mounter
-
-[Service]
-ExecStart=/usr/bin/udiskie
-Restart=on-failure
-
-[Install]
-WantedBy=default.target
-EOF
-            systemctl --user daemon-reload
-            systemctl --user enable --now udiskie.service
-            systemctl --user status udiskie --no-pager || true
-            echo "    udiskie auto-mount daemon enabled."
-
-            echo ""
-            echo ">>> Uncommenting zh_CN.UTF-8 in /etc/locale.gen..."
-            sudo sed -i 's/^#zh_CN.UTF-8/zh_CN.UTF-8/' /etc/locale.gen
-            echo "    zh_CN.UTF-8 enabled."
-
-            echo ">>> Generating locale..."
-            sudo locale-gen
-            echo ">>> Setting system locale to zh_CN.UTF-8..."
-            sudo localectl set-locale LANG=zh_CN.UTF-8
-
-            echo ">>> Installing Chinese fonts & Nerd fonts..."
-            sudo pacman -S --needed --noconfirm wqy-microhei wqy-microhei-lite wqy-bitmapfont wqy-zenhei \
-                ttf-arphic-ukai ttf-arphic-uming noto-fonts-cjk ttf-jetbrains-mono-nerd noto-fonts-emoji \
-                ttf-fira-code inter-font
-
-            echo ""
-            echo ">>> Configuring XDG user directories with English names..."
-            # Install xdg-user-dirs if not already present
-            sudo pacman -S --needed --noconfirm xdg-user-dirs
-            # Directly write config with English paths — more reliable than LANG override
-            mkdir -p ~/.config
-            cat > ~/.config/user-dirs.dirs << 'EOF'
-# This file is written by ArchInit (niri_dms.sh)
-# XDG user directories with English names
-# System locale remains Chinese (zh_CN.UTF-8)
-#
-XDG_DESKTOP_DIR="$HOME/Desktop"
-XDG_DOWNLOAD_DIR="$HOME/Downloads"
-XDG_TEMPLATES_DIR="$HOME/Templates"
-XDG_PUBLICSHARE_DIR="$HOME/Public"
-XDG_DOCUMENTS_DIR="$HOME/Documents"
-XDG_MUSIC_DIR="$HOME/Music"
-XDG_PICTURES_DIR="$HOME/Pictures"
-XDG_VIDEOS_DIR="$HOME/Videos"
-XDG_PROJECTS_DIR="$HOME/Projects"
-EOF
-            # Create the English directories if they don't exist
-            mkdir -p ~/Desktop ~/Downloads ~/Templates ~/Public ~/Documents ~/Music ~/Pictures ~/Videos ~/Projects
-            # Sync with xdg-user-dirs-update (respects existing config)
-            xdg-user-dirs-update 2>/dev/null || true
-            echo "    XDG user directories configured with English names."
-            echo "    (Desktop, Downloads, Documents, Pictures, Music, Videos, Public, Templates, Projects)"
-
-            echo "[Step 2 completed]"
-            ;;
-
-        # ─────────────────────────────────────
-        3) # Display Manager (LightDM)
-        # ─────────────────────────────────────
-            step_header 3
             echo ">>> Installing LightDM and greeter..."
             sudo pacman -S --needed --noconfirm lightdm lightdm-gtk-greeter
             echo ">>> Enabling LightDM display manager..."
             sudo systemctl enable lightdm
             echo ">>> Starting LightDM..."
             sudo systemctl start lightdm
-            echo "[Step 3 completed]"
+            echo "[Step 2 completed]"
             ;;
 
     esac

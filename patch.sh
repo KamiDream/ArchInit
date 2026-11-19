@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Patch toolbox for ArchInit — fix & patch utilities
-# Can be run independently or after niri_init.sh.
+# Can be run independently or after 0_niri_dms.sh / 1_basic_initialization.sh.
 # Interactive menu — use ↑/↓ to navigate, Enter to execute, q to quit.
 #
 # Currently includes:
