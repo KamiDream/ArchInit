@@ -53,8 +53,8 @@ cd ArchInit
 > - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文、Fcitx5 输入法环境变量配置等修补工具。
 >   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, Fcitx5 IM environment variables setup, and other patching tools.
 >
-> 先运行 `0_desktop_install.sh` 与 `1_basic_initialization.sh` 完成核心安装，再根据需要运行 `2_mix_install.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
-> Run `0_desktop_install.sh` and `1_basic_initialization.sh` first for the core setup, then run `2_mix_install.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
+> 先运行 `0_desktop_install.sh` 与 `1_basic_initialization.sh` 完成核心安装，再根据需要运行 `2_mix_install.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。
+> Run `0_desktop_install.sh` and `1_basic_initialization.sh` first for the core setup, then run `2_mix_install.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes.
 
 ---
 
@@ -369,60 +369,6 @@ starship preset tokyo-night -o ~/.config/starship.toml
 常用预设：`tokyo-night`、`pastel-powerline`、`gruvbox-rainbow`。完整列表见 [Starship Presets](https://starship.rs/presets/)。
 
 你也可以手动编辑配置文件，参考 [Starship 配置文档](https://starship.rs/config/)。
-
----
-
-## 🖼️ awww 壁纸守护程序管理 / awww Wallpaper Daemon Management
-
-> awww 壁纸守护程序的管理步骤，可逐一复制执行。
-
-### 安装 awww + 设置自启 / Install awww + Enable Autostart
-
-| 操作 / Action                                    | 说明 / Description                                                                                                                                            |
-| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🖼️ 安装 awww / Install awww                         | `sudo pacman -Syu awww` — 安装 awww 壁纸守护程序 / Install awww wallpaper daemon                                                                             |
-| 📄 创建 Systemd 服务文件 / Create systemd service   | 写入 `~/.config/systemd/user/awww-daemon.service`，内容如下 / Write the following content to `~/.config/systemd/user/awww-daemon.service`:          |
-
-```ini
-[Unit]
-Description=awww wallpaper daemon
-
-[Service]
-Type=simple
-ExecStart=/usr/bin/awww-daemon
-Restart=on-failure
-
-[Install]
-WantedBy=default.target
-```
-
-| 🔄 重新加载用户配置 / Reload user config            | `systemctl --user daemon-reload` — 使 Systemd 识别新服务 / Reload Systemd user configuration to recognize new service                                          |
-| ▶️ 启用并启动服务 / Enable & start service          | `systemctl --user enable --now awww-daemon.service` — 设置开机自启并立即启动 / Enable and start the service immediately                                        |
-
-### 取消自启（保留服务文件） / Disable Autostart (Keep Service File)
-
-| 操作 / Action                        | 说明 / Description                                                                |
-| ------------------------------------ | --------------------------------------------------------------------------------- |
-| 🛑 停止服务 / Stop service              | `systemctl --user stop awww-daemon.service` — 立即停止守护进程 / Stop the daemon immediately |
-| 🔌 禁用服务 / Disable service           | `systemctl --user disable awww-daemon.service` — 取消开机自启 / Disable auto-start on boot |
-| 💾 保留服务文件 / Keep service file     | 服务文件 `awww-daemon.service` **保留不动**，方便后续重新启用 / Service file is kept for later reuse |
-
-### 启用自启 / Enable Autostart
-
-| 操作 / Action                        | 说明 / Description                                                                |
-| ------------------------------------ | --------------------------------------------------------------------------------- |
-| ▶️ 启用服务 / Enable service            | `systemctl --user enable awww-daemon.service` — 设置开机自启 / Enable auto-start on boot |
-| 🚀 启动服务 / Start service             | `systemctl --user start awww-daemon.service` — 立即启动守护进程 / Start the daemon immediately |
-| ✅ 服务文件检查 / Service file check    | 确保 `awww-daemon.service` 存在（若缺失则先执行安装步骤）/ Ensure service file exists (run install step first if missing) |
-
-### 彻底删除 awww / Completely Remove awww
-
-| 操作 / Action                              | 说明 / Description                                                                                                                          |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🛑 停止并禁用服务 / Stop & disable service    | `systemctl --user stop && systemctl --user disable awww-daemon.service` — 先停止运行并取消自启 / Stop the running service and disable auto-start |
-| 🗑️ 删除服务文件 / Remove service file         | `rm ~/.config/systemd/user/awww-daemon.service` — 清理 Systemd 服务文件 / Remove the systemd service file                                   |
-| 🔄 重新加载 Systemd 配置 / Reload Systemd     | `systemctl --user daemon-reload` — 使 Systemd 清理已删除服务的状态 / Reload Systemd to clean up the removed service's state               |
-| 📦 卸载 awww 软件包 / Remove awww package     | `sudo pacman -Rns awww` — 彻底卸载 awww 及其依赖和配置文件 / Completely remove awww package, its dependencies, and config files              |
 
 ---
 
