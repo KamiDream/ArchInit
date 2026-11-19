@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Supplementary script for ArchInit — LightDM WebKit2 Greeter setup
-# Run after 0_niri_dms.sh if you need a graphical login manager.
+# Run after 0_desktop_install.sh if you need a graphical login manager.
 # Interactive menu — use ↑/↓ to navigate, Enter to execute, q to quit.
 
 set -uo pipefail

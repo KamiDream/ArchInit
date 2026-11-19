@@ -37,12 +37,12 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 ```bash
 git clone https://github.com/KamiDream/ArchInit.git
 cd ArchInit
-./0_niri_dms.sh
+./0_desktop_install.sh
 ```
 
 > ⚠️ **注意 / Note**：
 >
-> - **`0_niri_dms.sh`**：使用 **DMS Shell + LightDM**（完整桌面环境）。提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
+> - **`0_desktop_install.sh`**：使用 **DMS Shell + LightDM**（完整桌面环境）。提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Uses **DMS Shell + LightDM** (full desktop environment). Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
 > - **`1_basic_initialization.sh`**：**基础初始化**，安装基础包、文件管理器、归档工具、自动挂载守护进程、字体、XDG 目录等。提供**交互式菜单**。
 >   **Basic initialization** — base packages, file manager, archive tool, auto-mount daemon, fonts, XDG dirs. Provides an **interactive menu**.
@@ -53,12 +53,12 @@ cd ArchInit
 > - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文、Fcitx5 输入法环境变量配置等修补工具。
 >   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, Fcitx5 IM environment variables setup, and other patching tools.
 >
-> 先运行 `0_niri_dms.sh` 与 `1_basic_initialization.sh` 完成核心安装，再根据需要运行 `2_niri_append.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
-> Run `0_niri_dms.sh` and `1_basic_initialization.sh` first for the core setup, then run `2_niri_append.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
+> 先运行 `0_desktop_install.sh` 与 `1_basic_initialization.sh` 完成核心安装，再根据需要运行 `2_niri_append.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
+> Run `0_desktop_install.sh` and `1_basic_initialization.sh` first for the core setup, then run `2_niri_append.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
 
 ---
 
-### [`0_niri_dms.sh`](0_niri_dms.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
+### [`0_desktop_install.sh`](0_desktop_install.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
 
 #### Step 1: 注册 DMS 服务 / Register DMS Service
 
@@ -288,7 +288,7 @@ cd ArchInit
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`0_niri_dms.sh`](0_niri_dms.sh)、[`1_basic_initialization.sh`](1_basic_initialization.sh)、[`2_niri_append.sh`](2_niri_append.sh)、[`lightdm.sh`](lightdm.sh) 和 [`patch.sh`](patch.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`0_niri_dms.sh`](0_niri_dms.sh), [`1_basic_initialization.sh`](1_basic_initialization.sh), [`2_niri_append.sh`](2_niri_append.sh), [`lightdm.sh`](lightdm.sh) and [`patch.sh`](patch.sh) provide an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
+- **选择步骤 / Choose steps**：[`0_desktop_install.sh`](0_desktop_install.sh)、[`1_basic_initialization.sh`](1_basic_initialization.sh)、[`2_niri_append.sh`](2_niri_append.sh)、[`lightdm.sh`](lightdm.sh) 和 [`patch.sh`](patch.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`0_desktop_install.sh`](0_desktop_install.sh), [`1_basic_initialization.sh`](1_basic_initialization.sh), [`2_niri_append.sh`](2_niri_append.sh), [`lightdm.sh`](lightdm.sh) and [`patch.sh`](patch.sh) provide an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
 - **添加自己的包 / Add your own packages**：可直接修改 `1_basic_initialization.sh` 或 `2_niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
