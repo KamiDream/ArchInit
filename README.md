@@ -37,13 +37,11 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 ```bash
 git clone https://github.com/KamiDream/ArchInit.git
 cd ArchInit
-./niri_dms.sh    # 或 ./niri_tty.sh
+./niri_dms.sh
 ```
 
 > ⚠️ **注意 / Note**：
 >
-> - **`niri_tty.sh`**：**全自动一键安装**。运行后只需输入 sudo 密码，即可依次完成所有步骤。**TTY 轻量版**，基础初始化 + AUR 助手 + SSH 服务器（适合无桌面/远程场景）。
->   **Fully automated one-click setup** — enter your sudo password and all steps run sequentially. **TTY lightweight edition**: base initialization + AUR helper + SSH server (for headless/remote scenarios).
 > - **`niri_dms.sh`**：使用 **DMS Shell + LightDM**（完整桌面环境）。提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
 >   Uses **DMS Shell + LightDM** (full desktop environment). Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
 > - **`niri_append.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
@@ -53,8 +51,8 @@ cd ArchInit
 > - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文、Fcitx5 输入法环境变量配置等修补工具。
 >   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, Fcitx5 IM environment variables setup, and other patching tools.
 >
-> 先运行 `niri_dms.sh` 或 `niri_tty.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
-> Run either `niri_dms.sh` or `niri_tty.sh` first for the core setup, then run `niri_append.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
+> 先运行 `niri_dms.sh` 完成核心安装，再根据需要运行 `niri_append.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。awww 壁纸守护程序的管理步骤详见下方参考文档。
+> Run `niri_dms.sh` first for the core setup, then run `niri_append.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes. See the awww wallpaper daemon section below for manual reference.
 
 ---
 
@@ -86,31 +84,6 @@ cd ArchInit
 | 📦 安装 LightDM / Install LightDM   | 安装 `lightdm` 与 `lightdm-gtk-greeter` / Install `lightdm` and `lightdm-gtk-greeter` |
 | ▶️ 启用 LightDM / Enable LightDM | 设置 LightDM 开机自启 / Enable LightDM to start on boot                 |
 | 🚀 启动 LightDM / Start LightDM  | 立即启动 LightDM 显示管理器 / Start LightDM display manager immediately |
-
-### [`niri_tty.sh`](niri_tty.sh) — 核心安装（TTY 版）/ Core Setup (TTY Edition)
-
-#### Step 1: 基础初始化 / Basic Initialization
-
-| 操作 / Action                                | 说明 / Description                                                                                                                                                                                                                                                                     |
-| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 📦 安装基础包 / Install base packages           | `fastfetch`, `fcitx5-im`（中文输入法 / Chinese input）、`fcitx5-rime`、`fuse2`、`ntfs-3g`                                                                                             |
-| 🌐 配置 locale / Configure locale               | 自动取消注释 `/etc/locale.gen` 中的 `zh_CN.UTF-8`，运行 `locale-gen`，设置系统 locale / Auto-uncomment `zh_CN.UTF-8` in `/etc/locale.gen`, run `locale-gen`, set system locale                                                                         |
-| 🔤 安装字体 / Install fonts                     | `wqy-microhei`、`wqy-microhei-lite`、`wqy-bitmapfont`、`wqy-zenhei`、`ttf-arphic-ukai`、`ttf-arphic-uming`、`noto-fonts-cjk`、`ttf-jetbrains-mono-nerd` 等中英文与 Nerd 字体 / Chinese & Nerd fonts 、`noto-fonts-emoji`                         |
-| 📁 配置 XDG 用户目录 / Configure XDG user dirs  | 安装 `xdg-user-dirs`，以英文 locale 运行 `xdg-user-dirs-update`，生成英文文件夹名（Desktop、Downloads 等），系统 locale 保持中文 / Install `xdg-user-dirs`, run `xdg-user-dirs-update` with English locale so folder names are English (Desktop, Downloads, etc.), system locale stays Chinese |
-
-#### Step 2: AUR 助手 / AUR Helper (yay / paru)
-
-| 操作 / Action                           | 说明 / Description                                                                                                                                                            |
-| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| ⚙️ 配置 pacman 源 / Configure pacman repos | 启用 `[multilib]`、添加 `[archlinuxcn]` 源（中科大、清华、哈工大、华为云镜像）/ Enable `[multilib]`, add `[archlinuxcn]` (mirrors: USTC, Tsinghua, HIT, Huawei Cloud) |
-| 📦 安装 AUR 助手 / Install AUR helpers     | `base-devel`、`yay`、`paru`、`flclash`                                                                                                                                |
-
-#### Step 3: SSH 服务器 / SSH Server
-
-| 操作 / Action                              | 说明 / Description                                                                                                               |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
-| 🔐 安装 OpenSSH / Install OpenSSH             | `openssh`                                                                                                                  |
-| ▶️ 启用 SSH 服务 / Enable SSH service         | 启用并启动 `sshd.service`，配置防火墙放行 SSH（如 firewalld 已激活）/ Enable and start `sshd.service`, allow SSH in firewall if active |
 
 ---
 
@@ -309,9 +282,9 @@ cd ArchInit
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`niri_tty.sh`](niri_tty.sh) 为全自动一键安装，所有步骤依次执行；[`niri_dms.sh`](niri_dms.sh)、[`niri_append.sh`](niri_append.sh)、[`lightdm.sh`](lightdm.sh) 和 [`patch.sh`](patch.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_tty.sh`](niri_tty.sh) runs fully automated; [`niri_dms.sh`](niri_dms.sh), [`niri_append.sh`](niri_append.sh), [`lightdm.sh`](lightdm.sh) and [`patch.sh`](patch.sh) provide an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
+- **选择步骤 / Choose steps**：[`niri_dms.sh`](niri_dms.sh)、[`niri_append.sh`](niri_append.sh)、[`lightdm.sh`](lightdm.sh) 和 [`patch.sh`](patch.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`niri_dms.sh`](niri_dms.sh), [`niri_append.sh`](niri_append.sh), [`lightdm.sh`](lightdm.sh) and [`patch.sh`](patch.sh) provide an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
-- **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh`、`niri_tty.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
+- **添加自己的包 / Add your own packages**：可直接修改 `niri_dms.sh` 或 `niri_append.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
 
 ---
 
