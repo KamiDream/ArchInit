@@ -47,11 +47,17 @@ LOGO
 # Step definitions
 # ─────────────────────────────────────────────
 STEPS=(
-    "Basic Initialization"
+    "Kitty 字体选择 / Kitty Font Selector"
+    "niri 核心组件 / Niri Core Components"
+    "系统拓展组件 / System Extensions"
+    "AUR 助手 / AUR Helper (yay / paru)"
+    "NTFS 增强工具 / NTFS Enhanced Tools"
+    "雾凇拼音 / Rime-ice Input Method"
+    "安装密钥库 / Install Keyring"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0)
+COMPLETED=(0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -180,9 +186,34 @@ execute_step() {
 
     case $step_num in
         # ─────────────────────────────────────
-        1) # Basic Initialization
+        1) # Kitty 字体选择 / Kitty Font Selector
         # ─────────────────────────────────────
             step_header 1
+            echo ">>> Running Kitty font selector, choose JetBrains Mono..."
+            if prompt_enter_or_quit "Press Enter to launch font selector"; then
+                kitten choose-fonts
+                # Restore terminal settings in case kitten choose-fonts left them modified
+                stty sane 2>/dev/null || true
+                prompt_enter_or_quit "Font selected. Press Enter to continue" || true
+                echo "[Step 1 completed]"
+            else
+                ret_val=1
+            fi
+            ;;
+
+        # ─────────────────────────────────────
+        2) # niri 核心组件 / Niri Core Components
+        # ─────────────────────────────────────
+            step_header 2
+            echo ">>> Installing core desktop packages..."
+            sudo pacman -S --needed --noconfirm kimageformats power-profiles-daemon cava
+            echo "[Step 2 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        3) # 系统拓展组件 / System Extensions
+        # ─────────────────────────────────────
+            step_header 3
             echo ">>> Installing base packages..."
             sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 vim firefox \
                 pcmanfm-qt udisks2
@@ -197,7 +228,7 @@ execute_step() {
 
             echo ""
             echo ">>> NTFS 工具说明 / NTFS tools note..."
-            echo "    NTFS 修复与恢复工具集由 ntfsprogs-plus 提供（2_niri_append.sh 安装）。"
+            echo "    NTFS 修复与恢复工具集由 ntfsprogs-plus 提供（2_mix_install.sh 安装）。"
             echo "    注意：ntfsprogs-plus 与 ntfs-3g 冲突，二者只装其一。"
             echo "    Usage: sudo ntfsfix -d /dev/sdXN"
 
@@ -269,7 +300,94 @@ EOF
             echo "    XDG user directories configured with English names."
             echo "    (Desktop, Downloads, Documents, Pictures, Music, Videos, Public, Templates, Projects)"
 
-            echo "[Step 1 completed]"
+            echo "[Step 3 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        4) # AUR 助手 / AUR Helper (yay / paru)
+        # ─────────────────────────────────────
+            step_header 4
+            echo ">>> Configuring /etc/pacman.conf..."
+            # Uncomment [multilib] and its Include line
+            sudo sed -i '/^#\[multilib\]/,/^#Include/ s/^#//' /etc/pacman.conf
+            echo "    [multilib] enabled."
+            # Add archlinuxcn repository if not already present
+            if ! grep -q '^\[archlinuxcn\]' /etc/pacman.conf; then
+                sudo tee -a /etc/pacman.conf > /dev/null << 'EOF'
+
+[archlinuxcn]
+Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
+Server = https://mirrors.hit.edu.cn/archlinuxcn/$arch
+Server = https://repo.huaweicloud.com/archlinuxcn/$arch
+EOF
+                echo "    [archlinuxcn] repository added."
+            else
+                echo "    [archlinuxcn] already present, skipping."
+            fi
+            echo ">>> Installing archlinuxcn-keyring and updating system..."
+            sudo pacman -Sy --needed --noconfirm archlinuxcn-keyring
+            sudo pacman -S --needed --noconfirm base-devel yay paru flclash
+            sudo pacman -Syu --noconfirm
+            echo "[Step 4 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        5) # NTFS 增强工具 / NTFS Enhanced Tools (ntfsprogs-plus)
+        # ─────────────────────────────────────
+            step_header 5
+            echo ">>> 安装 ntfsprogs-plus（增强版 NTFS 修复/恢复工具）..."
+            if command -v yay >/dev/null 2>&1; then
+                yay -S --noconfirm ntfsprogs-plus
+            elif command -v paru >/dev/null 2>&1; then
+                paru -S --noconfirm ntfsprogs-plus
+            else
+                echo -e "${YELLOW}    ⚠️ 未检测到 AUR 助手（yay/paru）。请先执行 Step 4 (AUR 助手)。${RESET}"
+                ret_val=1
+            fi
+            echo "    ntfsprogs-plus 提供 ntfsfix 增强、ntfsundelete、ntfsdump 等工具。"
+            echo "[Step 5 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        6) # 雾凇拼音 / Rime-ice Input Method
+        # ─────────────────────────────────────
+            step_header 6
+            echo ">>> 安装雾凇拼音 / Installing Rime-ice input method..."
+            yay -S --noconfirm rime-ice-pinyin-git
+            echo "    rime-ice-pinyin-git 安装完成 / installed."
+            echo ""
+            echo ">>> 复制 Fcitx5 雾凇拼音配置 / Copying Fcitx5 Rime-ice config..."
+            mkdir -p ~/.local/share/fcitx5/rime
+            if [[ -f "$SCRIPT_DIR/fcitx5/default.custom.yaml" ]]; then
+                cp "$SCRIPT_DIR/fcitx5/default.custom.yaml" ~/.local/share/fcitx5/rime/default.custom.yaml
+                echo "    配置已复制到 ~/.local/share/fcitx5/rime/default.custom.yaml"
+                echo "    Config copied successfully."
+            else
+                echo "    Warning: fcitx5/default.custom.yaml not found, skipping."
+            fi
+            echo ""
+            echo "    请重新登录或重启 Fcitx5 以加载雾凇拼音"
+            echo "    如果词库未生效，可尝试在 Fcitx5 中重新部署（右键托盘图标 → 重新部署）"
+            echo "    Log out and back in, or restart Fcitx5 to load Rime-ice."
+            echo "    If the schema does not appear, try re-deploying from Fcitx5 tray."
+            echo "[Step 6 completed]"
+            ;;
+
+        # ─────────────────────────────────────
+        7) # 安装密钥库 / Install Keyring
+        # ─────────────────────────────────────
+            step_header 7
+            echo ">>> 安装密钥库 / Installing keyring packages..."
+            sudo pacman -S --needed --noconfirm gnome-keyring libsecret seahorse
+            echo "    gnome-keyring libsecret seahorse 安装完成 / installed."
+            echo ""
+            echo ">>> 查看 gnome-keyring-daemon 服务状态 / Checking gnome-keyring-daemon service status..."
+            systemctl --user status gnome-keyring-daemon.service --no-pager || true
+            echo ""
+            echo "    提示：如服务未运行，重新登录后 systemd 用户会话会自动启动 gnome-keyring-daemon"
+            echo "    Tip: if the service is not running, re-login so the systemd user session starts it automatically."
+            echo "[Step 7 completed]"
             ;;
 
     esac

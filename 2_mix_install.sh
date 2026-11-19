@@ -48,11 +48,7 @@ LOGO
 # Step definitions
 # ─────────────────────────────────────────────
 STEPS=(
-    "Kitty 字体选择 / Kitty Font Selector"
-    "核心组件 / Core Components"
     "KVM 虚拟化 / KVM Virtualization"
-    "AUR 助手 / AUR Helper (yay / paru)"
-    "NTFS 增强工具 / NTFS Enhanced Tools"
     "NVIDIA 显卡驱动 / NVIDIA Graphics Driver"
     "Intel 核显驱动 / Intel Integrated Graphics"
     "启用 Zsh 终端 / Enable Zsh Shell"
@@ -61,12 +57,10 @@ STEPS=(
     "fastfetch 配置 / fastfetch Configuration"
     "配置 fastfetch 启动 / Configure fastfetch on startup"
     "Kitty 背景透明度 / Kitty Background Opacity"
-    "雾凇拼音 / Rime-ice Input Method"
-    "安装密钥库 / Install Keyring"
 )
 
 # 0 = pending, 1 = completed
-COMPLETED=(0 0 0 0 0 0 0 0 0 0 0 0 0 0 0)
+COMPLETED=(0 0 0 0 0 0 0 0 0)
 
 CURRENT_STEP=-1   # -1 means at menu, >=0 means inside a step
 SELECTED=0
@@ -128,6 +122,12 @@ render_menu() {
     for i in "${!STEPS[@]}"; do
         local sel=" "
         local mark=" "
+
+        # 在指定分组边界前输出分隔线
+        # 分组：Step 1 | Step 2-3 | Step 4-9
+        if [[ $i -eq 1 ]] || [[ $i -eq 3 ]]; then
+            echo "  ──────────────────────────────────────────────────────────────────────────────────────────────────────"
+        fi
 
         if [[ ${COMPLETED[$i]} -eq 1 ]]; then
             mark="✓"
@@ -207,34 +207,9 @@ execute_step() {
 
     case $step_num in
         # ─────────────────────────────────────
-        1) # Kitty 字体选择 / Kitty Font Selector
+        1) # KVM 虚拟化 / KVM Virtualization
         # ─────────────────────────────────────
             step_header 1
-            echo ">>> Running Kitty font selector, choose JetBrains Mono..."
-            if prompt_enter_or_quit "Press Enter to launch font selector"; then
-                kitten choose-fonts
-                # Restore terminal settings in case kitten choose-fonts left them modified
-                stty sane 2>/dev/null || true
-                prompt_enter_or_quit "Font selected. Press Enter to continue" || true
-                echo "[Step 1 completed]"
-            else
-                ret_val=1
-            fi
-            ;;
-
-        # ─────────────────────────────────────
-        2) # 核心组件 / Core Components
-        # ─────────────────────────────────────
-            step_header 2
-            echo ">>> Installing core desktop packages..."
-            sudo pacman -S --needed --noconfirm kimageformats power-profiles-daemon cava
-            echo "[Step 2 completed]"
-            ;;
-
-        # ─────────────────────────────────────
-        3) # KVM 虚拟化 / KVM Virtualization
-        # ─────────────────────────────────────
-            step_header 3
             echo ">>> Installing KVM packages..."
             sudo pacman -S --needed --noconfirm qemu-full virt-manager swtpm dnsmasq
             echo ">>> Enabling and starting libvirtd service..."
@@ -245,59 +220,13 @@ execute_step() {
             echo ">>> Adding current user to libvirt group..."
             sudo usermod -a -G libvirt "$(whoami)"
             echo "    Note: re-login is required for group changes to take effect."
-            echo "[Step 3 completed]"
+            echo "[Step 1 completed]"
             ;;
 
         # ─────────────────────────────────────
-        4) # AUR 助手 / AUR Helper (yay / paru)
+        2) # NVIDIA 显卡驱动 / NVIDIA Graphics Driver
         # ─────────────────────────────────────
-            step_header 4
-            echo ">>> Configuring /etc/pacman.conf..."
-            # Uncomment [multilib] and its Include line
-            sudo sed -i '/^#\[multilib\]/,/^#Include/ s/^#//' /etc/pacman.conf
-            echo "    [multilib] enabled."
-            # Add archlinuxcn repository if not already present
-            if ! grep -q '^\[archlinuxcn\]' /etc/pacman.conf; then
-                sudo tee -a /etc/pacman.conf > /dev/null << 'EOF'
-
-[archlinuxcn]
-Server = https://mirrors.ustc.edu.cn/archlinuxcn/$arch
-Server = https://mirrors.tuna.tsinghua.edu.cn/archlinuxcn/$arch
-Server = https://mirrors.hit.edu.cn/archlinuxcn/$arch
-Server = https://repo.huaweicloud.com/archlinuxcn/$arch
-EOF
-                echo "    [archlinuxcn] repository added."
-            else
-                echo "    [archlinuxcn] already present, skipping."
-            fi
-            echo ">>> Installing archlinuxcn-keyring and updating system..."
-            sudo pacman -Sy --needed --noconfirm archlinuxcn-keyring
-            sudo pacman -S --needed --noconfirm base-devel yay paru flclash
-            sudo pacman -Syu --noconfirm
-            echo "[Step 4 completed]"
-            ;;
-
-        # ─────────────────────────────────────
-        5) # NTFS 增强工具 / NTFS Enhanced Tools (ntfsprogs-plus)
-        # ─────────────────────────────────────
-            step_header 5
-            echo ">>> 安装 ntfsprogs-plus（增强版 NTFS 修复/恢复工具）..."
-            if command -v yay >/dev/null 2>&1; then
-                yay -S --noconfirm ntfsprogs-plus
-            elif command -v paru >/dev/null 2>&1; then
-                paru -S --noconfirm ntfsprogs-plus
-            else
-                echo -e "${YELLOW}    ⚠️ 未检测到 AUR 助手（yay/paru）。请先执行 Step 4 (AUR 助手)。${RESET}"
-                ret_val=1
-            fi
-            echo "    ntfsprogs-plus 提供 ntfsfix 增强、ntfsundelete、ntfsdump 等工具。"
-            echo "[Step 5 completed]"
-            ;;
-
-        # ─────────────────────────────────────
-        6) # NVIDIA 显卡驱动 / NVIDIA Graphics Driver
-        # ─────────────────────────────────────
-            step_header 6
+            step_header 2
             echo ">>> Installing kernel headers (detecting installed kernels)..."
             HEADERS=()
             pacman -Q linux >/dev/null 2>&1 && HEADERS+=(linux-headers) && echo "    linux kernel detected -> linux-headers"
@@ -323,7 +252,7 @@ EOF
                 fi
                 echo ">>> Regenerating initramfs..."
                 sudo mkinitcpio -P
-                echo "[Step 6 completed]"
+                echo "[Step 2 completed]"
             else
                 echo -e "${YELLOW}    ⚠️  No supported kernel found (linux/linux-zen). This step requires at least one kernel installed. Aborting.${RESET}"
                 ret_val=1
@@ -331,21 +260,21 @@ EOF
             ;;
 
         # ─────────────────────────────────────
-        7) # Intel 核显驱动 / Intel Integrated Graphics
+        3) # Intel 核显驱动 / Intel Integrated Graphics
         # ─────────────────────────────────────
-            step_header 7
+            step_header 3
             echo ">>> Installing Intel integrated graphics drivers..."
             sudo pacman -S --needed --noconfirm mesa vulkan-intel intel-media-driver mesa-utils
             echo "    (mesa: OpenGL/Vulkan 驱动基础; vulkan-intel: Intel Vulkan 驱动;"
             echo "     intel-media-driver: 硬件视频编解码; mesa-utils: glxinfo 等诊断工具)"
             echo "    --needed 已启用：已安装的包会自动跳过 / --needed skips already-installed packages."
-            echo "[Step 7 completed]"
+            echo "[Step 3 completed]"
             ;;
 
         # ─────────────────────────────────────
-        8) # 启用 Zsh 终端 / Enable Zsh Shell
+        4) # 启用 Zsh 终端 / Enable Zsh Shell
         # ─────────────────────────────────────
-            step_header 8
+            step_header 4
             echo ">>> Installing Zsh..."
             sudo pacman -S --needed --noconfirm zsh zsh-completions
             echo ">>> Listing available shells..."
@@ -367,13 +296,13 @@ EOF
             else
                 echo "    Kitty cursor settings already present, skipping."
             fi
-            echo "[Step 8 completed]"
+            echo "[Step 4 completed]"
             ;;
 
         # ─────────────────────────────────────
-        9) # Antidote 插件管理器 / Antidote Plugin Manager
+        5) # Antidote 插件管理器 / Antidote Plugin Manager
         # ─────────────────────────────────────
-            step_header 9
+            step_header 5
             if ! check_zsh; then
                 if ! prompt_enter_or_quit "Press Enter to skip"; then
                     ret_val=1
@@ -446,14 +375,14 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 # === Antidote End ===
 EOF
                 echo "    Antidote configuration written to ~/.zshrc."
-                echo "[Step 9 completed]"
+                echo "[Step 5 completed]"
             fi
             ;;
 
         # ─────────────────────────────────────
-        10) # Starship 提示符 / Starship Prompt
+        6) # Starship 提示符 / Starship Prompt
         # ─────────────────────────────────────
-            step_header 10
+            step_header 6
             if ! check_zsh; then
                 if ! prompt_enter_or_quit "Press Enter to skip"; then
                     ret_val=1
@@ -483,25 +412,25 @@ EOF
 eval "$(starship init zsh)"
 EOF
                 echo "    Starship init written to ~/.zshrc."
-                echo "[Step 10 completed]"
+                echo "[Step 6 completed]"
             fi
             ;;
 
         # ─────────────────────────────────────
-        11) # fastfetch 配置 / fastfetch Configuration
+        7) # fastfetch 配置 / fastfetch Configuration
         # ─────────────────────────────────────
-            step_header 11
+            step_header 7
             echo ">>> Copying fastfetch config to ~/.config/fastfetch..."
             mkdir -p ~/.config/fastfetch
             cp -r "$SCRIPT_DIR/fastfetch/"* ~/.config/fastfetch/
             echo "    fastfetch config copied successfully."
-            echo "[Step 11 completed]"
+            echo "[Step 7 completed]"
             ;;
 
         # ─────────────────────────────────────
-        12) # 配置 fastfetch 启动 / Configure fastfetch on startup
+        8) # 配置 fastfetch 启动 / Configure fastfetch on startup
         # ─────────────────────────────────────
-            step_header 12
+            step_header 8
             # Check if fastfetch (with or without leading space) is already the first line
             if [[ -f ~/.zshrc ]] && head -1 ~/.zshrc | grep -qE '^\s?fastfetch$'; then
                 echo ">>> fastfetch 已存在于 ~/.zshrc 第一行，正在移除（关闭自启）..."
@@ -519,17 +448,17 @@ EOF
                 echo "    fastfetch 已添加为 .zshrc 第一行（带前导空格，不记入历史）。"
                 echo "    ✅ 已开启 fastfetch 开机自启。"
             fi
-            echo "[Step 12 completed]"
+            echo "[Step 8 completed]"
             ;;
 
         # ─────────────────────────────────────
-        13) # Kitty 背景透明度 / Kitty Background Opacity
+        9) # Kitty 背景透明度 / Kitty Background Opacity
         # ─────────────────────────────────────
-            step_header 13
+            step_header 9
             kitty_conf="$HOME/.config/kitty/kitty.conf"
             if [[ ! -f "$kitty_conf" ]]; then
                 echo -e "${YELLOW}  ⚠️  Kitty 配置文件不存在 / Kitty config not found at ${kitty_conf}${RESET}"
-                echo "    请先执行 Step 8 (Kitty 终端配置) / Please run Step 8 first."
+                echo "    请先执行 Step 4 (Kitty 终端配置) / Please run Step 4 first."
                 if ! prompt_enter_or_quit "按 Enter 返回菜单 / Press Enter to return"; then
                     ret_val=1
                 fi
@@ -580,49 +509,8 @@ EOF
                 fi
                 echo -e "${GREEN}    ✅ 已更新 Kitty 背景透明度为 ${new_opacity}${RESET}"
                 echo "    重启 Kitty 终端即可生效 / Restart Kitty terminal to apply"
-                echo "[Step 13 completed]"
+                echo "[Step 9 completed]"
             fi
-            ;;
-
-        # ─────────────────────────────────────
-        14) # 雾凇拼音 / Rime-ice Input Method
-        # ─────────────────────────────────────
-            step_header 14
-            echo ">>> 安装雾凇拼音 / Installing Rime-ice input method..."
-            yay -S --noconfirm rime-ice-pinyin-git
-            echo "    rime-ice-pinyin-git 安装完成 / installed."
-            echo ""
-            echo ">>> 复制 Fcitx5 雾凇拼音配置 / Copying Fcitx5 Rime-ice config..."
-            mkdir -p ~/.local/share/fcitx5/rime
-            if [[ -f "$SCRIPT_DIR/fcitx5/default.custom.yaml" ]]; then
-                cp "$SCRIPT_DIR/fcitx5/default.custom.yaml" ~/.local/share/fcitx5/rime/default.custom.yaml
-                echo "    配置已复制到 ~/.local/share/fcitx5/rime/default.custom.yaml"
-                echo "    Config copied successfully."
-            else
-                echo "    Warning: fcitx5/default.custom.yaml not found, skipping."
-            fi
-            echo ""
-            echo "    请重新登录或重启 Fcitx5 以加载雾凇拼音"
-            echo "    如果词库未生效，可尝试在 Fcitx5 中重新部署（右键托盘图标 → 重新部署）"
-            echo "    Log out and back in, or restart Fcitx5 to load Rime-ice."
-            echo "    If the schema does not appear, try re-deploying from Fcitx5 tray."
-            echo "[Step 14 completed]"
-            ;;
-
-        # ─────────────────────────────────────
-        15) # 安装密钥库 / Install Keyring
-        # ─────────────────────────────────────
-            step_header 15
-            echo ">>> 安装密钥库 / Installing keyring packages..."
-            sudo pacman -S --needed --noconfirm gnome-keyring libsecret seahorse
-            echo "    gnome-keyring libsecret seahorse 安装完成 / installed."
-            echo ""
-            echo ">>> 查看 gnome-keyring-daemon 服务状态 / Checking gnome-keyring-daemon service status..."
-            systemctl --user status gnome-keyring-daemon.service --no-pager || true
-            echo ""
-            echo "    提示：如服务未运行，重新登录后 systemd 用户会话会自动启动 gnome-keyring-daemon"
-            echo "    Tip: if the service is not running, re-login so the systemd user session starts it automatically."
-            echo "[Step 15 completed]"
             ;;
 
     esac
