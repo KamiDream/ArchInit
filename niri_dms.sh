@@ -195,7 +195,7 @@ execute_step() {
         # ─────────────────────────────────────
             step_header 2
             echo ">>> Installing base packages..."
-            sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 ntfs-3g vim firefox \
+            sudo pacman -S --needed --noconfirm fastfetch fcitx5-im fcitx5-rime fuse2 vim firefox \
                 pcmanfm-qt udisks2
             echo ">>> Setting pcmanfm-qt as default file manager..."
             xdg-mime default pcmanfm-qt.desktop inode/directory 2>/dev/null || true
@@ -207,10 +207,10 @@ execute_step() {
             echo "    (Double-clicking an archive in pcmanfm-qt does nothing without this.)"
 
             echo ""
-            echo ">>> Install NTFS tools..."
-            echo "    ntfs-3g (installed above) provides ntfsfix — no extra package needed."
+            echo ">>> NTFS 工具说明 / NTFS tools note..."
+            echo "    NTFS 修复与恢复工具集由 ntfsprogs-plus 提供（niri_append.sh 安装）。"
+            echo "    注意：ntfsprogs-plus 与 ntfs-3g 冲突，二者只装其一。"
             echo "    Usage: sudo ntfsfix -d /dev/sdXN"
-            echo "    (For the enhanced recovery toolset, install ntfsprogs-plus via niri_append.sh)"
 
             echo ""
             echo ">>> [Root Cause 2: missing auto-mount daemon]"
