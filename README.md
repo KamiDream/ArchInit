@@ -66,16 +66,13 @@ python3 archinit.py
 >
 > 建议顺序：先「桌面安装」→「基础初始化」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「LightDM 配置」「修补工具」。
 > Suggested order: Desktop Install → Basic Initialization → optional KVM / GPU Drivers / Terminal Beautification → optional LightDM Configuration / Patch Tools.
->
-> 📦 原 Shell 脚本已归档到 [`SH/`](SH/) 目录，**仅作参考**（不再作为主入口）。
-> 📦 The original shell scripts are archived under [`SH/`](SH/) for **reference only** (no longer the primary entry point).
 
 ---
 
 ### 🖥️ 桌面安装 / Desktop Install
 
-> 对应 `archinit.py` 主菜单「桌面安装 / Desktop Install」；参考脚本：[`SH/0_desktop_install.sh`](SH/0_desktop_install.sh)。
-> Maps to the "Desktop Install" category in `archinit.py`; reference script: [`SH/0_desktop_install.sh`](SH/0_desktop_install.sh).
+> 对应 `archinit.py` 主菜单「桌面安装 / Desktop Install」分类；实现见 [`ZClass/steps/desktop.py`](ZClass/steps/desktop.py)。
+> Maps to the "Desktop Install" category in `archinit.py`; implementation in [`ZClass/steps/desktop.py`](ZClass/steps/desktop.py).
 
 #### Step 1: 注册 DMS 服务 / Register DMS Service
 
@@ -95,8 +92,8 @@ python3 archinit.py
 
 ### 🧱 基础初始化 / Basic Initialization
 
-> 对应 `archinit.py` 主菜单「基础初始化 / Basic Initialization」；参考脚本：[`SH/1_basic_initialization.sh`](SH/1_basic_initialization.sh)。
-> Maps to the "Basic Initialization" category in `archinit.py`; reference script: [`SH/1_basic_initialization.sh`](SH/1_basic_initialization.sh).
+> 对应 `archinit.py` 主菜单「基础初始化 / Basic Initialization」分类；实现见 [`ZClass/steps/basic.py`](ZClass/steps/basic.py)。
+> Maps to the "Basic Initialization" category in `archinit.py`; implementation in [`ZClass/steps/basic.py`](ZClass/steps/basic.py).
 
 #### Step 1: niri 核心组件 / Niri Core Components
 
@@ -154,8 +151,8 @@ python3 archinit.py
 
 ### 💻 KVM 安装 / KVM Install
 
-> 对应 `archinit.py` 主菜单「KVM 安装 / KVM Install」；参考脚本：[`SH/2_mix_install.sh`](SH/2_mix_install.sh)。
-> Maps to the "KVM Install" category in `archinit.py`; reference script: [`SH/2_mix_install.sh`](SH/2_mix_install.sh).
+> 对应 `archinit.py` 主菜单「KVM 安装 / KVM Install」分类；实现见 [`ZClass/steps/kvm.py`](ZClass/steps/kvm.py)。
+> Maps to the "KVM Install" category in `archinit.py`; implementation in [`ZClass/steps/kvm.py`](ZClass/steps/kvm.py).
 
 #### Step 1: KVM 虚拟化 / KVM Virtualization
 
@@ -170,8 +167,8 @@ python3 archinit.py
 
 ### 🎮 显卡驱动安装 / GPU Drivers
 
-> 对应 `archinit.py` 主菜单「显卡驱动安装 / GPU Drivers」；参考脚本：[`SH/2_mix_install.sh`](SH/2_mix_install.sh)。
-> Maps to the "GPU Drivers" category in `archinit.py`; reference script: [`SH/2_mix_install.sh`](SH/2_mix_install.sh).
+> 对应 `archinit.py` 主菜单「显卡驱动安装 / GPU Drivers」分类；实现见 [`ZClass/steps/gpu.py`](ZClass/steps/gpu.py)。
+> Maps to the "GPU Drivers" category in `archinit.py`; implementation in [`ZClass/steps/gpu.py`](ZClass/steps/gpu.py).
 
 #### Step 1: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
@@ -197,8 +194,8 @@ python3 archinit.py
 
 ### ✨ 终端美化 / Terminal Beautification
 
-> 对应 `archinit.py` 主菜单「终端美化 / Terminal Beautification」；参考脚本：[`SH/2_mix_install.sh`](SH/2_mix_install.sh)。
-> Maps to the "Terminal Beautification" category in `archinit.py`; reference script: [`SH/2_mix_install.sh`](SH/2_mix_install.sh).
+> 对应 `archinit.py` 主菜单「终端美化 / Terminal Beautification」分类；实现见 [`ZClass/steps/terminal.py`](ZClass/steps/terminal.py)。
+> Maps to the "Terminal Beautification" category in `archinit.py`; implementation in [`ZClass/steps/terminal.py`](ZClass/steps/terminal.py).
 
 #### Step 1: 启用 Zsh 终端 / Enable Zsh Shell
 
@@ -248,8 +245,8 @@ python3 archinit.py
 ---
 ### 🎨 LightDM 配置 / LightDM WebKit2 Greeter
 
-> 对应 `archinit.py` 主菜单「LightDM 配置 / LightDM WebKit2 Greeter」；参考脚本：[`SH/lightdm.sh`](SH/lightdm.sh)。
-> Maps to the "LightDM Configuration" category in `archinit.py`; reference script: [`SH/lightdm.sh`](SH/lightdm.sh).
+> 对应 `archinit.py` 主菜单「LightDM 配置 / LightDM WebKit2 Greeter」分类；实现见 [`ZClass/steps/lightdm.py`](ZClass/steps/lightdm.py)。
+> Maps to the "LightDM Configuration" category in `archinit.py`; implementation in [`ZClass/steps/lightdm.py`](ZClass/steps/lightdm.py).
 
 > ⚠️ **单 N 卡独显或开启了独显直连的用户（纯 N 卡用户）请勿使用此配置！**
 > **Do NOT use this configuration if you have a single/primary NVIDIA GPU!**
@@ -293,8 +290,8 @@ python3 archinit.py
 ---
 ### 🩹 修补工具 / Patch Tools
 
-> 对应 `archinit.py` 主菜单「修补工具 / Patch Tools」；参考脚本：[`SH/patch.sh`](SH/patch.sh)。
-> Maps to the "Patch Tools" category in `archinit.py`; reference script: [`SH/patch.sh`](SH/patch.sh).
+> 对应 `archinit.py` 主菜单「修补工具 / Patch Tools」分类；实现见 [`ZClass/steps/patch.py`](ZClass/steps/patch.py)。
+> Maps to the "Patch Tools" category in `archinit.py`; implementation in [`ZClass/steps/patch.py`](ZClass/steps/patch.py).
 
 #### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install
 
@@ -339,7 +336,7 @@ python3 archinit.py
 
 - **选择步骤 / Choose steps**：[`archinit.py`](archinit.py) 提供统一交互式菜单（`curses`）：主菜单选择 5 大分类，分类内用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回 / [`archinit.py`](archinit.py) provides a unified interactive menu (`curses`): pick one of 5 categories from the main menu, then use ↑/↓ to select a step, Enter to execute, q/Esc to go back.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf、.zshrc 等）均由脚本自动完成（`sed` 或 Python 直接读写文件），无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, .zshrc, etc.) are applied automatically (`sed` or direct file I/O in Python) — no manual editing required.
-- **添加自己的包 / Add your own packages**：可修改 `archinit.py` 中对应步骤函数的 `pacman -S` 列表；原 Shell 脚本亦保留在 [`SH/`](SH/) 供参考 / Edit the `pacman -S` lists in the relevant step function of `archinit.py`; the original shell scripts remain under [`SH/`](SH/) for reference.
+- **添加自己的包 / Add your own packages**：修改 `ZClass/steps/` 下对应步骤类方法里的 `pacman -S` 列表（如 `basic.py`、`gpu.py`）/ Edit the `pacman -S` lists in the corresponding step class methods under `ZClass/steps/` (e.g. `basic.py`, `gpu.py`).
 
 ---
 
