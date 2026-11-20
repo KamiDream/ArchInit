@@ -201,7 +201,7 @@ class UI:
             print()
             try:
                 input(Style.red_bold("  Press Enter to return to menu..."))
-            except EOFError:
+            except (EOFError, KeyboardInterrupt):
                 pass
         curses.reset_prog_mode()
         self.stdscr.clear()

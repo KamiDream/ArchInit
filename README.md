@@ -46,7 +46,7 @@ python3 archinit.py
 > - **`archinit.py`**：统一交互式安装器（Python 3 + 标准库 `curses`，**零第三方依赖**）。启动后进入**主菜单**，用 ↑/↓ 选择分类，Enter 进入；分类内再用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回上一级。执行步骤时会自动退出全屏界面，回到普通终端，`pacman`/`chsh`/`kitten`/`sudo` 等交互均正常。
 >   Unified interactive installer (Python 3 + stdlib `curses`, **no third-party dependencies**). Pick a **category** from the main menu with ↑/↓ + Enter; inside a category, pick a step with ↑/↓ + Enter, q/Esc to go back. When a step runs, it drops out of the full-screen UI back to the normal terminal so `pacman`/`chsh`/`kitten`/`sudo` work interactively.
 >
-> 七大分类（原混合安装已拆分为 KVM 安装 / 显卡驱动安装 / 终端美化，步骤完全保留）：
+> 八大分类（原混合安装已拆分为 KVM 安装 / 显卡驱动安装 / 终端美化，步骤完全保留）：
 > - **🖥️ 桌面安装 / Desktop Install**：注册 DMS 服务、显示管理器（LightDM）
 > - **🧱 基础初始化 / Basic Initialization**：niri 核心组件、系统拓展组件、Kitty 字体、AUR 助手、NTFS 增强工具、雾凇拼音、密钥库
 > - **💻 KVM 安装 / KVM Install**：KVM 虚拟化
@@ -54,8 +54,9 @@ python3 archinit.py
 > - **✨ 终端美化 / Terminal Beautification**：Zsh、Antidote、Starship、fastfetch、Kitty 透明度
 > - **🎨 LightDM 配置 / LightDM WebKit2 Greeter**：WebKit2 Greeter、KamiDream 主题、启用配置、黑屏救急
 > - **🩹 修补工具 / Patch Tools**：UU 加速器、XDG 转英文、Fcitx5 环境变量
+> - **🔀 应用后端切换 / App Backend Toggle**：生成应用 Wayland/X11 启动器
 >
-> Seven categories (the former "Mix Install" is split into KVM Install / GPU Drivers / Terminal Beautification; steps fully preserved):
+> Eight categories (the former "Mix Install" is split into KVM Install / GPU Drivers / Terminal Beautification; steps fully preserved):
 > - **Desktop Install**: Register DMS service, Display Manager (LightDM)
 > - **Basic Initialization**: Niri core components, system extensions, Kitty font, AUR helper, NTFS tools, Rime-ice, keyring
 > - **KVM Install**: KVM virtualization
@@ -63,9 +64,10 @@ python3 archinit.py
 > - **Terminal Beautification**: Zsh, Antidote, Starship, fastfetch, Kitty opacity
 > - **LightDM Configuration**: WebKit2 greeter, KamiDream theme, enable config, black-screen emergency fix
 > - **Patch Tools**: UU Accelerator, XDG dirs to English, Fcitx5 env vars
+> - **App Backend Toggle**: Generate Wayland/X11 launchers for an app
 >
-> 建议顺序：先「桌面安装」→「基础初始化」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「LightDM 配置」「修补工具」。
-> Suggested order: Desktop Install → Basic Initialization → optional KVM / GPU Drivers / Terminal Beautification → optional LightDM Configuration / Patch Tools.
+> 建议顺序：先「桌面安装」→「基础初始化」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「LightDM 配置」「修补工具」「应用后端切换」。
+> Suggested order: Desktop Install → Basic Initialization → optional KVM / GPU Drivers / Terminal Beautification → optional LightDM Configuration / Patch Tools / App Backend Toggle.
 
 ---
 
@@ -332,9 +334,27 @@ python3 archinit.py
 
 ---
 
+### 🔀 应用后端切换 / App Backend Toggle
+
+> 对应 `archinit.py` 主菜单「应用后端切换 / App Backend Toggle」分类；实现见 [`ZClass/steps/backend.py`](ZClass/steps/backend.py)。
+> Maps to the "App Backend Toggle" category in `archinit.py`; implementation in [`ZClass/steps/backend.py`](ZClass/steps/backend.py).
+
+#### Step 1: 生成 Wayland/X11 启动器 / Generate Wayland-X11 Launchers
+
+> 为指定应用生成两个启动器，分别在 Wayland 与 X11（XWayland）下运行，运行哪个就切到哪个后端。
+> Generate two launchers for a given app to run it under Wayland or X11 (XWayland); run either to switch backend.
+
+| 操作 / Action                        | 说明 / Description |
+| ------------------------------------ | ------------------ |
+| 🖥️ 输入应用 / Enter app           | 提示输入应用命令（如 `firefox`、`code`），自动解析其可执行文件路径；输入 `q` 取消，命令不存在时最多重试 3 次 / Prompt for an app command, resolving its executable path; enter `q` to cancel, up to 3 retries when the command is not found |
+| 🧩 生成启动器 / Generate launchers | 在 `~/.local/bin/` 写入可执行的 `<app>-wayland` 与 `<app>-x11`，分别设置 `QT_QPA_PLATFORM`/`GDK_BACKEND`/`SDL_VIDEODRIVER`/`MOZ_ENABLE_WAYLAND`/`ELECTRON_OZONE_PLATFORM_HINT` 后 `exec` 目标程序 / Write executable `<app>-wayland` and `<app>-x11` wrappers into `~/.local/bin/` that set backend env vars then exec the target |
+| 💡 使用 / Usage               | 运行 `<app>-wayland` 或 `<app>-x11` 即在该后端下启动；若 `~/.local/bin` 不在 PATH 中会给出提示 / Run `<app>-wayland` or `<app>-x11` to launch in that backend; a hint is shown when `~/.local/bin` is missing from PATH |
+
+---
+
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`archinit.py`](archinit.py) 提供统一交互式菜单（`curses`）：主菜单选择 5 大分类，分类内用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回 / [`archinit.py`](archinit.py) provides a unified interactive menu (`curses`): pick one of 5 categories from the main menu, then use ↑/↓ to select a step, Enter to execute, q/Esc to go back.
+- **选择步骤 / Choose steps**：[`archinit.py`](archinit.py) 提供统一交互式菜单（`curses`）：主菜单选择 8 大分类，分类内用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回 / [`archinit.py`](archinit.py) provides a unified interactive menu (`curses`): pick one of 8 categories from the main menu, then use ↑/↓ to select a step, Enter to execute, q/Esc to go back.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf、.zshrc 等）均由脚本自动完成（`sed` 或 Python 直接读写文件），无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, .zshrc, etc.) are applied automatically (`sed` or direct file I/O in Python) — no manual editing required.
 - **添加自己的包 / Add your own packages**：修改 `ZClass/steps/` 下对应步骤类方法里的 `pacman -S` 列表（如 `basic.py`、`gpu.py`）/ Edit the `pacman -S` lists in the corresponding step class methods under `ZClass/steps/` (e.g. `basic.py`, `gpu.py`).
 

@@ -65,6 +65,9 @@ class App:
             curses.wrapper(_curses_main)
         except KeyboardInterrupt:
             pass
+        except curses.error:
+            # execute_step 已手动 endwin()，wrapper 末尾再调用会返回 ERR —— 正常情况
+            pass
         print()
         print("已退出 / Exited.")
         return 0

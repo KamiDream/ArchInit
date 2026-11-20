@@ -1,5 +1,6 @@
 """分类目录：把各步骤类组装成可交互的分类列表。"""
 from .model import Category, Step
+from .steps.backend import BackendSteps
 from .steps.basic import BasicSteps
 from .steps.desktop import DesktopSteps
 from .steps.gpu import GpuSteps
@@ -56,5 +57,9 @@ class Catalog:
                 Step("UU 加速器安装 / UU Accelerator Install", PatchSteps.uu),
                 Step("XDG 用户目录转英文 / Migrate XDG Dirs to English", PatchSteps.xdg),
                 Step("Fcitx5 输入法环境变量 / Fcitx5 IM Environment Variables", PatchSteps.fcitx),
+            ]),
+            Category("应用后端切换 / App Backend Toggle", [
+                Step("生成 Wayland/X11 启动器 / Generate Wayland-X11 Launchers",
+                     BackendSteps.app_backend),
             ]),
         ]
