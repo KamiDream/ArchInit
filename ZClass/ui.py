@@ -1,6 +1,5 @@
 """curses 两栏界面（类似 yazi：左分类导航 / 右步骤内容）。"""
 import curses
-import time
 import unicodedata
 
 from .config import BRAND_LEFT, BRAND_RIGHT
@@ -197,9 +196,6 @@ class UI:
         if success:
             cat.completed[si] = True
             print(Style.green_bold(f"  ✅ Step {si+1} completed: {step.title}"))
-            print()
-            print(Style.yellow("  ⏳ Returning to menu in 3 seconds..."))
-            time.sleep(3)
         else:
             print(Style.red_bold(f"  ❌ Step {si+1} failed: {step.title}"))
             print()
