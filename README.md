@@ -54,7 +54,7 @@ python3 archinit.py
 > - **✨ 终端美化 / Terminal Beautification**：Zsh、Antidote、Starship、fastfetch、Kitty 透明度
 > - **🎨 LightDM 配置 / LightDM WebKit2 Greeter**：WebKit2 Greeter、KamiDream 主题、启用配置、黑屏救急
 > - **🩹 修补工具 / Patch Tools**：UU 加速器、XDG 转英文、Fcitx5 环境变量
-> - **🔀 应用后端切换 / App Backend Toggle**：输入应用后选 Wayland/X11 直接启动
+> - **🔀 应用后端切换 / App Backend Toggle**：输入命令启动、从已安装应用选择启动
 >
 > Eight categories (the former "Mix Install" is split into KVM Install / GPU Drivers / Terminal Beautification; steps fully preserved):
 > - **Desktop Install**: Register DMS service, Display Manager (LightDM)
@@ -64,7 +64,7 @@ python3 archinit.py
 > - **Terminal Beautification**: Zsh, Antidote, Starship, fastfetch, Kitty opacity
 > - **LightDM Configuration**: WebKit2 greeter, KamiDream theme, enable config, black-screen emergency fix
 > - **Patch Tools**: UU Accelerator, XDG dirs to English, Fcitx5 env vars
-> - **App Backend Toggle**: Pick Wayland/X11 for an app and launch it right away
+> - **App Backend Toggle**: Launch by command, or pick from installed apps
 >
 > 建议顺序：先「桌面安装」→「基础初始化」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「LightDM 配置」「修补工具」「应用后端切换」。
 > Suggested order: Desktop Install → Basic Initialization → optional KVM / GPU Drivers / Terminal Beautification → optional LightDM Configuration / Patch Tools / App Backend Toggle.
@@ -339,16 +339,33 @@ python3 archinit.py
 > 对应 `archinit.py` 主菜单「应用后端切换 / App Backend Toggle」分类；实现见 [`ZClass/steps/backend.py`](ZClass/steps/backend.py)。
 > Maps to the "App Backend Toggle" category in `archinit.py`; implementation in [`ZClass/steps/backend.py`](ZClass/steps/backend.py).
 
-#### Step 1: 选择平台启动应用 / Launch App on Wayland or X11
+#### Step 1: 输入命令启动 / Launch by Command
 
-> 输入应用命令后选择平台（Wayland / X11），确认后立即在该后端下启动应用。
-> Enter an app command, pick a backend (Wayland / X11), and the app launches on that backend right away.
+> 自己输入应用命令，选择平台（Wayland / X11）后立即启动。
+> Type the app command yourself, pick a backend (Wayland / X11), and it launches right away.
 
 | 操作 / Action                       | 说明 / Description |
 | ----------------------------------- | ------------------ |
-| 🖥️ 输入应用 / Enter app          | 提示输入应用命令（如 `firefox`、`code`），自动解析其可执行文件路径；输入 `q` 取消，命令不存在时最多重试 3 次 / Prompt for an app command, resolving its executable path; enter `q` to cancel, up to 3 retries when the command is not found |
+| 🖥️ 输入命令 / Enter command      | 自动 `command -v` 解析可执行路径（也支持绝对路径）；找不到时提示改用 Step 2，最多重试 3 次，`q` 取消 / Resolves the path via `command -v` (absolute paths also accepted); on failure it points to Step 2, up to 3 retries, `q` to cancel |
 | 🎯 选择平台 / Choose backend      | `1` = Wayland、`2` = X11（XWayland）、`q` 取消；输入非法时重新询问 / `1` = Wayland, `2` = X11 (XWayland), `q` to cancel; re-asks on invalid input |
 | 🚀 启动应用 / Launch             | 用对应的 `QT_QPA_PLATFORM`/`GDK_BACKEND`/`SDL_VIDEODRIVER`/`MOZ_ENABLE_WAYLAND`/`ELECTRON_OZONE_PLATFORM_HINT` 环境变量在后台启动应用（独立会话，不阻塞本工具），并打印 pid 与手动排查命令 / Launch the app detached (own session, non-blocking) with the matching backend env vars, printing the pid and a manual debug command |
+
+#### Step 2: 从已安装应用选择 / Pick Installed App
+
+> 不知道命令名时用这一步（例如 KVM 的「虚拟系统管理器」）：弹出全部已安装应用列表，用 ↑/↓ 上下选择（也可直接打字过滤）。
+> Use this when you don't know the command name (e.g. KVM's virt-manager): it opens a picker with every installed app and you move with ↑/↓ (or just type to filter).
+
+| 操作 / Action                       | 说明 / Description |
+| ----------------------------------- | ------------------ |
+| 🔎 扫描范围 / Scan scope         | `/usr/share/applications`、`/usr/local/share/applications`、`~/.local/share/applications`（含子目录）；仅保留 `Type=Application` 且非 `NoDisplay=true` 的条目，去重后按名称排序 / Scans the standard `applications` dirs recursively, keeping only `Type=Application` entries with `NoDisplay` unset, deduplicated and sorted |
+| 📋 列表界面 / List view          | 直接弹出全量列表，每项显示「名称 (可执行名)」，右上角显示 `已过滤/总数`，超出屏幕自动滚动 / Shows every app as `Name (executable)` with a `filtered/total` counter and automatic scrolling |
+| ↕️ 上下选择 / Move               | `↑`/`↓` 移动，`PgUp`/`PgDn` 每次翻 10 条，`Home`/`End` 到首尾 / `↑`/`↓` to move, `PgUp`/`PgDn` by 10, `Home`/`End` to jump |
+| 🏷️ 输入过滤 / Type to filter   | 直接敲字实时过滤（匹配 `Name`、`Name[*]`、`GenericName` 与可执行名，如 `virt` → 「虚拟系统管理器」）；`Backspace` 删除过滤字符 / Type to filter live (matches `Name`, `Name[*]`, `GenericName`, executable); `Backspace` removes characters |
+| ✅ 确认 / 取消 / Confirm or cancel | `Enter` 确定选中项，`q` 或 `Esc` 取消（ESC 立即生效，不卡顿）/ `Enter` confirms, `q`/`Esc` cancels (ESC responds immediately) |
+| 🚀 启动 / Launch                | 选中后同 Step 1：选平台 → 后台启动 / After picking, same as Step 1: choose backend → launch detached |
+
+> 实现提示：选择器在 [`ZClass/picker.py`](ZClass/picker.py) 中实现，方向键转义序列（`\E[A` / `\EOA` 等）由自身解析，不依赖 terminfo，因此在 kitty、foot、xterm 等不同终端下行为一致；`.desktop` 的 `Exec` 行会去掉 field code、剥掉 `env VAR=VAL` 前缀、非绝对路径用 `which` 解析，启动时传入完整 argv。
+> Implementation note: the picker lives in [`ZClass/picker.py`](ZClass/picker.py) and decodes arrow-key escape sequences (`\E[A` / `\EOA`, etc.) itself instead of relying on terminfo, so it behaves the same in kitty, foot, xterm, etc. `Exec` lines are sanitized (field codes removed, `env VAR=VAL` prefix stripped, non-absolute program resolved via `which`) and the full argv is launched.
 
 ---
 
