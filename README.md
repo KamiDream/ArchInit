@@ -12,6 +12,7 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 
 - **Arch Linux**（已安装并正常启动 / installed and booted）（个人习惯是archinstall时桌面不安装）
 - 请确保已经安装 git 和 vim，如果没有安装请运行 `sudo pacman -S vim git`
+- 需要 **Python 3**（标准库自带 `curses`，Arch 默认已安装 / bundled with Arch, no extra packages needed）
 - 已拥有 `sudo` 权限的普通用户（**不要以 root 身份运行** / **do not run as root**）
 - 网络连接正常 / Working internet connection
 
@@ -37,28 +38,44 @@ Designed for a fresh Arch Linux installation to quickly set up a complete develo
 ```bash
 git clone https://github.com/KamiDream/ArchInit.git
 cd ArchInit
-./0_desktop_install.sh
+python3 archinit.py
 ```
 
 > ⚠️ **注意 / Note**：
 >
-> - **`0_desktop_install.sh`**：使用 **DMS Shell + LightDM**（完整桌面环境）。提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
->   Uses **DMS Shell + LightDM** (full desktop environment). Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
-> - **`1_basic_initialization.sh`**：**基础初始化**，包含 Kitty 字体选择、niri 核心组件、系统拓展组件、AUR 助手、NTFS 增强工具、雾凇拼音、密钥库等。提供**交互式菜单**。
->   **Basic initialization** — Kitty font selector, Niri core components, system extensions, AUR helper, NTFS tools, Rime-ice, keyring. Provides an **interactive menu**.
-> - **`2_mix_install.sh`**：提供**交互式菜单**，使用 ↑/↓ 方向键导航，Enter 执行选中的步骤，q 退出。
->   Provides an **interactive menu** — use ↑/↓ arrows to navigate, Enter to execute, q to quit.
-> - **`lightdm.sh`**：**LightDM WebKit2 Greeter 配置脚本**，交互式菜单，可用于替换默认的 LightDM 主题为 KamiDream WebKit2 主题。
->   **LightDM WebKit2 Greeter setup script**, interactive menu — replaces default LightDM greeter with the KamiDream WebKit2 theme.
-> - **`patch.sh`**：**修补工具合集**，同样提供交互式菜单。目前包含 SteamDeck UU 加速器安装、XDG 用户目录转英文、Fcitx5 输入法环境变量配置等修补工具。
->   **Patch tool collection**, also with an interactive menu. Currently includes SteamDeck UU Accelerator installation, XDG user dirs migration, Fcitx5 IM environment variables setup, and other patching tools.
+> - **`archinit.py`**：统一交互式安装器（Python 3 + 标准库 `curses`，**零第三方依赖**）。启动后进入**主菜单**，用 ↑/↓ 选择分类，Enter 进入；分类内再用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回上一级。执行步骤时会自动退出全屏界面，回到普通终端，`pacman`/`chsh`/`kitten`/`sudo` 等交互均正常。
+>   Unified interactive installer (Python 3 + stdlib `curses`, **no third-party dependencies**). Pick a **category** from the main menu with ↑/↓ + Enter; inside a category, pick a step with ↑/↓ + Enter, q/Esc to go back. When a step runs, it drops out of the full-screen UI back to the normal terminal so `pacman`/`chsh`/`kitten`/`sudo` work interactively.
 >
-> 先运行 `0_desktop_install.sh` 与 `1_basic_initialization.sh` 完成核心安装，再根据需要运行 `2_mix_install.sh` 安装可选组件，`lightdm.sh` 配置 WebKit2 主题，`patch.sh` 可随时运行修补。
-> Run `0_desktop_install.sh` and `1_basic_initialization.sh` first for the core setup, then run `2_mix_install.sh` for optional extras, `lightdm.sh` for WebKit2 greeter theme, `patch.sh` at any time for fixes.
+> 七大分类（原混合安装已拆分为 KVM 安装 / 显卡驱动安装 / 终端美化，步骤完全保留）：
+> - **🖥️ 桌面安装 / Desktop Install**：注册 DMS 服务、显示管理器（LightDM）
+> - **🧱 基础初始化 / Basic Initialization**：niri 核心组件、系统拓展组件、Kitty 字体、AUR 助手、NTFS 增强工具、雾凇拼音、密钥库
+> - **💻 KVM 安装 / KVM Install**：KVM 虚拟化
+> - **🎮 显卡驱动安装 / GPU Drivers**：NVIDIA、Intel 核显、AMD 核显
+> - **✨ 终端美化 / Terminal Beautification**：Zsh、Antidote、Starship、fastfetch、Kitty 透明度
+> - **🎨 LightDM 配置 / LightDM WebKit2 Greeter**：WebKit2 Greeter、KamiDream 主题、启用配置、黑屏救急
+> - **🩹 修补工具 / Patch Tools**：UU 加速器、XDG 转英文、Fcitx5 环境变量
+>
+> Seven categories (the former "Mix Install" is split into KVM Install / GPU Drivers / Terminal Beautification; steps fully preserved):
+> - **Desktop Install**: Register DMS service, Display Manager (LightDM)
+> - **Basic Initialization**: Niri core components, system extensions, Kitty font, AUR helper, NTFS tools, Rime-ice, keyring
+> - **KVM Install**: KVM virtualization
+> - **GPU Drivers**: NVIDIA, Intel iGPU, AMD iGPU
+> - **Terminal Beautification**: Zsh, Antidote, Starship, fastfetch, Kitty opacity
+> - **LightDM Configuration**: WebKit2 greeter, KamiDream theme, enable config, black-screen emergency fix
+> - **Patch Tools**: UU Accelerator, XDG dirs to English, Fcitx5 env vars
+>
+> 建议顺序：先「桌面安装」→「基础初始化」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「LightDM 配置」「修补工具」。
+> Suggested order: Desktop Install → Basic Initialization → optional KVM / GPU Drivers / Terminal Beautification → optional LightDM Configuration / Patch Tools.
+>
+> 📦 原 Shell 脚本已归档到 [`SH/`](SH/) 目录，**仅作参考**（不再作为主入口）。
+> 📦 The original shell scripts are archived under [`SH/`](SH/) for **reference only** (no longer the primary entry point).
 
 ---
 
-### [`0_desktop_install.sh`](0_desktop_install.sh) — 核心安装（DMS 版）/ Core Setup (DMS Edition)
+### 🖥️ 桌面安装 / Desktop Install
+
+> 对应 `archinit.py` 主菜单「桌面安装 / Desktop Install」；参考脚本：[`SH/0_desktop_install.sh`](SH/0_desktop_install.sh)。
+> Maps to the "Desktop Install" category in `archinit.py`; reference script: [`SH/0_desktop_install.sh`](SH/0_desktop_install.sh).
 
 #### Step 1: 注册 DMS 服务 / Register DMS Service
 
@@ -76,7 +93,10 @@ cd ArchInit
 
 ---
 
-### [`1_basic_initialization.sh`](1_basic_initialization.sh) — 基础初始化 / Basic Initialization
+### 🧱 基础初始化 / Basic Initialization
+
+> 对应 `archinit.py` 主菜单「基础初始化 / Basic Initialization」；参考脚本：[`SH/1_basic_initialization.sh`](SH/1_basic_initialization.sh)。
+> Maps to the "Basic Initialization" category in `archinit.py`; reference script: [`SH/1_basic_initialization.sh`](SH/1_basic_initialization.sh).
 
 #### Step 1: niri 核心组件 / Niri Core Components
 
@@ -132,10 +152,10 @@ cd ArchInit
 
 ---
 
-### [`2_mix_install.sh`](2_mix_install.sh) — 可选扩展 / Optional Extras
+### 💻 KVM 安装 / KVM Install
 
-> 菜单中的步骤用分隔线分为三组：**Step 1**｜**Step 2-4**｜**Step 5-10**。
-> The menu steps are separated into three groups with dividers: **Step 1** | **Step 2-4** | **Step 5-10**.
+> 对应 `archinit.py` 主菜单「KVM 安装 / KVM Install」；参考脚本：[`SH/2_mix_install.sh`](SH/2_mix_install.sh)。
+> Maps to the "KVM Install" category in `archinit.py`; reference script: [`SH/2_mix_install.sh`](SH/2_mix_install.sh).
 
 #### Step 1: KVM 虚拟化 / KVM Virtualization
 
@@ -146,9 +166,14 @@ cd ArchInit
 | 🌐 配置网络 / Configure network         | 启动并设置 `default` 虚拟网络为自动启动 / Start and autostart the `default` virtual network            |
 | 👤 用户权限 / User permissions          | 将当前用户加入 `libvirt` 组（需重新登录生效）/ Add current user to `libvirt` group (re-login required) |
 
-<!-- 分组分隔 ── Step 1 | Step 2-3 -->
+---
 
-#### Step 2: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
+### 🎮 显卡驱动安装 / GPU Drivers
+
+> 对应 `archinit.py` 主菜单「显卡驱动安装 / GPU Drivers」；参考脚本：[`SH/2_mix_install.sh`](SH/2_mix_install.sh)。
+> Maps to the "GPU Drivers" category in `archinit.py`; reference script: [`SH/2_mix_install.sh`](SH/2_mix_install.sh).
+
+#### Step 1: NVIDIA 显卡驱动 / NVIDIA Graphics Driver
 
 | 操作 / Action                            | 说明 / Description                                                                                                                                                                                                                                                                                        |
 | ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -156,21 +181,26 @@ cd ArchInit
 | 🎮 安装 NVIDIA 驱动 / Install NVIDIA driver | `nvidia-dkms`、`nvidia-utils`、`nvidia-settings`                                                                                                                                                                                                                                                    |
 | ⚙️ 配置 initramfs / Configure initramfs     | 在 `/etc/mkinitcpio.conf` 中添加 nvidia 模块，**自动移除 HOOKS 中的 kms**（避免冲突），重新生成 initramfs / Add nvidia modules to `/etc/mkinitcpio.conf`, **auto-remove kms from HOOKS** (avoids conflict), regenerate initramfs          |
 
-#### Step 3: Intel 核显驱动 / Intel Integrated Graphics
+#### Step 2: Intel 核显驱动 / Intel Integrated Graphics
 
 | 操作 / Action                          | 说明 / Description                                                                                                                                                                                           |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🖥️ 安装 Intel 核显驱动 / Install drivers | `mesa`（OpenGL/Vulkan 驱动基础）、`vulkan-intel`（Intel Vulkan 驱动）、`intel-media-driver`（硬件视频编解码）、`mesa-utils`（`glxinfo` 等诊断工具）；已安装的包会自动跳过 / `mesa`, `vulkan-intel`, `intel-media-driver`, `mesa-utils`; already-installed packages are skipped |
 
-#### Step 4: AMD 核显驱动 / AMD Integrated Graphics
+#### Step 3: AMD 核显驱动 / AMD Integrated Graphics
 
 | 操作 / Action                          | 说明 / Description                                                                                                                                                                                           |
 | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🖥️ 安装 AMD 核显驱动 / Install drivers | `mesa`（OpenGL/Vulkan 驱动基础）、`vulkan-radeon`（AMD Vulkan 驱动 RADV）、`libva-mesa-driver`（VA-API 硬件视频解码）、`mesa-utils`（`glxinfo` 等诊断工具）；已安装的包会自动跳过 / `mesa`, `vulkan-radeon`, `libva-mesa-driver`, `mesa-utils`; already-installed packages are skipped |
 
-<!-- 分组分隔 ── Step 2-4 | Step 5-10 -->
+---
 
-#### Step 5: 启用 Zsh 终端 / Enable Zsh Shell
+### ✨ 终端美化 / Terminal Beautification
+
+> 对应 `archinit.py` 主菜单「终端美化 / Terminal Beautification」；参考脚本：[`SH/2_mix_install.sh`](SH/2_mix_install.sh)。
+> Maps to the "Terminal Beautification" category in `archinit.py`; reference script: [`SH/2_mix_install.sh`](SH/2_mix_install.sh).
+
+#### Step 1: 启用 Zsh 终端 / Enable Zsh Shell
 
 | 操作 / Action                         | 说明 / Description                                                             |
 | ------------------------------------- | ------------------------------------------------------------------------------ |
@@ -178,7 +208,7 @@ cd ArchInit
 | 🔄 更改默认 Shell / Change default shell | 将当前用户的默认 shell 切换为 Zsh / Switch current user's default shell to Zsh |
 | 🎨 配置 Kitty / Configure Kitty          | 设置光标尾迹和闪烁效果 / Set cursor trail and blink effects                    |
 
-#### Step 6: Antidote 插件管理器 / Antidote Plugin Manager
+#### Step 2: Antidote 插件管理器 / Antidote Plugin Manager
 
 | 操作 / Action                          | 说明 / Description                                                                                                                                              |
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -187,7 +217,7 @@ cd ArchInit
 | ⚙️ 配置插件 / Configure plugins           | 创建 `~/.zsh_plugins.txt`，添加 `zsh-completions`、`zsh-autosuggestions`、`fast-syntax-highlighting` / Create plugin list file with recommended plugins |
 | ⚙️ 配置 `.zshrc` / Configure `.zshrc` | 添加 `source ~/.antidote/antidote.zsh`、`antidote load` 和 `compinit` / Add Antidote source, load and compinit to `.zshrc`                              |
 
-#### Step 7: Starship 提示符 / Starship Prompt
+#### Step 3: Starship 提示符 / Starship Prompt
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                       |
 | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -197,26 +227,29 @@ cd ArchInit
 
 > 🎨 Starship 主题源自 [Catppuccin Starship](https://github.com/catppuccin/starship/tree/main) 与 [TaouMou/starship-presets](https://github.com/TaouMou/starship-presets)，本人将这两个按照自己的喜好合并了一下。
 
-#### Step 8: fastfetch 配置 / fastfetch Configuration
+#### Step 4: fastfetch 配置 / fastfetch Configuration
 
 | 操作 / Action          | 说明 / Description                                                                                                                                |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 📋 复制配置 / Copy config | 将仓库中的 `fastfetch/config.jsonc` 复制到 `~/.config/fastfetch/` / Copy `fastfetch/config.jsonc` from the repo to `~/.config/fastfetch/` |
 
-#### Step 9: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
+#### Step 5: 切换 fastfetch 开机自启 / Toggle fastfetch on Startup
 
 | 操作 / Action                              | 说明 / Description                                                                                                                                                                                                                                                                                                                                                                                         |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🔄 切换 `fastfetch` 自启 / Toggle fastfetch | 若 `.zshrc` 第一行是 `fastfetch`（或 ` fastfetch`）则删除之（关闭）；否则添加 ` fastfetch`（带前导空格，利用 `HIST_IGNORE_SPACE` 避免记入历史）为第一行（开启）/ If `.zshrc` first line is `fastfetch` (or ` fastfetch`), remove it (disable); otherwise prepend ` fastfetch` (with leading space — leverages `HIST_IGNORE_SPACE` to exclude from history) as the first line (enable) |
 
-#### Step 10: Kitty 背景透明度 / Kitty Background Opacity
+#### Step 6: Kitty 背景透明度 / Kitty Background Opacity
 
 | 操作 / Action                   | 说明 / Description                                                                                                                                                                                                                           |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🎨 调整背景透明度 / Adjust opacity | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
 
 ---
-### [`lightdm.sh`](lightdm.sh) — LightDM WebKit2 Greeter 配置 / LightDM WebKit2 Greeter Setup
+### 🎨 LightDM 配置 / LightDM WebKit2 Greeter
+
+> 对应 `archinit.py` 主菜单「LightDM 配置 / LightDM WebKit2 Greeter」；参考脚本：[`SH/lightdm.sh`](SH/lightdm.sh)。
+> Maps to the "LightDM Configuration" category in `archinit.py`; reference script: [`SH/lightdm.sh`](SH/lightdm.sh).
 
 > ⚠️ **单 N 卡独显或开启了独显直连的用户（纯 N 卡用户）请勿使用此配置！**
 > **Do NOT use this configuration if you have a single/primary NVIDIA GPU!**
@@ -258,7 +291,10 @@ cd ArchInit
 | 🔄 重启系统 / Reboot system                                           | 重启系统以恢复默认 GTK Greeter / Reboot to restore default greeter                                                 |
 
 ---
-### [`patch.sh`](patch.sh) — 修补工具 / Patch Tools
+### 🩹 修补工具 / Patch Tools
+
+> 对应 `archinit.py` 主菜单「修补工具 / Patch Tools」；参考脚本：[`SH/patch.sh`](SH/patch.sh)。
+> Maps to the "Patch Tools" category in `archinit.py`; reference script: [`SH/patch.sh`](SH/patch.sh).
 
 #### Step 1: UU 加速器安装（SteamDeck）/ UU Accelerator Install
 
@@ -301,9 +337,9 @@ cd ArchInit
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`0_desktop_install.sh`](0_desktop_install.sh)、[`1_basic_initialization.sh`](1_basic_initialization.sh)、[`2_mix_install.sh`](2_mix_install.sh)、[`lightdm.sh`](lightdm.sh) 和 [`patch.sh`](patch.sh) 提供交互式菜单，使用 ↑/↓ 方向键选择步骤，Enter 执行，q 退出 / [`0_desktop_install.sh`](0_desktop_install.sh), [`1_basic_initialization.sh`](1_basic_initialization.sh), [`2_mix_install.sh`](2_mix_install.sh), [`lightdm.sh`](lightdm.sh) and [`patch.sh`](patch.sh) provide an interactive menu — use ↑/↓ arrows to select, Enter to execute, q to quit.
-- **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf 等）均由脚本通过 `sed` 自动完成，无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, etc.) are applied automatically via `sed` — no manual editing required.
-- **添加自己的包 / Add your own packages**：可直接修改 `1_basic_initialization.sh` 或 `2_mix_install.sh` 中的 `pacman -S` 列表，增删所需软件包 / Edit the scripts and modify the `pacman -S` lists to suit your needs.
+- **选择步骤 / Choose steps**：[`archinit.py`](archinit.py) 提供统一交互式菜单（`curses`）：主菜单选择 5 大分类，分类内用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回 / [`archinit.py`](archinit.py) provides a unified interactive menu (`curses`): pick one of 5 categories from the main menu, then use ↑/↓ to select a step, Enter to execute, q/Esc to go back.
+- **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf、.zshrc 等）均由脚本自动完成（`sed` 或 Python 直接读写文件），无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, .zshrc, etc.) are applied automatically (`sed` or direct file I/O in Python) — no manual editing required.
+- **添加自己的包 / Add your own packages**：可修改 `archinit.py` 中对应步骤函数的 `pacman -S` 列表；原 Shell 脚本亦保留在 [`SH/`](SH/) 供参考 / Edit the `pacman -S` lists in the relevant step function of `archinit.py`; the original shell scripts remain under [`SH/`](SH/) for reference.
 
 ---
 
@@ -317,8 +353,8 @@ cd ArchInit
 
 ### Q：Kitty 字体选择器无法启动？/ Kitty font selector won't launch?
 
-确保已安装 Kitty：`sudo pacman -S kitty`，或在 [`1_basic_initialization.sh`](1_basic_initialization.sh) 的 **Step 1**（Kitty 字体选择）前手动安装。
-Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before **Step 1** (Kitty font selector) of [`1_basic_initialization.sh`](1_basic_initialization.sh).
+确保已安装 Kitty：`sudo pacman -S kitty`，或在 [`archinit.py`](archinit.py) 的「基础初始化 / Basic Initialization」分类的 **Step 3**（Kitty 字体选择）前手动安装。
+Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before **Step 3** (Kitty font selector) of the "Basic Initialization" category in [`archinit.py`](archinit.py).
 
 ### Q：NVIDIA 驱动安装后黑屏？/ Black screen after NVIDIA driver install?
 
@@ -333,7 +369,7 @@ Check the `MODULES` line in `/etc/mkinitcpio.conf`, then run `sudo mkinitcpio -P
 - **LTS 内核定位**：仅作为紧急情况下的备用内核，正常情况下不会使用。
 - **如果不想看到报错**，按以下步骤操作：
   1. 安装 LTS 头文件：`sudo pacman -S linux-lts-headers`
-  2. 重新运行 [`2_mix_install.sh`](2_mix_install.sh) 的 **Step 2**（NVIDIA 显卡驱动脚本）
+  2. 重新运行 [`archinit.py`](archinit.py) 的「显卡驱动安装 / GPU Drivers」分类 **Step 1**（NVIDIA 显卡驱动）
   3. 重启系统
 
 This error occurs because the script only auto-detects `linux` and `linux-zen` kernels — it does not install `linux-lts-headers` or `linux-hardened-headers`. If you have the LTS kernel installed, `mkinitcpio -P` builds initramfs for **all** installed kernels, and missing LTS headers cause compilation warnings/errors.
@@ -342,7 +378,7 @@ This error occurs because the script only auto-detects `linux` and `linux-zen` k
 - **LTS kernel role**: Emergency backup only — not used under normal circumstances.
 - **To suppress the error**:
   1. Install LTS headers: `sudo pacman -S linux-lts-headers`
-  2. Re-run **Step 2** of [`2_mix_install.sh`](2_mix_install.sh) (NVIDIA driver script)
+  2. Re-run **Step 1** of the "GPU Drivers" category in [`archinit.py`](archinit.py) (NVIDIA driver step)
   3. Reboot
 
 ### Q：locales 未生效？/ Locales not working?
