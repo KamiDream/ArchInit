@@ -59,7 +59,7 @@ class Catalog:
                 Step("Fcitx5 输入法环境变量 / Fcitx5 IM Environment Variables", PatchSteps.fcitx),
             ]),
             Category("应用后端切换 / App Backend Toggle", [
-                Step("生成 Wayland/X11 启动器 / Generate Wayland-X11 Launchers",
+                Step("选择平台启动应用 / Launch App on Wayland or X11",
                      BackendSteps.app_backend),
             ]),
         ]

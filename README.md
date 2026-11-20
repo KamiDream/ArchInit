@@ -54,7 +54,7 @@ python3 archinit.py
 > - **✨ 终端美化 / Terminal Beautification**：Zsh、Antidote、Starship、fastfetch、Kitty 透明度
 > - **🎨 LightDM 配置 / LightDM WebKit2 Greeter**：WebKit2 Greeter、KamiDream 主题、启用配置、黑屏救急
 > - **🩹 修补工具 / Patch Tools**：UU 加速器、XDG 转英文、Fcitx5 环境变量
-> - **🔀 应用后端切换 / App Backend Toggle**：生成应用 Wayland/X11 启动器
+> - **🔀 应用后端切换 / App Backend Toggle**：输入应用后选 Wayland/X11 直接启动
 >
 > Eight categories (the former "Mix Install" is split into KVM Install / GPU Drivers / Terminal Beautification; steps fully preserved):
 > - **Desktop Install**: Register DMS service, Display Manager (LightDM)
@@ -64,7 +64,7 @@ python3 archinit.py
 > - **Terminal Beautification**: Zsh, Antidote, Starship, fastfetch, Kitty opacity
 > - **LightDM Configuration**: WebKit2 greeter, KamiDream theme, enable config, black-screen emergency fix
 > - **Patch Tools**: UU Accelerator, XDG dirs to English, Fcitx5 env vars
-> - **App Backend Toggle**: Generate Wayland/X11 launchers for an app
+> - **App Backend Toggle**: Pick Wayland/X11 for an app and launch it right away
 >
 > 建议顺序：先「桌面安装」→「基础初始化」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「LightDM 配置」「修补工具」「应用后端切换」。
 > Suggested order: Desktop Install → Basic Initialization → optional KVM / GPU Drivers / Terminal Beautification → optional LightDM Configuration / Patch Tools / App Backend Toggle.
@@ -339,16 +339,16 @@ python3 archinit.py
 > 对应 `archinit.py` 主菜单「应用后端切换 / App Backend Toggle」分类；实现见 [`ZClass/steps/backend.py`](ZClass/steps/backend.py)。
 > Maps to the "App Backend Toggle" category in `archinit.py`; implementation in [`ZClass/steps/backend.py`](ZClass/steps/backend.py).
 
-#### Step 1: 生成 Wayland/X11 启动器 / Generate Wayland-X11 Launchers
+#### Step 1: 选择平台启动应用 / Launch App on Wayland or X11
 
-> 为指定应用生成两个启动器，分别在 Wayland 与 X11（XWayland）下运行，运行哪个就切到哪个后端。
-> Generate two launchers for a given app to run it under Wayland or X11 (XWayland); run either to switch backend.
+> 输入应用命令后选择平台（Wayland / X11），确认后立即在该后端下启动应用。
+> Enter an app command, pick a backend (Wayland / X11), and the app launches on that backend right away.
 
-| 操作 / Action                        | 说明 / Description |
-| ------------------------------------ | ------------------ |
-| 🖥️ 输入应用 / Enter app           | 提示输入应用命令（如 `firefox`、`code`），自动解析其可执行文件路径；输入 `q` 取消，命令不存在时最多重试 3 次 / Prompt for an app command, resolving its executable path; enter `q` to cancel, up to 3 retries when the command is not found |
-| 🧩 生成启动器 / Generate launchers | 在 `~/.local/bin/` 写入可执行的 `<app>-wayland` 与 `<app>-x11`，分别设置 `QT_QPA_PLATFORM`/`GDK_BACKEND`/`SDL_VIDEODRIVER`/`MOZ_ENABLE_WAYLAND`/`ELECTRON_OZONE_PLATFORM_HINT` 后 `exec` 目标程序 / Write executable `<app>-wayland` and `<app>-x11` wrappers into `~/.local/bin/` that set backend env vars then exec the target |
-| 💡 使用 / Usage               | 运行 `<app>-wayland` 或 `<app>-x11` 即在该后端下启动；若 `~/.local/bin` 不在 PATH 中会给出提示 / Run `<app>-wayland` or `<app>-x11` to launch in that backend; a hint is shown when `~/.local/bin` is missing from PATH |
+| 操作 / Action                       | 说明 / Description |
+| ----------------------------------- | ------------------ |
+| 🖥️ 输入应用 / Enter app          | 提示输入应用命令（如 `firefox`、`code`），自动解析其可执行文件路径；输入 `q` 取消，命令不存在时最多重试 3 次 / Prompt for an app command, resolving its executable path; enter `q` to cancel, up to 3 retries when the command is not found |
+| 🎯 选择平台 / Choose backend      | `1` = Wayland、`2` = X11（XWayland）、`q` 取消；输入非法时重新询问 / `1` = Wayland, `2` = X11 (XWayland), `q` to cancel; re-asks on invalid input |
+| 🚀 启动应用 / Launch             | 用对应的 `QT_QPA_PLATFORM`/`GDK_BACKEND`/`SDL_VIDEODRIVER`/`MOZ_ENABLE_WAYLAND`/`ELECTRON_OZONE_PLATFORM_HINT` 环境变量在后台启动应用（独立会话，不阻塞本工具），并打印 pid 与手动排查命令 / Launch the app detached (own session, non-blocking) with the matching backend env vars, printing the pid and a manual debug command |
 
 ---
 
