@@ -3,6 +3,10 @@ import curses
 import unicodedata
 
 from .config import BRAND_LEFT, BRAND_RIGHT
+from .model import CANCELLED
+from .picker import Picker
+from .shell import Shell
+from .status import Status
 from .style import Style
 
 
@@ -13,6 +17,7 @@ class UI:
         self.color = curses.has_colors()
         self.bright_brand = True
         self.main_sel = 0  # 记住主菜单上次高亮的分类位置
+        Picker.bind(stdscr)  # 步骤内弹出选择器时复用本窗口
 
     # ── 颜色 ──
     def init_colors(self):
@@ -167,11 +172,14 @@ class UI:
             self.putw(ry, rx, line, attr); ry += 1
 
         self.putw(footer_y, 0, "═" * (w - 1))
-        if focus == "left":
+        if Status.message:
+            self.putw(footer_y + 1, 2, Status.message, self.attr(4, curses.A_BOLD))
+        elif focus == "left":
             hint = "↑/↓ 选择分类  •  →/Enter 进入  •  q 退出"
+            self.putw(footer_y + 1, 2, hint)
         else:
             hint = "↑/↓ 选择步骤  •  Enter 执行  •  ←/Esc 返回分类  •  q 退出"
-        self.putw(footer_y + 1, 2, hint)
+            self.putw(footer_y + 1, 2, hint)
         self.stdscr.refresh()
 
     # ── 执行单个步骤（退出 curses 回到普通终端）──
@@ -179,31 +187,41 @@ class UI:
         step = cat.steps[si]
         curses.def_prog_mode()
         curses.endwin()
-        print()
-        print("=" * 121)
-        print(f" Step {si+1}: {step.title}")
-        print("=" * 121)
-        success = False
+        result = False
         try:
-            success = bool(step.func())
+            result = step.func()
         except KeyboardInterrupt:
             print("\n  ⚠️  已被用户中断 / Interrupted by user.")
-            success = False
+            result = False
         except Exception as e:  # noqa: BLE001
             print(Style.red_bold(f"\n  ❌ 异常 / Exception: {e}"))
-            success = False
-        print()
-        if success:
+            result = False
+
+        if result is CANCELLED:
+            # 用户主动取消：直接回菜单，不标记完成、不等待按键
+            Status.set(f"↩️  已取消 / Cancelled: {step.title}")
+        elif result:
             cat.completed[si] = True
-            print(Style.green_bold(f"  ✅ Step {si+1} completed: {step.title}"))
+            if not Status.message:
+                Status.set(f"✅ 完成 / Done: {step.title}")
         else:
+            # 失败需要用户注意，保留终端输出并等待按键
+            print()
             print(Style.red_bold(f"  ❌ Step {si+1} failed: {step.title}"))
             print()
             try:
-                input(Style.red_bold("  Press Enter to return to menu..."))
+                Shell.wait_key("按 Enter 返回菜单 / Press Enter to return")
             except (EOFError, KeyboardInterrupt):
                 pass
         curses.reset_prog_mode()
+        # 步骤内部可能嵌入过额外窗口（如 Picker 的 curses.wrapper），
+        # 退出时会关掉 keypad、留下非阻塞 timeout，这里恢复主界面状态
+        try:
+            self.stdscr.keypad(True)
+            self.stdscr.timeout(-1)
+            curses.curs_set(0)
+        except curses.error:
+            pass
         self.stdscr.clear()
         self.stdscr.refresh()
 
@@ -220,6 +238,7 @@ class UI:
             self.main_sel = cat_idx
             self.draw_twopane(cat_idx, focus)
             key = self.stdscr.getch()
+            Status.clear()  # 任意按键后清除底部提示
 
             # 窗口缩放：刷新行列数并重绘
             if key == curses.KEY_RESIZE:

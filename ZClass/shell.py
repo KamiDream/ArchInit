@@ -2,6 +2,9 @@
 import os
 import shutil
 import subprocess
+import sys
+import termios
+import tty
 
 
 class Shell:
@@ -35,13 +38,44 @@ class Shell:
         return cls.ok(f"pacman -Q {pkg} >/dev/null 2>&1")
 
     @staticmethod
-    def prompt(msg="Press Enter to continue..."):
-        """等待 Enter；输入 q 返回 False。"""
+    def wait_key(msg="按 Enter 继续 / Press Enter to continue"):
+        """单键等待：Enter 继续（True）；q 或 ESC 返回（False）。ESC 即时生效。"""
+        label = f"  [{msg}]  Enter 继续 · q/ESC 返回 / Enter=continue, q/ESC=back  "
+        fd = -1
+        old = None
         try:
-            ans = input(f"  [{msg}]  (or press q to return to menu) ")
-        except EOFError:
+            fd = sys.stdin.fileno()
+            if not os.isatty(fd):
+                raise OSError("stdin is not a tty")
+            old = termios.tcgetattr(fd)
+            tty.setcbreak(fd)
+            mode = termios.tcgetattr(fd)
+            mode[3] &= ~termios.ECHO  # 不回显按键（Ctrl-C 仍可中断）
+            termios.tcsetattr(fd, termios.TCSADRAIN, mode)
+        except (OSError, ValueError, termios.error):
+            try:
+                input(label)
+            except EOFError:
+                pass
             return True
-        return ans.strip().lower() != "q"
+        try:
+            sys.stdout.write(label)
+            sys.stdout.flush()
+            while True:
+                ch = sys.stdin.read(1)
+                if ch in ("", "\n", "\r"):
+                    return True
+                if ch in ("q", "Q", "\x1b"):
+                    return False
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old)
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+
+    @staticmethod
+    def prompt(msg="按 Enter 继续 / Press Enter to continue"):
+        """等待按键：Enter 继续（True）；q 或 ESC 返回（False）。"""
+        return Shell.wait_key(msg)
 
     @staticmethod
     def sudo_write(path, content, append=False):

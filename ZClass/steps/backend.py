@@ -3,12 +3,12 @@ import os
 import shlex
 import shutil
 import subprocess
-import sys
 
 from ..config import HOME
-from ..picker import Picker
+from ..model import CANCELLED
+from ..picker import FreeText, Picker
 from ..shell import Shell
-from ..style import Style
+from ..status import Status
 
 WAYLAND_ENV = {
     "QT_QPA_PLATFORM": "wayland",
@@ -34,24 +34,12 @@ DESKTOP_DIRS = (
 
 
 class BackendSteps:
-    # ── 终端输入 ──
-    @staticmethod
-    def _ask(prompt):
-        """读取一行终端输入；stdin 不可用（EOF）时回退到 /dev/tty。"""
-        try:
-            return input(prompt)
-        except EOFError:
-            pass
-        try:
-            with open("/dev/tty", encoding="utf-8", errors="replace") as tty:
-                sys.stdout.write(prompt)
-                sys.stdout.flush()
-                line = tty.readline()
-        except OSError:
-            return None
-        return line if line else None
+    # 记住上次的选择，返回/再次进入时恢复
+    _last_app_idx: int = 0
+    _last_app_query: str = ""
+    _last_backend_idx: int = 0
 
-    # ── .desktop 扫描（用于「不知道命令名」的场景）──
+    # ── .desktop 扫描 ──
     @staticmethod
     def _desktop_exec(exec_line):
         """把 Desktop Entry 的 Exec 行转成可执行 argv；失败返回 []。"""
@@ -133,146 +121,107 @@ class BackendSteps:
         apps.sort(key=lambda a: a[0].lower())
         return apps
 
+    # ── 输入的命令（不在扫描列表里的应用）──
+    @staticmethod
+    def _resolve_free(text):
+        """把用户输入的文字解析成 (显示名, argv)；找不到返回 None。"""
+        app = text.strip()
+        if not app:
+            return None
+        if "/" in app:
+            path = os.path.expanduser(app)
+            if os.path.exists(path):
+                return os.path.basename(path), [path]
+            return None
+        target = shutil.which(app)
+        if target:
+            return app, [target]
+        found = Shell.capture(f"command -v {shlex.quote(app)}").strip()
+        if found and os.path.isabs(found) and os.path.exists(found):
+            return app, [found]
+        return None
+
+    # ── 选择应用（列表 + 可输入列表外命令）──
     @classmethod
-    def _pick_from_apps(cls):
-        """列出全部已安装应用，供方向键上下选择（可直接输入关键字过滤）；返回 (显示名, argv) 或 None。"""
+    def _pick_app(cls):
+        """返回 (显示名, argv) 或 None（用户取消）。"""
         apps = cls._installed_apps()
-        if not apps:
-            print(Style.yellow("    ⚠️  未找到已安装应用 / No installed applications found."))
-            print("    请改用手动输入命令 / Enter the command manually instead.")
-            return None
-
         rows = [(name, os.path.basename(argv[0])) for name, argv, _aliases in apps]
-        print("    正在打开应用列表 / Opening the app list...")
-        idx = Picker.choose(
-            "从已安装应用中选择 / Pick installed app（输入可过滤 / type to filter）", rows)
-        if idx is None:
+        title = "选择应用 / Pick app"
+        subtitle = ("选择应用 → 选择平台 → 立即启动 · 输入可过滤 · Tab 或空匹配 Enter 当命令用 / "
+                    "pick app → backend → launch · type to filter · Tab uses typed text as a command")
+        notice = "" if apps else (
+            "⚠️  未找到已安装应用，可直接输入命令后按 Tab / no .desktop apps — type a command and press Tab")
+
+        while True:
+            res = Picker.choose(title, rows, initial=cls._last_app_idx,
+                                query=cls._last_app_query, allow_free=True,
+                                subtitle=subtitle, notice=notice)
+            cls._last_app_query = Picker.last_query
+
+            if isinstance(res, FreeText):
+                picked = cls._resolve_free(str(res))
+                if picked:
+                    return picked
+                notice = f"⚠️  未找到该命令 / Command not found: {str(res).strip()}"
+                continue
+            if res is None:
+                return None
+            if not isinstance(res, int):
+                return None
+            cls._last_app_idx = res
+            name, argv, _aliases = apps[res]
+            return name, argv
+
+    # ── 选择平台 ──
+    @staticmethod
+    def _choose_backend(app_label=""):
+        """返回 (平台名, 环境变量字典) 或 None（用户按 Esc 返回选应用）。"""
+        rows = [
+            ("Wayland", "原生 / native"),
+            ("X11 (XWayland)", "兼容模式 / compatibility"),
+        ]
+        subtitle = f"已选应用 / App: {app_label}" if app_label else ""
+        idx = Picker.choose("选择启动平台 / Choose backend", rows,
+                            initial=BackendSteps._last_backend_idx, subtitle=subtitle)
+        if not isinstance(idx, int):
             return None
-        name, argv, _aliases = apps[idx]
-        print(f"    ✅ 已选择 / Picked: {name}  ({' '.join(shlex.quote(t) for t in argv)})")
-        return name, argv
+        BackendSteps._last_backend_idx = idx
+        return ("Wayland", WAYLAND_ENV) if idx == 0 else ("X11 (XWayland)", X11_ENV)
 
-    # ── 手动输入命令 ──
-    @staticmethod
-    def _resolve_command():
-        """询问应用命令并解析为 (显示名, argv)；返回 None 表示取消。"""
-        for _ in range(3):
-            raw = BackendSteps._ask("  输入应用命令 / App command (e.g. firefox, virt-manager): ")
-            if raw is None:
-                print(Style.yellow("    ⚠️  无法读取终端输入 / Cannot read terminal input."))
-                print("    请在真实终端中直接运行 ./archinit.py")
-                print("    Please run ./archinit.py from a real terminal.")
-                return None
-            app = raw.strip()
-            if not app or app.lower() == "q":
-                print("    已取消 / Cancelled.")
-                return None
-            if "/" in app:
-                cand = os.path.expanduser(app)
-                if os.path.exists(cand):
-                    return os.path.basename(cand), [cand]
-            else:
-                target = Shell.capture(f"command -v {shlex.quote(app)}").strip()
-                if target and os.path.exists(target):
-                    return app, [target]
-            print(Style.yellow(f"    ⚠️  未找到该命令 / Command not found: {app}"))
-            print("    可改用「从已安装应用中选择」/ Try \"pick from installed apps\" instead.")
-            print()
-        print(Style.red_bold("    ❌ 已放弃 / Giving up after 3 attempts."))
-        return None
-
-    @staticmethod
-    def _choose_backend():
-        """选择启动平台；返回 (平台名, 环境变量字典) 或 None 表示取消。"""
-        print()
-        print("  选择启动平台 / Choose backend:")
-        print("    1) Wayland")
-        print("    2) X11 (XWayland)")
-        print("    q) 取消 / Cancel")
-        print()
-        for _ in range(3):
-            raw = BackendSteps._ask("  选择 / Choose [1/2/q]: ")
-            if raw is None:
-                print(Style.yellow("    ⚠️  无法读取终端输入 / Cannot read terminal input."))
-                return None
-            ans = raw.strip().lower()
-            if ans in ("", "q"):
-                print("    已取消 / Cancelled.")
-                return None
-            if ans in ("1", "w", "wl", "wayland"):
-                return "Wayland", WAYLAND_ENV
-            if ans in ("2", "x", "x11", "xcb"):
-                return "X11 (XWayland)", X11_ENV
-            print(Style.yellow("    ⚠️  请输入 1 或 2 / Enter 1 or 2."))
-        print(Style.red_bold("    ❌ 已放弃 / Giving up after 3 attempts."))
-        return None
-
+    # ── 启动 ──
     @staticmethod
     def _launch(argv, name, label, extra_env):
         env = os.environ.copy()
         env.update(extra_env)
-        print()
-        print(f">>> 以 {label} 启动 / Launching on {label}...")
-        print(f"    {name}: {' '.join(shlex.quote(t) for t in argv)}")
         try:
             proc = subprocess.Popen(
                 argv, env=env, start_new_session=True,
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
             )
         except OSError as e:
-            print(Style.red_bold(f"    ❌ 启动失败 / Failed to launch: {e}"))
+            Status.set(f"❌ 启动失败 / Failed to launch {name}: {e}")
             return False
-        print(Style.green_bold(f"    ✅ 已启动 / Started (pid {proc.pid})"))
-        print()
-        print("    提示 / Tip:")
-        print("      · 界面可能要几秒后才出现；关闭应用后本工具仍可继续使用。")
-        print("      · The window may take a moment; the tool keeps running after you close the app.")
-        print("      · 若应用没有出现，可在终端手动运行下面这行排查 / If nothing appears, run this manually:")
-        envs = " ".join(f"{k}={v}" for k, v in extra_env.items())
         cmd = " ".join(shlex.quote(t) for t in argv)
-        print(f"        env {envs} {cmd}")
+        Status.set(f"🚀 {label} · {name} (pid {proc.pid}) · {cmd}")
         return True
 
+    # ── 流程：选应用 → 选平台 → 启动 ──
     @classmethod
-    def _run(cls, entry):
-        """公共尾段：选平台 → 启动 → 等待回车。"""
-        picked = cls._choose_backend()
-        if picked is None:
-            print()
-            return False
-        label, extra_env = picked
-        name, argv = entry
-        ok = cls._launch(argv, name, label, extra_env)
-        print()
-        Shell.prompt("按 Enter 返回菜单 / Press Enter to return")
-        return ok
+    def _select_and_launch(cls):
+        while True:
+            entry = cls._pick_app()
+            if not entry:
+                return CANCELLED
 
-    @classmethod
-    def by_command(cls):
-        """Step 1：手动输入命令。"""
-        print(">>> 输入命令启动 / Launch by command...")
-        print("    输入应用命令（如 firefox、virt-manager）→ 选择平台 → 立即启动")
-        print("    Type an app command, pick a backend, it launches right away")
-        print("    输入 q 可取消 / Enter q to cancel")
-        print()
+            name, argv = entry
+            picked = cls._choose_backend(f"{name}  ({argv[0]})")
+            if picked is None:
+                continue
 
-        entry = cls._resolve_command()
-        if not entry:
-            print()
-            return Shell.prompt("按 Enter 返回菜单 / Press Enter to return")
-        return cls._run(entry)
+            label, extra_env = picked
+            return cls._launch(argv, name, label, extra_env)
 
     @classmethod
-    def from_installed(cls):
-        """Step 2：从已安装应用（.desktop）中选择。"""
-        print(">>> 从已安装应用中选择 / Pick from installed apps...")
-        print("    打开列表后用 ↑/↓ 上下选择（可直接输入关键字过滤），Enter 确定，q/Esc 取消")
-        print("    Use ↑/↓ to move (type to filter), Enter to confirm, q/Esc to cancel")
-        print("    不知道命令名时用这个（例如 KVM 的「虚拟系统管理器」）/ Use this when you don't know the command name")
-        print()
-
-        entry = cls._pick_from_apps()
-        if not entry:
-            print()
-            return Shell.prompt("按 Enter 返回菜单 / Press Enter to return")
-        return cls._run(entry)
+    def app_backend(cls):
+        return cls._select_and_launch()
