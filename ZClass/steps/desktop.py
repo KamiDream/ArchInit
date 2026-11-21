@@ -9,10 +9,10 @@ class DesktopSteps:
     def register_dms(cls):
         def install():
             # 官方脚本需要真实 tty（会自己开 /dev/tty，且可能交互），
-            # 所以临时把终端还给它，跑完自动回到面板
+            # 所以放到独立 pty 里跑，并把键盘/输出转发过来
             with TaskView.terminal():
-                rc = Shell.run("curl -fsSL https://install.danklinux.com | sh")
-            return rc == 0, "安装脚本未成功完成 / installer did not finish"
+                ok = Shell.run_in_tty("curl -fsSL https://install.danklinux.com | sh")
+            return ok, "安装脚本未成功完成 / installer did not finish"
 
         ok = TaskView.run("桌面安装 · 注册 DMS 服务 / Register DMS", [
             ("运行 DMS 安装脚本（会临时回到终端）/ run DMS installer", install),

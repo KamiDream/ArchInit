@@ -122,6 +122,75 @@ class Shell:
         rc, out = cls.capture_all(cmd)
         return rc == 0, out
 
+    @classmethod
+    def run_in_tty(cls, cmd):
+        """在独立 pty 中运行命令（保证有控制终端 / /dev/tty），并把输入输出接回当前终端。
+
+        适合那些“自己会开 /dev/tty”或需要真实交互的安装脚本（DMS、UU 等）。
+        直接继承父进程 stdio 时，某些环境下子进程拿不到控制终端，脚本就会报
+        “无法打开新 tty”。
+        """
+        stdin_fd = sys.stdin.fileno()
+        stdout_fd = sys.stdout.fileno()
+
+        pid, master = pty.fork()
+        if pid == 0:  # 子进程：pty 即其控制终端
+            os.execvp("/bin/bash", ["/bin/bash", "-c", cmd])
+            os._exit(127)
+
+        # 把当前终端尺寸同步给 pty，避免程序按 0 列渲染
+        try:
+            import fcntl
+            winsize = fcntl.ioctl(stdin_fd, termios.TIOCGWINSZ, b"\x00" * 8)
+            fcntl.ioctl(master, termios.TIOCSWINSZ, winsize)
+        except (OSError, termios.error, ValueError):
+            pass
+
+        old = None
+        try:
+            old = termios.tcgetattr(stdin_fd)
+            tty.setraw(stdin_fd)   # 逐键转发，Ctrl-C 交给子进程处理
+        except (OSError, termios.error, ValueError):
+            old = None
+
+        try:
+            while True:
+                try:
+                    ready, _, _ = select.select([master, stdin_fd], [], [], 0.2)
+                except OSError:
+                    break
+                if master in ready:
+                    try:
+                        data = os.read(master, 4096)
+                    except OSError:   # EIO：子进程退出
+                        break
+                    if not data:
+                        break
+                    os.write(stdout_fd, data)
+                if stdin_fd in ready:
+                    try:
+                        data = os.read(stdin_fd, 1024)
+                    except OSError:
+                        data = b""
+                    if data:
+                        try:
+                            os.write(master, data)
+                        except OSError:
+                            break
+        finally:
+            if old is not None:
+                try:
+                    termios.tcsetattr(stdin_fd, termios.TCSADRAIN, old)
+                except (OSError, termios.error):
+                    pass
+            os.close(master)
+
+        try:
+            _, status = os.waitpid(pid, 0)
+            return os.waitstatus_to_exitcode(status) == 0
+        except ChildProcessError:
+            return False
+
     @staticmethod
     def brief(text, limit=60):
         """把命令输出压成一行失败说明（界面里的失败原因）。"""

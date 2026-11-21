@@ -44,10 +44,10 @@ class PatchSteps:
             return Shell.sudo('chown "$(whoami)" /home/deck')
 
         def install():
-            # 官方脚本可能要求交互，临时交还终端
+            # 官方脚本可能要求交互，放到独立 pty 里跑（保证有控制终端）
             with TaskView.terminal():
-                rc = Shell.run("curl -s uudeck.com | sudo bash")
-            return rc == 0, "安装脚本未成功完成 / installer did not finish"
+                ok = Shell.run_in_tty("curl -s uudeck.com | sudo bash")
+            return ok, "安装脚本未成功完成 / installer did not finish"
 
         ok = TaskView.run("修补工具 · UU 加速器 / UU Accelerator", [
             ("创建 /home/deck 并授权 / create & chown", make_dir),
