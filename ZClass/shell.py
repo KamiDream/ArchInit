@@ -1,12 +1,19 @@
 """Shell 命令执行与文件读写封装。"""
 import os
+import pty
+import re
+import select
 import shutil
+import struct
 import subprocess
 import sys
 import termios
 import tty
 from collections.abc import Callable
 from typing import ClassVar
+
+ANSI = re.compile(r"\x1b\[[0-9;?]*[A-Za-z]")
+PTY_COLS = 120
 
 
 class Shell:
@@ -47,18 +54,38 @@ class Shell:
     def stream(cmd, on_line=None):
         """逐行读取命令输出（不写终端），返回 (ok, 最后一行)。用于展示进度。
 
-        用二进制原始读取（bufsize=0），否则 read(n) 会阻塞到读满或 EOF，进度就不是实时的
-        了；再自己按 \\r / \\n 切分，以兼容 pacman、git --progress 那种回车刷新。
+        命令跑在临时 pty 上：pacman / git 只有在 isatty() 为真时才输出
+        “进度条 + 百分比 + 已下载大小 + 速度”，所以给它一个假终端，再自己按
+        \\r / \\n 切行（进度条是用回车原地刷新的）。
         """
-        proc = subprocess.Popen(
-            cmd, shell=True, executable="/bin/bash",
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0,
-        )
-        tail = ""
-        buf = b""
-        if proc.stdout is not None:
+        master, slave = pty.openpty()
+        try:
+            # 给 pty 一个合理的列数，否则 pacman 认为宽度为 0 而不画进度条
+            try:
+                import fcntl
+                fcntl.ioctl(slave, termios.TIOCSWINSZ,
+                            struct.pack("HHHH", 24, PTY_COLS, 0, 0))
+            except OSError:
+                pass
+            proc = subprocess.Popen(
+                cmd, shell=True, executable="/bin/bash",
+                stdin=subprocess.DEVNULL, stdout=slave, stderr=slave,
+                close_fds=True, start_new_session=True,
+            )
+            os.close(slave)
+            slave = -1
+            tail = ""
+            buf = b""
             while True:
-                chunk = proc.stdout.read(4096)
+                try:
+                    ready, _, _ = select.select([master], [], [], 0.2)
+                    if not ready:
+                        if proc.poll() is not None:
+                            break
+                        continue
+                    chunk = os.read(master, 8192)
+                except OSError:   # EIO：子进程退出，pty 关闭
+                    break
                 if not chunk:
                     break
                 buf += chunk
@@ -67,14 +94,24 @@ class Shell:
                     if not cuts:
                         break
                     idx = min(cuts)
-                    line = buf[:idx].decode("utf-8", "replace").strip()
+                    line = ANSI.sub("", buf[:idx].decode("utf-8", "replace")).strip()
                     buf = buf[idx + 1:]
                     if line:
                         tail = line
                         if on_line:
                             on_line(line)
-        proc.wait()
-        return proc.returncode == 0, tail
+            if buf.strip():
+                line = ANSI.sub("", buf.decode("utf-8", "replace")).strip()
+                if line:
+                    tail = line
+                    if on_line:
+                        on_line(line)
+            proc.wait()
+            return proc.returncode == 0, tail
+        finally:
+            if slave >= 0:
+                os.close(slave)
+            os.close(master)
 
     @classmethod
     def quiet(cls, cmd):
