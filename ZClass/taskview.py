@@ -71,7 +71,8 @@ class TaskView:
         self.hold = hold
         self.results = []
         self.current = None
-        self.started = 0.0
+        self.started = 0.0          # 当前任务开始时间
+        self.total_start = 0.0      # 整个面板开始时间
         self.lock = threading.Lock()
         self.attr_ok = curses.A_BOLD
         self.attr_err = curses.A_BOLD
@@ -182,15 +183,7 @@ class TaskView:
                 show = lines[-room:]
                 start = (h - 3) - len(show)
                 for idx, text in enumerate(show):
-                    row = start + idx
-                    if idx == len(show) - 1:   # 最新一行带 spinner 与耗时
-                        spin = self.SPINNER[int(time.time() * 8) % len(self.SPINNER)]
-                        elapsed = int(time.time() - self.started) if self.started else 0
-                        head = f"   {spin} {elapsed:>2d}s  "
-                        self._put(row, 0, head, self.attr_sel)
-                        self._put(row, len(head), text)
-                    else:
-                        self._put(row, 9, text)
+                    self._put(start + idx, 4, text)
 
         self._put(h - 2, 0, "═" * (w - 1))
         footer = {
@@ -199,6 +192,16 @@ class TaskView:
             "failed": "❌ 失败 / failed · 按任意键返回 / press any key",
         }[state]
         self._put(h - 1, 2, footer)
+
+        # 右下角（双实线下）：spinner + 已耗时 / 总耗时
+        if state == "running" and self.current is not None:
+            spin = self.SPINNER[int(time.time() * 8) % len(self.SPINNER)]
+            elapsed = int(time.time() - self.started) if self.started else 0
+            self._put(h - 1, max(0, w - len(f"{spin} {elapsed}s ") - 1), f"{spin} {elapsed}s ",
+                      self.attr_sel)
+        elif state == "done" and self.total_start:
+            total = int(time.time() - self.total_start)
+            self._put(h - 1, max(0, w - len(f"✅ {total}s ") - 1), f"✅ {total}s ", self.attr_ok)
         s.refresh()
 
     # ── 执行 ──
@@ -217,6 +220,7 @@ class TaskView:
         except curses.error:
             pass
         self.results = []
+        self.total_start = time.time()
         Shell.progress_hook = self.progress
         try:
             for i, (_label, func) in enumerate(self.items):

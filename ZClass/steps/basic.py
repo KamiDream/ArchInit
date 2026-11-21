@@ -9,11 +9,11 @@ from ..taskview import TaskView
 
 
 def _aur(pkg):
-    """用 yay / paru 安装（静默），返回 (ok, 说明)。"""
+    """用 yay / paru 安装（静默、无 tty），返回 (ok, 说明)。"""
     helper = "yay" if Shell.which("yay") else ("paru" if Shell.which("paru") else "")
     if not helper:
         return False, "未检测到 yay/paru / AUR helper missing"
-    ok, out = Shell.quiet(f"{helper} -S --noconfirm {pkg}")
+    ok, out = Shell.quiet_user(f"{helper} -S --needed --noconfirm {pkg}")
     return ok, Shell.brief(out)
 
 
@@ -141,7 +141,11 @@ class BasicSteps:
                 "Server = https://mirrors.hit.edu.cn/archlinuxcn/$arch\n"
                 "Server = https://repo.huaweicloud.com/archlinuxcn/$arch\n"
                 "EOF")
-            return rc == 0, Shell.brief(out)
+            if rc != 0:
+                return False, Shell.brief(out)
+            if not Shell.ok("grep -q '^\\[archlinuxcn\\]' /etc/pacman.conf"):
+                return False, "仓库未写入 / repo not written"
+            return True
 
         ok = TaskView.run("基础初始化 · AUR 助手 / AUR Helper", [
             ("启用 [multilib] 仓库 / enable multilib", enable_multilib),

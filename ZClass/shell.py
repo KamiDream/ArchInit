@@ -149,10 +149,26 @@ class Shell:
 
     @classmethod
     def quiet(cls, cmd):
-        """执行命令返回 (ok, 尾部输出)；任务面板激活时实时回报进度。"""
+        """执行命令返回 (ok, 尾部输出)；任务面板激活时实时回报进度。
+
+        用 pty 让命令能输出进度条（只适合不会自己调 sudo 的命令，如 git）。
+        """
         hook = cls.progress_hook
         if hook is not None:
             return cls.stream(cmd, hook)
+        rc, out = cls.capture_all(cmd)
+        return rc == 0, out
+
+    @classmethod
+    def quiet_user(cls, cmd):
+        """以当前用户身份执行、**不分配 tty**（如 yay / paru）。
+
+        AUR 助手内部会再调 sudo；如果外面套了 pty，sudo 就落在新 tty 的票据上
+        而要密码。保持无 tty 才能复用启动时建立的那张票据。
+        """
+        hook = cls.progress_hook
+        if hook is not None:
+            return cls._stream_pipe(cmd, hook)
         rc, out = cls.capture_all(cmd)
         return rc == 0, out
 
