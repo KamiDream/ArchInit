@@ -5,28 +5,59 @@ import time
 
 from ..config import HOME
 from ..shell import Shell
-from ..style import Style
+from ..status import Status
+from ..taskview import TaskView
+
+XDG_DIRS = (
+    'XDG_DESKTOP_DIR="$HOME/Desktop"\n'
+    'XDG_DOWNLOAD_DIR="$HOME/Downloads"\n'
+    'XDG_TEMPLATES_DIR="$HOME/Templates"\n'
+    'XDG_PUBLICSHARE_DIR="$HOME/Public"\n'
+    'XDG_DOCUMENTS_DIR="$HOME/Documents"\n'
+    'XDG_MUSIC_DIR="$HOME/Music"\n'
+    'XDG_PICTURES_DIR="$HOME/Pictures"\n'
+    'XDG_VIDEOS_DIR="$HOME/Videos"\n'
+    'XDG_PROJECTS_DIR="$HOME/Projects"\n'
+)
+
+NAME_MAP = (
+    ("XDG_DESKTOP_DIR", "Desktop"),
+    ("XDG_DOWNLOAD_DIR", "Downloads"),
+    ("XDG_TEMPLATES_DIR", "Templates"),
+    ("XDG_PUBLICSHARE_DIR", "Public"),
+    ("XDG_DOCUMENTS_DIR", "Documents"),
+    ("XDG_MUSIC_DIR", "Music"),
+    ("XDG_PICTURES_DIR", "Pictures"),
+    ("XDG_VIDEOS_DIR", "Videos"),
+    ("XDG_PROJECTS_DIR", "Projects"),
+)
 
 
 class PatchSteps:
-    @staticmethod
-    def uu():
-        print(">>> Installing UU Accelerator...")
-        print("    This will:")
-        print("      • Create /home/deck directory")
-        print("      • Set ownership to current user")
-        print("      • Download and run UU install script from uudeck.com")
-        print()
-        if Shell.prompt("Press Enter to start installation"):
-            print(">>> Creating /home/deck...")
-            Shell.run("sudo mkdir /home/deck")
-            Shell.run('sudo chown "$(whoami)" /home/deck')
-            print(">>> Downloading and running UU install script...")
-            Shell.run("curl -s uudeck.com | sudo bash")
-            print()
-            return True
-        return False
+    # ── UU 加速器 ──
+    @classmethod
+    def uu(cls):
+        def make_dir():
+            ok, out = Shell.sudo("mkdir -p /home/deck")
+            if not ok:
+                return False, Shell.brief(out)
+            return Shell.sudo('chown "$(whoami)" /home/deck')
 
+        def install():
+            # 官方脚本可能要求交互，临时交还终端
+            with TaskView.terminal():
+                rc = Shell.run("curl -s uudeck.com | sudo bash")
+            return rc == 0, "安装脚本未成功完成 / installer did not finish"
+
+        ok = TaskView.run("修补工具 · UU 加速器 / UU Accelerator", [
+            ("创建 /home/deck 并授权 / create & chown", make_dir),
+            ("下载并运行官方安装脚本 / run installer", install),
+        ])
+        Status.set("✅ UU 加速器已安装 / installed" if ok
+                   else "❌ UU 加速器安装未完成 / install not finished")
+        return ok
+
+    # ── XDG 用户目录转英文 ──
     @staticmethod
     def _parse_xdg_dirs(path):
         d = {}
@@ -40,128 +71,87 @@ class PatchSteps:
 
     @classmethod
     def xdg(cls):
-        print(">>> 安装 xdg-user-dirs（如未安装）/ Installing xdg-user-dirs (if not present)...")
-        Shell.run("sudo pacman -S --needed --noconfirm xdg-user-dirs")
-
         conf = os.path.join(HOME, ".config/user-dirs.dirs")
-        bak = conf + ".bak." + str(int(time.time()))
-        old = {}
-        if os.path.isfile(conf):
-            shutil.copyfile(conf, bak)
-            print(f"    原配置已备份到 / Old config backed up to: {bak}")
-            old = cls._parse_xdg_dirs(bak)
-        else:
-            print("    未发现现有配置，将创建全新配置 / No existing config found, creating fresh config.")
+        state = {"bak": "", "old": {}, "migrated": 0, "failed": []}
 
-        print()
-        print(">>> 直接写入英文路径配置文件...")
-        print("    Writing config file with English paths directly...")
-        Shell.write_file(conf,
-                         "# This file is written by ArchInit (archinit.py)\n"
-                         "# XDG user directories with English names\n"
-                         "# System locale remains Chinese (zh_CN.UTF-8)\n"
-                         "#\n"
-                         'XDG_DESKTOP_DIR="$HOME/Desktop"\n'
-                         'XDG_DOWNLOAD_DIR="$HOME/Downloads"\n'
-                         'XDG_TEMPLATES_DIR="$HOME/Templates"\n'
-                         'XDG_PUBLICSHARE_DIR="$HOME/Public"\n'
-                         'XDG_DOCUMENTS_DIR="$HOME/Documents"\n'
-                         'XDG_MUSIC_DIR="$HOME/Music"\n'
-                         'XDG_PICTURES_DIR="$HOME/Pictures"\n'
-                         'XDG_VIDEOS_DIR="$HOME/Videos"\n'
-                         'XDG_PROJECTS_DIR="$HOME/Projects"\n')
-        print(f"    ✅ 配置文件已写入 / Config written: {conf}")
+        def backup_and_write():
+            if os.path.isfile(conf):
+                state["bak"] = conf + ".bak." + str(int(time.time()))
+                shutil.copyfile(conf, state["bak"])
+                state["old"] = cls._parse_xdg_dirs(state["bak"])
+            Shell.write_file(
+                conf,
+                "# This file is written by ArchInit (archinit.py)\n"
+                "# XDG user directories with English names\n"
+                "# System locale remains Chinese (zh_CN.UTF-8)\n"
+                "#\n" + XDG_DIRS)
+            return True
 
-        print()
-        print(">>> 迁移目录内容...")
-        print("    Migrating directory contents...")
-        mapping = [
-            ("XDG_DESKTOP_DIR", "Desktop"),
-            ("XDG_DOWNLOAD_DIR", "Downloads"),
-            ("XDG_TEMPLATES_DIR", "Templates"),
-            ("XDG_PUBLICSHARE_DIR", "Public"),
-            ("XDG_DOCUMENTS_DIR", "Documents"),
-            ("XDG_MUSIC_DIR", "Music"),
-            ("XDG_PICTURES_DIR", "Pictures"),
-            ("XDG_VIDEOS_DIR", "Videos"),
-            ("XDG_PROJECTS_DIR", "Projects"),
-        ]
-        migrated = 0
-        for key, en_name in mapping:
-            en_path = os.path.join(HOME, en_name)
-            old_path = old.get(key, "")
-            if not old_path or old_path == en_path:
-                continue
-            if not os.path.isdir(old_path):
-                continue
-            print()
-            print(f"  发现旧目录 / Found old dir: {old_path}")
-            print(f"  目标目录 / Target dir: {en_path}")
-            os.makedirs(en_path, exist_ok=True)
-            entries = []
-            try:
-                entries = os.listdir(old_path)
-            except OSError:
-                entries = []
-            if entries:
-                print("    迁移内容中 / Migrating contents...")
+        def migrate():
+            for key, en_name in NAME_MAP:
+                en_path = os.path.join(HOME, en_name)
+                old_path = state["old"].get(key, "")
+                if not old_path or old_path == en_path or not os.path.isdir(old_path):
+                    continue
+                os.makedirs(en_path, exist_ok=True)
+                try:
+                    entries = os.listdir(old_path)
+                except OSError:
+                    entries = []
                 for name in entries:
                     try:
                         shutil.move(os.path.join(old_path, name), os.path.join(en_path, name))
                     except OSError as e:
-                        print(Style.yellow(f"    ⚠️  移动失败 / Failed to move {name}: {e}"))
-                print("    ✅ 内容已迁移 / Contents migrated.")
-            else:
-                print("    目录为空，无需迁移 / Directory empty, no migration needed.")
-            try:
-                os.rmdir(old_path)
-                print(f"    ✅ 旧目录已删除 / Old directory removed: {old_path}")
-            except OSError:
-                print(f"    ⚠️  旧目录未能删除（可能仍有内容）/ Old dir not removed: {old_path}")
-            migrated += 1
+                        state["failed"].append(f"{name}: {e}")
+                try:
+                    os.rmdir(old_path)
+                except OSError:
+                    pass
+                state["migrated"] += 1
+            return True
 
-        if migrated == 0:
-            print("    无需迁移，目录名未改变 / No migration needed — directory names unchanged.")
+        def sync():
+            Shell.capture_all("xdg-user-dirs-update 2>/dev/null || true")
+            return True
+
+        ok = TaskView.run("修补工具 · XDG 目录转英文 / Migrate XDG Dirs", [
+            ("安装 xdg-user-dirs", lambda: Shell.pacman("xdg-user-dirs")),
+            ("备份并写入英文路径配置 / backup & write config", backup_and_write),
+            ("迁移旧目录内容 / migrate contents", migrate),
+            ("同步 xdg-user-dirs / sync", sync),
+        ])
+        if ok:
+            msg = f"✅ XDG 已转英文名（迁移 {state['migrated']} 个目录）/ migrated {state['migrated']}"
+            if state["bak"]:
+                msg += f" · 备份 backup: {os.path.basename(state['bak'])}"
+            if state["failed"]:
+                msg += f" · ⚠️ {len(state['failed'])} 个文件移动失败 / some moves failed"
+            Status.set(msg)
         else:
-            print()
-            print(f"    ✅ 共迁移 {migrated} 个目录 / Total {migrated} directories migrated.")
+            Status.set("❌ XDG 目录迁移失败 / migration failed")
+        return ok
 
-        print()
-        print(">>> 同步 xdg-user-dirs（保留已有配置）...")
-        print("    Syncing xdg-user-dirs (preserving existing config)...")
-        Shell.run("xdg-user-dirs-update 2>/dev/null || true")
-        print("    ✅ 同步完成 / Sync done.")
-        print()
-        print("    ✅ XDG 用户目录已切换为英文名 / XDG user dirs migrated to English names.")
-        print("    系统 locale 仍为中文（zh_CN.UTF-8），不受影响。")
-        print("    System locale remains Chinese (zh_CN.UTF-8); unaffected.")
-        print()
-        print("    请重新登录后检查效果。备份文件可手动删除：")
-        print("    Re-login to verify. Backup can be removed manually:")
-        print(f'      rm "{bak}"')
-        return True
-
-    @staticmethod
-    def fcitx():
+    # ── Fcitx5 环境变量 ──
+    @classmethod
+    def fcitx(cls):
         conf_dir = os.path.join(HOME, ".config/environment.d")
         conf = os.path.join(conf_dir, "fcitx.conf")
-        print(">>> 写入 Fcitx5 输入法环境变量...")
-        print("    Writing Fcitx5 input method environment variables...")
-        print(f"    目标文件 / Target file: {conf}")
-        print()
-        if os.path.isfile(conf):
-            shutil.copyfile(conf, conf + ".bak." + str(int(time.time())))
-            print(f"    原配置已备份 / Old config backed up: {conf}.bak.*")
-        os.makedirs(conf_dir, exist_ok=True)
-        Shell.write_file(conf,
-                         "# Fcitx5 input method environment variables\n"
-                         "XMODIFIERS=@im=fcitx5\n"
-                         "#GTK_IM_MODULE=fcitx5\n"
-                         "QT_IM_MODULE=fcitx5\n"
-                         "SDL_IM_MODULE=fcitx5\n")
-        print(f"    ✅ 配置文件已写入 / Config written: {conf}")
-        print()
-        print("    ✅ Fcitx5 环境变量已配置 / Fcitx5 environment variables configured.")
-        print("    重新登录后生效（environment.d 由 systemd 用户会话加载）。")
-        print("    Re-login to take effect (environment.d is loaded by systemd user session).")
-        return True
+
+        def write_conf():
+            if os.path.isfile(conf):
+                shutil.copyfile(conf, conf + ".bak." + str(int(time.time())))
+            os.makedirs(conf_dir, exist_ok=True)
+            Shell.write_file(conf,
+                             "# Fcitx5 input method environment variables\n"
+                             "XMODIFIERS=@im=fcitx5\n"
+                             "#GTK_IM_MODULE=fcitx5\n"
+                             "QT_IM_MODULE=fcitx5\n"
+                             "SDL_IM_MODULE=fcitx5\n")
+            return True
+
+        ok = TaskView.run("修补工具 · Fcitx5 输入法环境变量 / Fcitx5 IM Env", [
+            (f"写入 {conf}", write_conf),
+        ])
+        Status.set("✅ Fcitx5 环境变量已配置，重新登录后生效 / re-login to apply" if ok
+                   else "❌ Fcitx5 环境变量写入失败 / failed")
+        return ok

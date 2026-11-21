@@ -43,14 +43,17 @@ python3 archinit.py
 
 > ⚠️ **注意 / Note**：
 >
-> - **`archinit.py`**：统一交互式安装器（Python 3 + 标准库 `curses`，**零第三方依赖**）。启动后进入**主菜单**，用 ↑/↓ 选择分类，Enter 进入；分类内再用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回上一级。执行步骤时会自动退出全屏界面，回到普通终端，`pacman`/`chsh`/`kitten`/`sudo` 等交互均正常。
->   Unified interactive installer (Python 3 + stdlib `curses`, **no third-party dependencies**). Pick a **category** from the main menu with ↑/↓ + Enter; inside a category, pick a step with ↑/↓ + Enter, q/Esc to go back. When a step runs, it drops out of the full-screen UI back to the normal terminal so `pacman`/`chsh`/`kitten`/`sudo` work interactively.
+> - **`archinit.py`**：统一交互式安装器（Python 3 + 标准库 `curses`，**零第三方依赖**）。启动后先进**主题风格的启动页**（`ArchInit_KamiDream` 品牌 + `═` 分隔线）：sudo 已缓存则短暂展示后进主菜单，需要密码则**直接在启动页里输**（掩码显示，不切屏）；进去后用 ↑/↓ 选择分类，Enter 进入；分类内再用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回上一级。执行步骤时会自动退出全屏界面，回到普通终端，`pacman`/`chsh`/`kitten`/`sudo` 等交互均正常。
+>   Unified interactive installer (Python 3 + stdlib `curses`, **no third-party dependencies**). It starts with a **branded splash screen** (the `ArchInit_KamiDream` title with `═` rules): if sudo is already cached it lingers briefly and opens the menu, otherwise the sudo password is entered **right on the splash screen** (masked, no screen switching). Then pick a **category** with ↑/↓ + Enter; inside a category, pick a step with ↑/↓ + Enter, q/Esc to go back. When a step runs, it drops out of the full-screen UI back to the normal terminal so `pacman`/`chsh`/`kitten`/`sudo` work interactively.
 >
 > 步骤结束后的等待提示为**单键响应**：`Enter` 继续、`q` 或 `ESC` 直接返回菜单（无需再按回车）。
 > After a step finishes, the wait prompt takes a **single key**: `Enter` continues, `q` or `ESC` returns to the menu immediately.
 >
-> 步骤的运行提示/错误/结果都显示在界面内（选择器顶部的黄色提示行、主界面底部的状态行），不会直接刷到终端上；底部状态行按任意键消失。
-> Step hints, errors and results are shown **inside the UI** (yellow notice line in the picker, status line at the bottom of the main view) instead of being printed to the terminal; any key dismisses the status line.
+> 步骤的运行提示/错误/结果都显示在界面内（任务面板、选择器顶部的黄色提示行、主界面底部的状态行），不会直接刷到终端上；底部状态行按任意键消失。
+> Step hints, errors and results are shown **inside the UI** (task panel, yellow notice line in the picker, status line at the bottom) instead of being printed to the terminal; any key dismisses the status line.
+>
+> 大部分步骤在**任务面板**里执行（`✅`/`⏳`/`❌` 清单，命令输出不落到终端）；只有本身就需要全屏交互的步骤（`kitten choose-fonts`、UU 官方安装脚本）会临时把终端交还给它，结束后自动回到面板。
+> Most steps run inside a **task panel** (a `✅`/`⏳`/`❌` checklist; command output never reaches the terminal). Only steps that are inherently interactive (`kitten choose-fonts`, the UU installer script) hand the terminal back temporarily and return to the panel afterwards.
 >
 > 八大分类（原混合安装已拆分为 KVM 安装 / 显卡驱动安装 / 终端美化，步骤完全保留）：
 > - **🖥️ 桌面安装 / Desktop Install**：注册 DMS 服务、显示管理器（LightDM）
@@ -248,13 +251,16 @@ python3 archinit.py
 
 | 操作 / Action                   | 说明 / Description                                                                                                                                                                                                                           |
 | ------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🎨 调整背景透明度 / Adjust opacity | 显示当前 `background_opacity` 值，提供预设选项（0.6~1.0）或自定义输入，自动更新 `~/.config/kitty/kitty.conf` / Show current `background_opacity`, offer presets (0.6~1.0) or custom input, auto-update `~/.config/kitty/kitty.conf` |
+| 🎨 调整背景透明度 / Adjust opacity | 弹出光标列表（↑/↓ 选择，当前值预先高亮）：`0.6` / `0.7` / `0.8`（默认）/ `0.9` / `1.0`，Esc 取消；选中后自动更新 `~/.config/kitty/kitty.conf` / Opens a cursor list (↑/↓, current value pre-highlighted): `0.6`/`0.7`/`0.8` (default)/`0.9`/`1.0`, Esc to cancel; updates `~/.config/kitty/kitty.conf` |
 
 ---
 ### 🎨 LightDM 配置 / LightDM WebKit2 Greeter
 
 > 对应 `archinit.py` 主菜单「LightDM 配置 / LightDM WebKit2 Greeter」分类；实现见 [`ZClass/steps/lightdm.py`](ZClass/steps/lightdm.py)。
 > Maps to the "LightDM Configuration" category in `archinit.py`; implementation in [`ZClass/steps/lightdm.py`](ZClass/steps/lightdm.py).
+>
+> 本分类下的四个步骤都在**界面内的任务面板**里执行（`ArchInit_KamiDream` 品牌 + 任务清单，`⏳` 进行中 / `✅` 成功 / `❌` 失败），**命令输出不落到终端**；最终结果再显示到主界面底部状态行（如 `✅ LightDM 已配置，重启后生效`）。失败时会停在那一步的清单上等你按键，并提示原因（如 `sudo 凭证过期`）。
+> All four steps run inside an **in-UI task panel** (branded header + task list with `⏳` running / `✅` done / `❌` failed) and **command output never reaches the terminal**; the outcome is then mirrored in the status line at the bottom (e.g. `✅ configured — reboot to apply`). On failure the panel stays on screen with the reason (e.g. `sudo expired`).
 
 > ⚠️ **单 N 卡独显或开启了独显直连的用户（纯 N 卡用户）请勿使用此配置！**
 > **Do NOT use this configuration if you have a single/primary NVIDIA GPU!**
@@ -375,7 +381,7 @@ python3 archinit.py
 
 - **选择步骤 / Choose steps**：[`archinit.py`](archinit.py) 提供统一交互式菜单（`curses`）：主菜单选择 8 大分类，分类内用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回 / [`archinit.py`](archinit.py) provides a unified interactive menu (`curses`): pick one of 8 categories from the main menu, then use ↑/↓ to select a step, Enter to execute, q/Esc to go back.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf、.zshrc 等）均由脚本自动完成（`sed` 或 Python 直接读写文件），无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, .zshrc, etc.) are applied automatically (`sed` or direct file I/O in Python) — no manual editing required.
-- **添加自己的包 / Add your own packages**：修改 `ZClass/steps/` 下对应步骤类方法里的 `pacman -S` 列表（如 `basic.py`、`gpu.py`）/ Edit the `pacman -S` lists in the corresponding step class methods under `ZClass/steps/` (e.g. `basic.py`, `gpu.py`).
+- **添加自己的包 / Add your own packages**：步骤现在以「任务面板」形式执行，改 `ZClass/steps/` 里对应任务的 `Shell.pacman("…")` 包列表即可（如 `basic.py`、`gpu.py`）；新增的每条任务写成 `(显示名称, callable)`，callable 返回 `True/False` 或 `(bool, 失败原因)` / Steps run as a **task panel**: edit the `Shell.pacman("…")` lists inside the tasks under `ZClass/steps/` (e.g. `basic.py`, `gpu.py`). Each task is `(label, callable)` where the callable returns `True/False` or `(bool, reason)`.
 
 ---
 

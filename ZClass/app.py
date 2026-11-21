@@ -1,4 +1,4 @@
-"""应用编排：启动横幅、sudo 提权与保活、进入 curses 界面。"""
+"""应用编排：启动页、sudo 提权与保活、进入 curses 界面。"""
 import curses
 import locale
 import subprocess
@@ -6,21 +6,11 @@ import threading
 import time
 
 from .catalog import Catalog
-from .config import BRAND_LEFT, BRAND_RIGHT
 from .shell import Shell
-from .style import Style
 from .ui import UI
 
 
 class App:
-    @staticmethod
-    def _print_banner():
-        print(Style.c(BRAND_LEFT, "94") + Style.c(BRAND_RIGHT, "95"))
-        print("═" * 121)
-        print("  ArchInit — 统一安装器 / Unified Installer")
-        print("═" * 121)
-        print()
-
     @staticmethod
     def _keepalive():
         while True:
@@ -28,46 +18,106 @@ class App:
                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
             time.sleep(60)
 
+    @staticmethod
+    def _missing_tools():
+        for cmd in ("pacman", "sudo"):
+            if not Shell.which(cmd):
+                return cmd
+        return ""
+
+    @staticmethod
+    def _sudo_cached():
+        return subprocess.run(["sudo", "-n", "true"],
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                              check=False).returncode == 0
+
+    @staticmethod
+    def _sudo_validate(secret):
+        """用 sudo -S 验证密码（密码从 stdin 送入，不经过终端回显）。"""
+        try:
+            return subprocess.run(["sudo", "-S", "-v"], input=secret + "\n", text=True,
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                                  check=False).returncode == 0
+        except OSError:
+            return False
+
+    def _acquire_sudo(self, ui):
+        """已缓存则短暂展示启动页；否则直接在启动页里输密码（不切屏）。"""
+        if self._sudo_cached():
+            ui.draw_splash("✅ sudo 权限已就绪 / sudo privileges ready")
+            time.sleep(0.6)  # 给启动页一个可读的展示时长，避免一闪而过
+            return True
+
+        for attempt in range(3):
+            if attempt == 0:
+                msg = "🔐 需要 sudo 密码 / sudo password required"
+            else:
+                msg = "❌ 密码错误，请重试 / wrong password, try again"
+            secret = ui.ask_sudo(msg, error=attempt > 0)
+            if secret is None:
+                return False
+            if secret and self._sudo_validate(secret):
+                return True
+
+        # 某些系统 sudo 需要真实 tty（sudo -S 不可用）：回退到普通终端提示
+        curses.endwin()
+        try:
+            return subprocess.run(["sudo", "-v"], check=False).returncode == 0
+        finally:
+            try:
+                curses.reset_prog_mode()
+            except curses.error:
+                pass
+
+    def _curses_main(self, stdscr):
+        curses.curs_set(0)
+        try:
+            curses.set_escdelay(25)
+        except (AttributeError, curses.error):
+            pass
+
+        categories = Catalog.build()
+        ui = UI(stdscr, categories)
+        ui.init_colors()
+
+        missing = self._missing_tools()
+        if missing:
+            ui.draw_splash(f"❌ 未找到 {missing}，请在 Arch Linux 上运行 / not found, run on Arch Linux",
+                           error=True)
+            stdscr.getch()
+            return 1
+
+        ui.draw_splash("🔐 正在检查 sudo 权限 … / checking sudo access")
+        if not self._acquire_sudo(ui):
+            ui.draw_splash("❌ 获取 sudo 权限失败 / failed to acquire sudo privileges", error=True)
+            stdscr.getch()
+            return 1
+
+        threading.Thread(target=self._keepalive, daemon=True).start()
+
+        # 从 sudo 提示回到界面后恢复终端状态
+        try:
+            stdscr.keypad(True)
+            stdscr.timeout(-1)
+        except curses.error:
+            pass
+        ui.run()
+        return 0
+
     def run(self):
         try:
             locale.setlocale(locale.LC_ALL, "")
         except locale.Error:
             pass
 
-        for cmd in ("pacman", "sudo"):
-            if not Shell.which(cmd):
-                print(f"Error: '{cmd}' not found. This script must be run on Arch Linux.")
-                return 1
-
-        self._print_banner()
-        print(">>> Requesting sudo access (password required)...")
-        if subprocess.run(["sudo", "-v"], check=False).returncode != 0:
-            print("    ❌ Failed to acquire sudo privileges. Aborting.")
-            return 1
-        threading.Thread(target=self._keepalive, daemon=True).start()
-        print("    ✅ Sudo privileges acquired.")
-        print()
-        time.sleep(1)
-
-        categories = Catalog.build()
-
-        def _curses_main(stdscr):
-            curses.curs_set(0)
-            try:
-                curses.set_escdelay(25)
-            except (AttributeError, curses.error):
-                pass
-            ui = UI(stdscr, categories)
-            ui.init_colors()
-            ui.run()
-
+        code = 1
         try:
-            curses.wrapper(_curses_main)
+            code = curses.wrapper(self._curses_main)
         except KeyboardInterrupt:
-            pass
+            code = 0
         except curses.error:
             # execute_step 已手动 endwin()，wrapper 末尾再调用会返回 ERR —— 正常情况
-            pass
+            code = 0
         print()
         print("已退出 / Exited.")
-        return 0
+        return code

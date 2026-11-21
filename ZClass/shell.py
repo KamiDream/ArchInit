@@ -30,6 +30,34 @@ class Shell:
         ).stdout
 
     @staticmethod
+    def capture_all(cmd):
+        """执行命令并捕获 stdout+stderr，返回 (returncode, 输出文本)。用于不在终端刷屏的场景。"""
+        r = subprocess.run(
+            cmd, shell=True, executable="/bin/bash",
+            capture_output=True, text=True, errors="replace", check=False,
+        )
+        return r.returncode, ((r.stdout or "") + (r.stderr or "")).strip()
+
+    @staticmethod
+    def brief(text, limit=60):
+        """把命令输出压成一行失败说明（界面里的失败原因）。"""
+        if "password is required" in text or "askpass" in text:
+            return "sudo 凭证过期 / sudo expired"
+        lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+        return lines[-1][:limit] if lines else ""
+
+    @classmethod
+    def sudo(cls, cmd):
+        """以非交互方式（sudo -n）执行 root 命令，返回 (ok, 输出)。"""
+        rc, out = cls.capture_all(f"sudo -n {cmd}")
+        return rc == 0, out
+
+    @classmethod
+    def pacman(cls, pkgs, action="-S --needed --noconfirm"):
+        """pacman 操作（静默），返回 (ok, 输出)。"""
+        return cls.sudo(f"pacman {action} {pkgs}")
+
+    @staticmethod
     def which(name):
         return shutil.which(name) is not None
 

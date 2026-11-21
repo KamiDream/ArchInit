@@ -8,6 +8,7 @@ from .picker import Picker
 from .shell import Shell
 from .status import Status
 from .style import Style
+from .taskview import TaskView
 
 
 class UI:
@@ -18,6 +19,7 @@ class UI:
         self.bright_brand = True
         self.main_sel = 0  # 记住主菜单上次高亮的分类位置
         Picker.bind(stdscr)  # 步骤内弹出选择器时复用本窗口
+        TaskView.bind(stdscr)  # 步骤内展示任务进度时复用本窗口
 
     # ── 颜色 ──
     def init_colors(self):
@@ -84,6 +86,96 @@ class UI:
         except curses.error:
             pass
 
+    # ── 品牌标题（供主界面与启动页共用）──
+    def draw_brand(self, y):
+        """在 y 行绘制 ArchInit_KamiDream（Kami 淡蓝 / Dream 淡粉）。"""
+        prefix = "ArchInit_"
+        self.putw(y, 2, prefix, curses.A_BOLD)
+        px = 2 + self._trunc(prefix, 10 ** 6)[1]
+        self.putw(y, px, BRAND_LEFT, self.brand_attr(6))
+        px += self._trunc(BRAND_LEFT, 10 ** 6)[1]
+        self.putw(y, px, BRAND_RIGHT, self.brand_attr(7))
+
+    # ── 启动页（sudo 请求 / 错误提示）──
+    def draw_splash(self, msg="", error=False, secret=None):
+        """同一套主题风格的启动画面。
+
+        secret=None  普通启动/错误页（error=True 时提示按键退出）
+        secret=""    密码输入页（掩码显示），Enter 确认、Esc 取消
+        """
+        self.stdscr.erase()
+        h, w = self.stdscr.getmaxyx()
+        if h < 8 or w < 40:
+            self.putw(0, 0, msg or "ArchInit", self.attr(5 if error else 4, curses.A_BOLD))
+            self.stdscr.refresh()
+            return
+
+        self.putw(0, 0, "=" * (w - 1))
+        self.draw_brand(1)
+        self.putw(2, 0, "=" * (w - 1))
+
+        title = "ArchInit — 统一安装器 / Unified Installer"
+        self.putw(4, max(1, (w - self._trunc(title, 10 ** 6)[1]) // 2), title,
+                  self.attr(3, curses.A_BOLD))
+        if msg:
+            attr = self.attr(5, curses.A_BOLD) if error else self.attr(4, curses.A_BOLD)
+            self.putw(6, max(1, (w - self._trunc(msg, 10 ** 6)[1]) // 2), msg, attr)
+
+        if secret is not None:
+            label = "sudo 密码 / password: "
+            line = label + "•" * len(secret)
+            width = self._trunc(line, 10 ** 6)[1]
+            x = max(1, (w - width) // 2)
+            self.putw(8, x, line, curses.A_BOLD)
+            try:  # 把光标放到输入末尾，方便看出正在输入
+                self.stdscr.move(8, x + width)
+            except curses.error:
+                pass
+
+        self.putw(h - 2, 0, "═" * (w - 1))
+        if secret is not None:
+            hint = "Enter 确认 · Esc 取消 / Enter=ok, Esc=cancel"
+        elif error:
+            hint = "按任意键退出 / press any key to exit"
+        else:
+            hint = "启动中 … / starting …"
+        self.putw(h - 1, 2, hint)
+        self.stdscr.refresh()
+
+    def ask_sudo(self, msg, error=False):
+        """在启动页内输入 sudo 密码（掩码）；返回密码字符串，Esc 返回 None。"""
+        secret = ""
+        try:
+            curses.curs_set(1)
+        except curses.error:
+            pass
+        try:
+            while True:
+                self.draw_splash(msg, error=error, secret=secret)
+                try:
+                    ch = self.stdscr.get_wch()
+                except curses.error:
+                    continue
+                if isinstance(ch, int):
+                    if ch == curses.KEY_ENTER:
+                        return secret
+                    if ch in (curses.KEY_BACKSPACE, curses.KEY_DC):
+                        secret = secret[:-1]
+                    continue
+                if ch in ("\n", "\r"):
+                    return secret
+                if ch == "\x1b":
+                    return None
+                if ch in ("\x7f", "\x08"):
+                    secret = secret[:-1]
+                elif ch.isprintable():
+                    secret += ch
+        finally:
+            try:
+                curses.curs_set(0)
+            except curses.error:
+                pass
+
     # ── 两栏界面：左分类导航 / 右步骤内容（类似 yazi）──
     def draw_twopane(self, cat_idx, focus):
         self.stdscr.erase()
@@ -98,12 +190,7 @@ class UI:
         # logo 上方一条 (=)，下方一条 (=)
         self.putw(y, 0, "=" * (w - 1)); y += 1
         # 标题：ArchInit_KamiDream（Kami 淡蓝 / Dream 淡粉）
-        prefix = "ArchInit_"
-        self.putw(y, 2, prefix, curses.A_BOLD)
-        px = 2 + self._trunc(prefix, 10 ** 6)[1]
-        self.putw(y, px, BRAND_LEFT, self.brand_attr(6))
-        px += self._trunc(BRAND_LEFT, 10 ** 6)[1]
-        self.putw(y, px, BRAND_RIGHT, self.brand_attr(7))
+        self.draw_brand(y)
         y += 1
         self.putw(y, 0, "=" * (w - 1)); y += 1
         body_top = y

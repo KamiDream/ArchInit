@@ -1,10 +1,32 @@
-"""分类：LightDM 配置 / LightDM WebKit2 Greeter。"""
+"""分类：LightDM 配置 / LightDM WebKit2 Greeter。
+
+所有步骤都用 TaskView 在界面内执行，命令输出不落到终端；
+命令统一加 `sudo -n`：凭证过期时快速失败而不是在无提示的状态下卡住。
+"""
 import os
 import shutil
+import subprocess
 import tempfile
 
 from ..shell import Shell
-from ..style import Style
+from ..status import Status
+from ..taskview import TaskView
+
+
+def _tail(text, limit=64):
+    """把命令输出压缩成一行失败说明。"""
+    if "password is required" in text or "askpass" in text:
+        return "sudo 凭证过期 / sudo expired"
+    lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+    return lines[-1][:limit] if lines else ""
+
+
+def _sudo_write(path, content, append=False):
+    """以 root 写文件（非交互），返回 (ok, 错误信息)。"""
+    args = ["sudo", "-n", "tee"] + (["-a"] if append else []) + [path]
+    r = subprocess.run(args, input=content, text=True,
+                       stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, check=False)
+    return r.returncode == 0, _tail(r.stderr or "")
 
 
 class LightDmSteps:
@@ -13,16 +35,6 @@ class LightDmSteps:
     THEME_REPO = "https://github.com/KamiDream/LdmWk2Theme.git"
     REQUIRED = ("index.html", "js/main.js", "css/style.css")
 
-    @staticmethod
-    def greeter():
-        print(">>> 安装 lightdm-webkit2-greeter...")
-        print("    Installing lightdm-webkit2-greeter...")
-        Shell.run("sudo pacman -S --needed --noconfirm lightdm-webkit2-greeter")
-        print()
-        print(Style.green_bold("    ✅ lightdm-webkit2-greeter 安装完成 / installed successfully."))
-        return True
-
-    # ── 主题 ──
     @classmethod
     def theme_path(cls):
         return os.path.join(cls.THEMES_DIR, cls.THEME_NAME)
@@ -31,114 +43,138 @@ class LightDmSteps:
     def theme_installed(cls):
         return os.path.isfile(os.path.join(cls.theme_path(), "index.html"))
 
+    # ── Step 1: 安装 greeter ──
+    @classmethod
+    def greeter(cls):
+        def install():
+            rc, out = Shell.capture_all(
+                "sudo -n pacman -S --needed --noconfirm lightdm-webkit2-greeter")
+            if rc == 0 and Shell.installed("lightdm-webkit2-greeter"):
+                return True
+            return False, _tail(out) or "安装失败 / install failed"
+
+        ok = TaskView.run("LightDM 配置 · 安装 greeter / Install greeter", [
+            ("安装 lightdm-webkit2-greeter", install),
+        ])
+        Status.set("✅ lightdm-webkit2-greeter 已安装 / installed" if ok
+                   else "❌ lightdm-webkit2-greeter 安装失败 / install failed")
+        return ok
+
+    # ── Step 2: 安装/更新主题 ──
     @classmethod
     def theme(cls):
         target = cls.theme_path()
+        staging = target + ".new"
         clone = os.path.join(tempfile.gettempdir(), cls.THEME_NAME + ".clone")
 
-        print(">>> 克隆主题到临时目录（失败不会影响已安装的主题）...")
-        print("    Cloning into a temp dir (a failure won't break the installed theme)...")
-        if not Shell.which("git"):
-            print(Style.red_bold("    ❌ 未安装 git，请先安装 / git is required: sudo pacman -S git"))
-            return False
-        if os.path.isdir(clone):
+        def prepare():
+            if not Shell.which("git"):
+                return False, "需要 git / git required"
+            if os.path.isdir(clone):
+                shutil.rmtree(clone, ignore_errors=True)
+            rc, out = Shell.capture_all(f'git clone --depth 1 {cls.THEME_REPO} "{clone}"')
+            if rc != 0:
+                return False, _tail(out) or "克隆失败 / clone failed"
+            missing = [f for f in cls.REQUIRED if not os.path.isfile(os.path.join(clone, f))]
+            if missing:
+                return False, "缺少 " + ", ".join(missing)
+            shutil.rmtree(os.path.join(clone, ".git"), ignore_errors=True)
+            return True
+
+        def replace():
+            # 先复制到暂存目录，成功后才替换旧主题，缩小"旧的删了新的没到位"的窗口
+            for cmd, why in (
+                (f"sudo -n mkdir -p {cls.THEMES_DIR}", "创建目录失败 / mkdir failed"),
+                (f"sudo -n rm -rf {staging}", "清理暂存目录失败 / staging cleanup failed"),
+                (f'sudo -n cp -r "{clone}" "{staging}"', "复制失败 / copy failed"),
+                (f"sudo -n rm -rf {target}", "删除旧主题失败 / rm failed"),
+                (f"sudo -n mv {staging} {target}", "替换失败 / replace failed"),
+            ):
+                rc, out = Shell.capture_all(cmd)
+                if rc != 0:
+                    return False, _tail(out) or why
             shutil.rmtree(clone, ignore_errors=True)
-        if Shell.run(f'git clone --depth 1 {cls.THEME_REPO} "{clone}"') != 0:
-            print(Style.red_bold("    ❌ 克隆失败，原有主题保持不变 / Clone failed, existing theme kept."))
-            return False
+            return True
 
-        missing = [f for f in cls.REQUIRED if not os.path.isfile(os.path.join(clone, f))]
-        if missing:
-            print(Style.red_bold(f"    ❌ 主题不完整，缺少 / Incomplete theme, missing: {', '.join(missing)}"))
-            print(f"       临时目录 / temp dir: {clone}")
-            return False
-        shutil.rmtree(os.path.join(clone, ".git"), ignore_errors=True)
+        def verify():
+            if cls.theme_installed():
+                return True
+            return False, "找不到 index.html / index.html missing"
 
-        print()
-        print(f">>> 安装到 {target} ...")
-        print("    Installing...")
-        Shell.run(f"sudo mkdir -p {cls.THEMES_DIR}")
-        Shell.run(f"sudo rm -rf {target}")
-        if Shell.run(f'sudo cp -r "{clone}" "{target}"') != 0:
-            print(Style.red_bold("    ❌ 复制失败 / Copy failed."))
-            return False
-        shutil.rmtree(clone, ignore_errors=True)
+        ok = TaskView.run("LightDM 配置 · 安装主题 / Install theme", [
+            ("克隆 KamiDream 主题 / clone theme", prepare),
+            ("替换已安装主题 / replace theme", replace),
+            ("确认安装结果 / verify install", verify),
+        ])
+        Status.set("✅ KamiDream 主题已更新 / theme updated · 背景 assets/background.png" if ok
+                   else "❌ 主题未更新 / theme not updated")
+        return ok
 
-        if not cls.theme_installed():
-            print(Style.red_bold(f"    ❌ 安装后找不到 {target}/index.html"))
-            print("       greeter 会报 “An error was detected in the current theme”")
-            return False
-
-        print()
-        print(Style.green_bold(f"    ✅ KamiDream 主题已安装/更新到 {target}"))
-        print("    Theme installed/updated successfully.")
-        print()
-        print("    🖼️  如需替换背景图片，请替换以下文件：")
-        print(f"       {target}/assets/background.png")
-        print("       To replace the background image, replace the file above with your own.")
-        return True
-
-    # ── 启用 ──
+    # ── Step 3: 启用配置 ──
     @classmethod
     def enable(cls):
         if not cls.theme_installed():
-            print(Style.red_bold(f"    ❌ 未找到主题 / Theme not installed: {cls.theme_path()}"))
-            print("       先执行「安装 KamiDream 主题」步骤；否则 greeter 会报")
-            print("       “An error was detected in the current theme that could interfere")
-            print("        with the system login process.”")
-            print("       Run the theme step first, otherwise the greeter shows that error.")
+            Status.set("❌ 未找到主题，请先执行 Step 2 / theme missing")
             return False
 
-        print(">>> 配置 /etc/lightdm/lightdm.conf...")
-        print("    Configuring /etc/lightdm/lightdm.conf...")
-        Shell.run("sudo mkdir -p /etc/lightdm")
         conf = "/etc/lightdm/lightdm.conf"
-        # 同时处理“已注释”和“已启用”两种写法，避免留下重复行
-        if Shell.ok(f"grep -Eq '^#?greeter-session=lightdm-webkit2-greeter' {conf}"):
-            Shell.run(f"sudo sed -i 's|^#\\?greeter-session=lightdm-webkit2-greeter.*|"
-                      f"greeter-session=lightdm-webkit2-greeter|' {conf}")
-        elif Shell.read_file(conf).find("[Seat:*]") >= 0:
-            Shell.run(f"sudo sed -i '/^\\[Seat:\\*\\]/a greeter-session=lightdm-webkit2-greeter' {conf}")
-        else:
-            Shell.sudo_write(conf, "[Seat:*]\ngreeter-session=lightdm-webkit2-greeter\n", append=True)
-        print("    /etc/lightdm/lightdm.conf 已配置 / configured.")
-        print()
-        print(">>> 配置 /etc/lightdm/lightdm-webkit2-greeter.conf...")
-        print("    Configuring /etc/lightdm/lightdm-webkit2-greeter.conf...")
         wconf = "/etc/lightdm/lightdm-webkit2-greeter.conf"
-        if Shell.ok(f"grep -q '^webkit_theme' {wconf} 2>/dev/null"):
-            Shell.run(f"sudo sed -i 's|^webkit_theme\\s*=.*|webkit_theme        = {cls.THEME_NAME}|' {wconf}")
-            print(f"    webkit_theme 已更新为 {cls.THEME_NAME} / updated.")
-        else:
-            Shell.sudo_write(wconf, f"[greeter]\nwebkit_theme        = {cls.THEME_NAME}\n", append=True)
-            print("    webkit_theme 已添加 / added.")
-        print("    /etc/lightdm/lightdm-webkit2-greeter.conf 已配置 / configured.")
-        print()
-        print(Style.green_bold("    ✅ LightDM 配置完成 / Configuration complete."))
-        print()
-        print("=" * 121)
-        print(Style.yellow("   ⚠️  请重启系统以应用 LightDM 登录管理器 / Please reboot to apply LightDM"))
-        print("     重启命令 / Reboot command: sudo reboot")
-        print("     或 / Or: sudo systemctl reboot")
-        print("=" * 121)
-        print()
-        return Shell.prompt("按 Enter 继续 / Press Enter to continue")
 
-    @staticmethod
-    def emergency():
-        print(">>> 注释 /etc/lightdm/lightdm.conf 中的 greeter-session=lightdm-webkit2-greeter...")
-        print("    Commenting out greeter-session=lightdm-webkit2-greeter in /etc/lightdm/lightdm.conf...")
+        def lightdm_conf():
+            if Shell.ok(f"grep -Eq '^#?greeter-session=lightdm-webkit2-greeter' {conf}"):
+                rc, out = Shell.capture_all(
+                    "sudo -n sed -i 's|^#\\?greeter-session=lightdm-webkit2-greeter.*|"
+                    f"greeter-session=lightdm-webkit2-greeter|' {conf}")
+                return (rc == 0), _tail(out)
+            if Shell.read_file(conf).find("[Seat:*]") >= 0:
+                rc, out = Shell.capture_all(
+                    f"sudo -n sed -i '/^\\[Seat:\\*\\]/a greeter-session=lightdm-webkit2-greeter' {conf}")
+                return (rc == 0), _tail(out)
+            return _sudo_write(conf, "[Seat:*]\ngreeter-session=lightdm-webkit2-greeter\n", append=True)
+
+        def webkit_conf():
+            if Shell.ok(f"grep -q '^webkit_theme' {wconf} 2>/dev/null"):
+                rc, out = Shell.capture_all(
+                    f"sudo -n sed -i 's|^webkit_theme\\s*=.*|webkit_theme        = {cls.THEME_NAME}|' {wconf}")
+                return (rc == 0), _tail(out)
+            return _sudo_write(wconf, f"[greeter]\nwebkit_theme        = {cls.THEME_NAME}\n", append=True)
+
+        def verify():
+            if not Shell.ok(f"grep -q '^greeter-session=lightdm-webkit2-greeter' {conf}"):
+                return False, "greeter-session 未写入 / not written"
+            if not Shell.ok(f"grep -q 'webkit_theme.*{cls.THEME_NAME}' {wconf}"):
+                return False, "webkit_theme 未写入 / not written"
+            return True
+
+        ok = TaskView.run("LightDM 配置 · 启用 / Enable", [
+            ("写入 lightdm.conf（greeter-session）", lightdm_conf),
+            ("写入 lightdm-webkit2-greeter.conf（webkit_theme）", webkit_conf),
+            ("校验配置 / verify config", verify),
+        ])
+        Status.set("✅ LightDM 已配置，重启后生效 / configured — reboot to apply" if ok
+                   else "❌ LightDM 配置失败 / configuration failed")
+        return ok
+
+    # ── Step 4: 黑屏救急 ──
+    @classmethod
+    def emergency(cls):
         conf = "/etc/lightdm/lightdm.conf"
-        if Shell.ok(f"grep -q '^greeter-session=lightdm-webkit2-greeter' {conf} 2>/dev/null"):
-            Shell.run(f"sudo sed -i 's|^greeter-session=lightdm-webkit2-greeter|#greeter-session=lightdm-webkit2-greeter|' {conf}")
-            print(Style.green_bold("    ✅ 已注释 greeter-session 行 / Commented out."))
-        else:
-            print(Style.yellow("    ⏭️  未找到 greeter-session=lightdm-webkit2-greeter，可能已被注释 / Not found, may already be commented."))
-        print()
-        print("=" * 121)
-        print(Style.yellow("   ⚠️  请重启系统以恢复默认 LightDM Greeter / Please reboot to restore default LightDM greeter"))
-        print("     重启命令 / Reboot command: sudo reboot")
-        print("     或 / Or: sudo systemctl reboot")
-        print("=" * 121)
-        print()
-        return Shell.prompt("按 Enter 继续 / Press Enter to continue")
+
+        def comment_out():
+            if not Shell.ok(f"grep -q '^greeter-session=lightdm-webkit2-greeter' {conf} 2>/dev/null"):
+                return True  # 本来就没启用
+            rc, out = Shell.capture_all(
+                f"sudo -n sed -i 's|^greeter-session=lightdm-webkit2-greeter|"
+                f"#greeter-session=lightdm-webkit2-greeter|' {conf}")
+            if rc != 0:
+                return False, _tail(out)
+            if not Shell.ok(f"grep -q '^#greeter-session=lightdm-webkit2-greeter' {conf}"):
+                return False, "注释未生效 / not commented"
+            return True
+
+        ok = TaskView.run("LightDM 配置 · 黑屏救急 / Emergency revert", [
+            ("注释 greeter-session（恢复默认 greeter）", comment_out),
+        ])
+        Status.set("✅ 已恢复默认 greeter，重启后生效 / reverted — reboot to apply" if ok
+                   else "❌ 恢复失败 / failed to revert")
+        return ok

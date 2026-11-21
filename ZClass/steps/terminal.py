@@ -4,8 +4,11 @@ import re
 import shutil
 
 from ..config import HOME, ROOT_DIR
+from ..model import CANCELLED
+from ..picker import Picker
 from ..shell import Shell
-from ..style import Style
+from ..status import Status
+from ..taskview import TaskView
 
 ANTIDOTE_BLOCK = """
 # === Antidote Start ===
@@ -58,168 +61,182 @@ zstyle ':completion:*' cache-path ~/.zsh/cache
 
 
 class TerminalSteps:
-    @staticmethod
-    def zsh():
-        print(">>> Installing Zsh...")
-        Shell.run("sudo pacman -S --needed --noconfirm zsh zsh-completions")
-        print(">>> Listing available shells...")
-        Shell.run("chsh -l")
-        print(">>> Changing default shell to Zsh (password required)...")
-        Shell.run("chsh -s /usr/bin/zsh || true")
-        print()
-        print(">>> Configuring Kitty terminal...")
-        os.makedirs(os.path.join(HOME, ".config/kitty"), exist_ok=True)
-        kitty_conf = os.path.join(HOME, ".config/kitty/kitty.conf")
-        if "cursor_trail" not in Shell.read_file(kitty_conf):
+    # ── Zsh + Kitty ──
+    @classmethod
+    def zsh(cls):
+        def set_shell():
+            # 用 usermod 代替 chsh，避免在界面里弹出密码提示
+            return Shell.sudo('usermod --shell /usr/bin/zsh "$(whoami)"')
+
+        def kitty_cursor():
+            os.makedirs(os.path.join(HOME, ".config/kitty"), exist_ok=True)
+            kitty_conf = os.path.join(HOME, ".config/kitty/kitty.conf")
+            if "cursor_trail" in Shell.read_file(kitty_conf):
+                return True
             Shell.write_file(kitty_conf,
                              "\ncursor_trail 2\n"
                              "cursor_blink_interval 0.5\n"
                              "cursor_stop_blinking_after 0\n",
                              append=True)
-            print("    Kitty cursor settings added.")
-        else:
-            print("    Kitty cursor settings already present, skipping.")
-        return True
+            return True
 
-    @staticmethod
-    def antidote():
-        if not Shell.which("zsh"):
-            print("Warning: Zsh does not appear to be installed.")
-            return Shell.prompt("Press Enter to skip")
-        print(">>> Cleaning up any previous Antidote configuration...")
-        shutil.rmtree(os.path.join(HOME, ".antidote"), ignore_errors=True)
-        zshrc = os.path.join(HOME, ".zshrc")
-        txt = Shell.read_file(zshrc)
-        txt = re.sub(r"^# === Antidote Start ===$.*?^# === Antidote End ===$\n?",
-                     "", txt, flags=re.DOTALL | re.MULTILINE)
-        Shell.write_file(zshrc, txt)
-        print("    Cleanup done.")
-        print(">>> Installing Antidote plugin manager...")
-        Shell.run('git clone --depth=1 https://github.com/mattmc3/antidote.git ~/.antidote')
-        print()
-        print(">>> Creating ~/.zsh_plugins.txt with recommended plugins...")
-        Shell.write_file(os.path.join(HOME, ".zsh_plugins.txt"),
-                         "zsh-users/zsh-completions\n"
-                         "zsh-users/zsh-autosuggestions\n"
-                         "zdharma-continuum/fast-syntax-highlighting\n")
-        print("    Plugins configured.")
-        print()
-        print(">>> Appending Antidote configuration to ~/.zshrc...")
-        Shell.write_file(zshrc, ANTIDOTE_BLOCK, append=True)
-        print("    Antidote configuration written to ~/.zshrc.")
-        return True
+        ok = TaskView.run("终端美化 · 启用 Zsh / Enable Zsh Shell", [
+            ("安装 zsh + zsh-completions", lambda: Shell.pacman("zsh zsh-completions")),
+            ("把默认 shell 改为 zsh / set default shell", set_shell),
+            ("写入 Kitty 光标配置 / kitty cursor settings", kitty_cursor),
+        ])
+        Status.set("✅ Zsh 已启用（重新登录后生效）/ enabled — re-login to apply" if ok
+                   else "❌ Zsh 配置失败 / failed")
+        return ok
 
-    @staticmethod
-    def starship():
-        if not Shell.which("zsh"):
-            print("Warning: Zsh does not appear to be installed.")
-            return Shell.prompt("Press Enter to skip")
-        print(">>> Installing Starship prompt...")
-        Shell.run("sudo pacman -S --needed --noconfirm starship")
-        print()
-        print(">>> Copying Starship config to ~/.config/starship.toml...")
-        os.makedirs(os.path.join(HOME, ".config"), exist_ok=True)
-        src = os.path.join(ROOT_DIR, "starship/starship.toml")
-        if os.path.isfile(src):
+    # ── Antidote ──
+    @classmethod
+    def antidote(cls):
+        def check_zsh():
+            if Shell.which("zsh"):
+                return True
+            return False, "未安装 zsh，请先执行上一步 / zsh not installed"
+
+        def cleanup():
+            shutil.rmtree(os.path.join(HOME, ".antidote"), ignore_errors=True)
+            zshrc = os.path.join(HOME, ".zshrc")
+            txt = Shell.read_file(zshrc)
+            txt = re.sub(r"^# === Antidote Start ===$.*?^# === Antidote End ===$\n?",
+                         "", txt, flags=re.DOTALL | re.MULTILINE)
+            Shell.write_file(zshrc, txt)
+            return True
+
+        def clone():
+            rc, out = Shell.capture_all(
+                "git clone --depth=1 https://github.com/mattmc3/antidote.git ~/.antidote")
+            return rc == 0, Shell.brief(out)
+
+        def plugins():
+            Shell.write_file(os.path.join(HOME, ".zsh_plugins.txt"),
+                             "zsh-users/zsh-completions\n"
+                             "zsh-users/zsh-autosuggestions\n"
+                             "zdharma-continuum/fast-syntax-highlighting\n")
+            return True
+
+        def append_block():
+            Shell.write_file(os.path.join(HOME, ".zshrc"), ANTIDOTE_BLOCK, append=True)
+            return True
+
+        ok = TaskView.run("终端美化 · Antidote 插件管理器 / Antidote", [
+            ("检查 zsh / check zsh", check_zsh),
+            ("清理旧的 Antidote 配置 / cleanup", cleanup),
+            ("克隆 antidote / clone", clone),
+            ("写入 ~/.zsh_plugins.txt", plugins),
+            ("写入 ~/.zshrc 配置块 / append config", append_block),
+        ])
+        Status.set("✅ Antidote 已配置，重新打开终端生效 / configured" if ok
+                   else "❌ Antidote 配置失败 / failed")
+        return ok
+
+    # ── Starship ──
+    @classmethod
+    def starship(cls):
+        def check_zsh():
+            if Shell.which("zsh"):
+                return True
+            return False, "未安装 zsh，请先执行「启用 Zsh 终端」/ zsh not installed"
+
+        def copy_config():
+            os.makedirs(os.path.join(HOME, ".config"), exist_ok=True)
+            src = os.path.join(ROOT_DIR, "starship/starship.toml")
+            if not os.path.isfile(src):
+                return False, "缺少 starship/starship.toml"
             shutil.copyfile(src, os.path.join(HOME, ".config/starship.toml"))
-            print("    Starship config copied successfully.")
-            print("    Prompt: 󰄛 ❯  (Catppuccin Macchiato palette)")
-            print("    Character: [󰄛](green) ❯  on success, [󰄛](red) ❯  on error")
-        else:
-            print("    Warning: starship/starship.toml not found, skipping.")
-        print()
-        print(">>> Adding Starship init to ~/.zshrc...")
-        zshrc = os.path.join(HOME, ".zshrc")
-        txt = Shell.read_file(zshrc)
-        txt = re.sub(r'^eval "\$\(starship init zsh\)"\n?', "", txt, flags=re.MULTILINE)
-        Shell.write_file(zshrc, txt)
-        Shell.write_file(zshrc, '\n# Starship 提示符\neval "$(starship init zsh)"\n', append=True)
-        print("    Starship init written to ~/.zshrc.")
-        return True
+            return True
 
-    @staticmethod
-    def fastfetch_config():
-        print(">>> Copying fastfetch config to ~/.config/fastfetch...")
-        dst = os.path.join(HOME, ".config/fastfetch")
-        os.makedirs(dst, exist_ok=True)
-        src = os.path.join(ROOT_DIR, "fastfetch")
-        if os.path.isdir(src):
+        def add_init():
+            zshrc = os.path.join(HOME, ".zshrc")
+            txt = Shell.read_file(zshrc)
+            txt = re.sub(r'^eval "\$\(starship init zsh\)"\n?', "", txt, flags=re.MULTILINE)
+            Shell.write_file(zshrc, txt)
+            Shell.write_file(zshrc, '\n# Starship 提示符\neval "$(starship init zsh)"\n', append=True)
+            return True
+
+        ok = TaskView.run("终端美化 · Starship 提示符 / Starship Prompt", [
+            ("检查 zsh / check zsh", check_zsh),
+            ("安装 starship", lambda: Shell.pacman("starship")),
+            ("复制 starship.toml / copy config", copy_config),
+            ("写入 ~/.zshrc 初始化 / append init", add_init),
+        ])
+        Status.set("✅ Starship 已配置（󰄛 ❯ Catppuccin Macchiato）/ configured" if ok
+                   else "❌ Starship 配置失败 / failed")
+        return ok
+
+    # ── fastfetch 配置 ──
+    @classmethod
+    def fastfetch_config(cls):
+        def copy_config():
+            dst = os.path.join(HOME, ".config/fastfetch")
+            src = os.path.join(ROOT_DIR, "fastfetch")
+            if not os.path.isdir(src):
+                return False, "缺少 fastfetch 配置目录 / config dir missing"
+            os.makedirs(dst, exist_ok=True)
             shutil.copytree(src, dst, dirs_exist_ok=True)
-        print("    fastfetch config copied successfully.")
-        return True
+            return True
 
-    @staticmethod
-    def fastfetch_startup():
+        ok = TaskView.run("终端美化 · fastfetch 配置 / fastfetch Config", [
+            ("复制 fastfetch 配置到 ~/.config/fastfetch", copy_config),
+        ])
+        Status.set("✅ fastfetch 配置已复制 / config copied" if ok
+                   else "❌ fastfetch 配置失败 / failed")
+        return ok
+
+    # ── fastfetch 开机显示 ──
+    @classmethod
+    def fastfetch_startup(cls):
         zshrc = os.path.join(HOME, ".zshrc")
         first = ""
         if os.path.isfile(zshrc):
             with open(zshrc, encoding="utf-8") as f:
                 first = f.readline().rstrip("\n")
+
         if re.fullmatch(r"\s?fastfetch", first):
-            print(">>> fastfetch 已存在于 ~/.zshrc 第一行，正在移除（关闭自启）...")
-            lines = Shell.read_file(zshrc).splitlines(keepends=True)
-            if lines:
-                lines = lines[1:]
+            lines = Shell.read_file(zshrc).splitlines(keepends=True)[1:]
             Shell.write_file(zshrc, "".join(lines))
-            print("    fastfetch 已从 .zshrc 第一行移除。")
-            print("    ✅ 已关闭 fastfetch 开机自启。")
+            Status.set("✅ 已关闭 fastfetch 开机自启 / startup disabled")
         else:
-            print(">>> fastfetch 不在 ~/.zshrc 第一行，正在添加（开启自启）...")
             if not os.path.isfile(zshrc):
                 open(zshrc, "a").close()
-            txt = Shell.read_file(zshrc)
-            Shell.write_file(zshrc, " fastfetch\n" + txt)
-            print("    fastfetch 已添加为 .zshrc 第一行（带前导空格，不记入历史）。")
-            print("    ✅ 已开启 fastfetch 开机自启。")
+            Shell.write_file(zshrc, " fastfetch\n" + Shell.read_file(zshrc))
+            Status.set("✅ 已开启 fastfetch 开机自启 / startup enabled")
         return True
 
-    @staticmethod
-    def kitty_opacity():
+    # ── Kitty 背景透明度 ──
+    @classmethod
+    def kitty_opacity(cls):
         kitty_conf = os.path.join(HOME, ".config/kitty/kitty.conf")
         if not os.path.isfile(kitty_conf):
-            print(Style.yellow(f"  ⚠️  Kitty 配置文件不存在 / Kitty config not found at {kitty_conf}"))
-            print("    请先执行「启用 Zsh 终端」（含 Kitty 终端配置）/ Please run the Zsh step first.")
-            return Shell.prompt("按 Enter 返回菜单 / Press Enter to return")
+            Status.set(f"❌ 未找到 {kitty_conf}，请先执行「启用 Zsh 终端」/ run Zsh step first")
+            return False
+
         conf = Shell.read_file(kitty_conf)
         m = re.search(r"^background_opacity\s+([\d.]+)", conf, re.MULTILINE)
         current = m.group(1) if m else "未设置 / not set"
-        print()
-        print(f">>> 当前 Kitty 背景透明度 / Current Kitty background opacity: {current}")
-        print("    (0.0 = 完全透明 / fully transparent, 1.0 = 完全不透明 / fully opaque)")
-        print()
-        print(">>> 请选择新的透明度 / Select new opacity:")
-        print("    1) 0.6")
-        print("    2) 0.7")
-        print("    3) 0.8  (默认 / default)")
-        print("    4) 0.9")
-        print("    5) 1.0  (不透明 / opaque)")
-        print("    6) 自定义 / Custom value")
-        print()
-        try:
-            choice = input("  输入选项 (1-6) / Enter option (1-6): ").strip()
-        except EOFError:
-            choice = ""
-        presets = {"1": "0.6", "2": "0.7", "3": "0.8", "4": "0.9", "5": "1.0"}
-        if choice in presets:
-            new_opacity = presets[choice]
-        elif choice == "6":
-            try:
-                new_opacity = input("  输入透明度值 (0.0-1.0) / Enter opacity value (0.0-1.0): ").strip()
-            except EOFError:
-                new_opacity = ""
-            if not re.fullmatch(r"[0-9]+(\.[0-9]+)?", new_opacity or "") or float(new_opacity) > 1.0:
-                print(Style.yellow("    ⚠️  无效值，使用默认 0.8 / Invalid value, using default 0.8"))
-                new_opacity = "0.8"
-        else:
-            print(Style.yellow("    ⚠️  无效选项，使用默认 0.8 / Invalid option, using default 0.8"))
-            new_opacity = "0.8"
-        print()
-        print(f">>> 设置背景透明度为 {new_opacity} / Setting background opacity to {new_opacity}...")
+
+        rows = [
+            ("0.6", "更透明 / more transparent"),
+            ("0.7", ""),
+            ("0.8", "默认 / default"),
+            ("0.9", ""),
+            ("1.0", "完全不透明 / opaque"),
+        ]
+        initial = next((i for i, (v, _) in enumerate(rows) if v == current), 2)
+        idx = Picker.choose(f"Kitty 背景透明度 / Background opacity（当前 / current: {current}）",
+                            rows, initial=initial)
+        if not isinstance(idx, int):
+            return CANCELLED
+
+        value = rows[idx][0]
         if re.search(r"^background_opacity", conf, re.MULTILINE):
-            conf = re.sub(r"^background_opacity\s+.*", f"background_opacity {new_opacity}", conf, flags=re.MULTILINE)
+            conf = re.sub(r"^background_opacity\s+.*", f"background_opacity {value}",
+                          conf, flags=re.MULTILINE)
             Shell.write_file(kitty_conf, conf)
         else:
-            Shell.write_file(kitty_conf, f"background_opacity {new_opacity}\n", append=True)
-        print(Style.green_bold(f"    ✅ 已更新 Kitty 背景透明度为 {new_opacity}"))
-        print("    重启 Kitty 终端即可生效 / Restart Kitty terminal to apply")
+            Shell.write_file(kitty_conf, f"background_opacity {value}\n", append=True)
+        Status.set(f"✅ Kitty 背景透明度已设为 {value}，重启 Kitty 生效 / restart Kitty to apply")
         return True
