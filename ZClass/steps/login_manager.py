@@ -42,6 +42,28 @@ def ensure_background():
     return True
 
 
+def enable_greetd():
+    """启用 greetd，返回 (ok, 说明)。
+
+    /etc/systemd/system/display-manager.service 这张软链全局只能指向一个 DM，
+    lightdm 占着它时 `systemctl enable greetd` 会报 "File ... already exists"，
+    所以必须先 disable lightdm；启用失败则把 lightdm 启用回去，别让机器开机没登录器。
+    """
+    if Shell.ok("systemctl is-enabled greetd"):
+        return True
+    had_lightdm = Shell.ok("systemctl is-enabled lightdm")
+    if had_lightdm:
+        Shell.sudo("systemctl disable lightdm")
+    ok, out = Shell.sudo("systemctl enable greetd")
+    if not ok:
+        if had_lightdm:
+            Shell.sudo("systemctl enable lightdm")
+        if "already exists" in out:
+            return False, "display-manager.service 被其它登录器占用 / owned by another DM"
+        return False, Shell.brief(out)
+    return True
+
+
 def set_background(source):
     """把 source 拷成登录器背景，并让 regreet.toml 指向它。返回 (ok, 说明)。
 
@@ -425,13 +447,7 @@ class LoginManagerSteps:
             return ok, Shell.brief(err)
 
         def switch_service():
-            ok1, out1 = Shell.sudo("systemctl enable greetd")
-            if not ok1:
-                return False, Shell.brief(out1)
-            # LightDM 可能已经卸载：单子不存在时 disable 会报错，这里直接跳过
-            if Shell.ok("systemctl is-enabled lightdm"):
-                Shell.sudo("systemctl disable lightdm")
-            return True
+            return enable_greetd()
 
         def verify():
             if not Shell.ok(f"grep -q regreet {GREETD_CONF}"):

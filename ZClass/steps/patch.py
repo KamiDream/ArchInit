@@ -7,7 +7,7 @@ from ..config import HOME
 from ..shell import Shell
 from ..status import Status
 from ..taskview import TaskView
-from .login_manager import GREETD_CONF, ensure_background
+from .login_manager import GREETD_CONF, enable_greetd, ensure_background
 
 XDG_DIRS = (
     'XDG_DESKTOP_DIR="$HOME/Desktop"\n'
@@ -179,8 +179,8 @@ class PatchSteps:
             if not Shell.ok(f"grep -q regreet {GREETD_CONF}"):
                 return False, "还没配置 ReGreet，先跑「登录管理器 → 配置并启用」/ configure ReGreet first"
             # 装好了也配好了，只是没启用：这步直接帮它启用
-            ok, out = Shell.sudo("systemctl enable greetd")
-            return ok, Shell.brief(out)
+            # （内部会先停用 lightdm，让出 display-manager.service）
+            return enable_greetd()
 
         def disable():
             Shell.sudo("systemctl disable lightdm")   # 不存在也无所谓
