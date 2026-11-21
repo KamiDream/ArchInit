@@ -72,8 +72,8 @@ class LightDmSteps:
                 return False, "需要 git / git required"
             if os.path.isdir(clone):
                 shutil.rmtree(clone, ignore_errors=True)
-            rc, out = Shell.capture_all(f'git clone --depth 1 {cls.THEME_REPO} "{clone}"')
-            if rc != 0:
+            ok, out = Shell.quiet(f'git clone --depth 1 {cls.THEME_REPO} "{clone}"')
+            if not ok:
                 return False, _tail(out) or "克隆失败 / clone failed"
             missing = [f for f in cls.REQUIRED if not os.path.isfile(os.path.join(clone, f))]
             if missing:

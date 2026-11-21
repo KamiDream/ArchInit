@@ -5,9 +5,14 @@ import subprocess
 import sys
 import termios
 import tty
+from collections.abc import Callable
+from typing import ClassVar
 
 
 class Shell:
+    # 任务面板存在时由 TaskView 设置，用于实时回报命令输出（进度行）
+    progress_hook: ClassVar[Callable[[str], None] | None] = None
+
     @staticmethod
     def run(cmd):
         """在当前终端（已退出 curses）执行 shell 命令，继承 stdin/stdout。"""
@@ -39,6 +44,48 @@ class Shell:
         return r.returncode, ((r.stdout or "") + (r.stderr or "")).strip()
 
     @staticmethod
+    def stream(cmd, on_line=None):
+        """逐行读取命令输出（不写终端），返回 (ok, 最后一行)。用于展示进度。
+
+        用二进制原始读取（bufsize=0），否则 read(n) 会阻塞到读满或 EOF，进度就不是实时的
+        了；再自己按 \\r / \\n 切分，以兼容 pacman、git --progress 那种回车刷新。
+        """
+        proc = subprocess.Popen(
+            cmd, shell=True, executable="/bin/bash",
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0,
+        )
+        tail = ""
+        buf = b""
+        if proc.stdout is not None:
+            while True:
+                chunk = proc.stdout.read(4096)
+                if not chunk:
+                    break
+                buf += chunk
+                while True:
+                    cuts = [i for i in (buf.find(b"\n"), buf.find(b"\r")) if i >= 0]
+                    if not cuts:
+                        break
+                    idx = min(cuts)
+                    line = buf[:idx].decode("utf-8", "replace").strip()
+                    buf = buf[idx + 1:]
+                    if line:
+                        tail = line
+                        if on_line:
+                            on_line(line)
+        proc.wait()
+        return proc.returncode == 0, tail
+
+    @classmethod
+    def quiet(cls, cmd):
+        """执行命令返回 (ok, 尾部输出)；任务面板激活时实时回报进度。"""
+        hook = cls.progress_hook
+        if hook is not None:
+            return cls.stream(cmd, hook)
+        rc, out = cls.capture_all(cmd)
+        return rc == 0, out
+
+    @staticmethod
     def brief(text, limit=60):
         """把命令输出压成一行失败说明（界面里的失败原因）。"""
         if "password is required" in text or "askpass" in text:
@@ -49,8 +96,7 @@ class Shell:
     @classmethod
     def sudo(cls, cmd):
         """以非交互方式（sudo -n）执行 root 命令，返回 (ok, 输出)。"""
-        rc, out = cls.capture_all(f"sudo -n {cmd}")
-        return rc == 0, out
+        return cls.quiet(f"sudo -n {cmd}")
 
     @classmethod
     def pacman(cls, pkgs, action="-S --needed --noconfirm"):

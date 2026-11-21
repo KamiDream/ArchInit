@@ -8,8 +8,8 @@ class DesktopSteps:
     @classmethod
     def register_dms(cls):
         def install():
-            rc, out = Shell.capture_all("curl -fsSL https://install.danklinux.com | sh")
-            return rc == 0, Shell.brief(out)
+            ok, out = Shell.quiet("curl -fsSL https://install.danklinux.com | sh")
+            return ok, Shell.brief(out)
 
         ok = TaskView.run("桌面安装 · 注册 DMS 服务 / Register DMS", [
             ("运行 DMS 安装脚本 / run DMS installer", install),

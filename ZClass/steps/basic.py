@@ -13,8 +13,8 @@ def _aur(pkg):
     helper = "yay" if Shell.which("yay") else ("paru" if Shell.which("paru") else "")
     if not helper:
         return False, "未检测到 yay/paru / AUR helper missing"
-    rc, out = Shell.capture_all(f"{helper} -S --noconfirm {pkg}")
-    return rc == 0, Shell.brief(out)
+    ok, out = Shell.quiet(f"{helper} -S --noconfirm {pkg}")
+    return ok, Shell.brief(out)
 
 
 class BasicSteps:

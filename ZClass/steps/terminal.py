@@ -107,9 +107,9 @@ class TerminalSteps:
             return True
 
         def clone():
-            rc, out = Shell.capture_all(
+            ok, out = Shell.quiet(
                 "git clone --depth=1 https://github.com/mattmc3/antidote.git ~/.antidote")
-            return rc == 0, Shell.brief(out)
+            return ok, Shell.brief(out)
 
         def plugins():
             Shell.write_file(os.path.join(HOME, ".zsh_plugins.txt"),

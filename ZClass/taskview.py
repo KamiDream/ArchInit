@@ -1,6 +1,7 @@
 """在 TUI 内执行一组任务并显示进度（命令输出不写到终端）。"""
 import contextlib
 import curses
+import threading
 import time
 import unicodedata
 
@@ -24,11 +25,23 @@ def _ok(res):
 
 
 class TaskView:
-    """逐条执行任务并在同主题风格的方框里显示状态：⏳ 进行中 / ✅ 成功 / ❌ 失败。"""
+    """逐条执行任务并在同主题风格的方框里显示状态：⏳ 进行中 / ✅ 成功 / ❌ 失败。
+
+    任务内部可通过 Shell.quiet()/Shell.pacman() 执行的命令会实时把最新一行输出
+    回报到面板底部的「进度行」上（带 spinner 与耗时）。
+    """
 
     BRAND_LEFT = "Kami"
     BRAND_RIGHT = "Dream"
     _shared_stdscr = None  # 主界面调用 bind() 后复用该窗口
+    _live = ""             # 当前任务的实时输出行（跨线程共享）
+
+    SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+
+    @classmethod
+    def progress(cls, text):
+        """由任务内部（通常是 Shell 的输出回调）调用，更新面板上的进度行。"""
+        cls._live = (text or "").strip()[:160]
 
     def __init__(self, stdscr, title, items, hold):
         self.stdscr = stdscr
@@ -37,6 +50,8 @@ class TaskView:
         self.hold = hold
         self.results = []
         self.current = None
+        self.started = 0.0
+        self.lock = threading.Lock()
         self.attr_ok = curses.A_BOLD
         self.attr_err = curses.A_BOLD
         self.attr_sel = curses.A_BOLD
@@ -78,6 +93,14 @@ class TaskView:
             pass
 
     def _draw(self, state, detail=""):
+        """重绘面板（加锁，避免后台 spinner 线程与主线程同时绘制）。"""
+        with self.lock:
+            try:
+                self._draw_impl(state, detail)
+            except curses.error:
+                pass
+
+    def _draw_impl(self, state, detail=""):
         s = self.stdscr
         s.erase()
         h, w = s.getmaxyx()
@@ -116,6 +139,15 @@ class TaskView:
         if detail and y < h - 3:
             self._put(y + 1, 4, detail, self.attr_err)
 
+        # 进度行：spinner + 已耗时 + 命令最新一行输出
+        if state == "running" and self.current is not None:
+            live_y = min(y + 1, h - 3)
+            spin = self.SPINNER[int(time.time() * 8) % len(self.SPINNER)]
+            elapsed = int(time.time() - self.started) if self.started else 0
+            head = f"   {spin} {elapsed:>2d}s  "
+            self._put(live_y, 0, head, self.attr_sel)
+            self._put(live_y, len(head), TaskView._live or "连接中 … / starting …")
+
         self._put(h - 2, 0, "═" * (w - 1))
         footer = {
             "running": "执行中 … / running …",
@@ -126,25 +158,45 @@ class TaskView:
         s.refresh()
 
     # ── 执行 ──
+    def _tick(self, stop):
+        """后台定时重绘，使 spinner / 进度行 / 耗时保持更新。"""
+        with contextlib.suppress(Exception):
+            while not stop.wait(0.2):
+                self._draw("running")
+
     def _run(self):
+        from .shell import Shell
+
         self._init_colors()
         try:
             curses.curs_set(0)
         except curses.error:
             pass
         self.results = []
-        for i, (_label, func) in enumerate(self.items):
-            self.current = i
-            self._draw("running")
-            try:
-                res = func()
-            except Exception as e:  # noqa: BLE001
-                res = (False, str(e)[:60])
-            ok = _ok(res)
-            note = res[1] if isinstance(res, tuple) and len(res) > 1 else ""
-            self.results.append((ok, note))
-            if not ok:
-                break
+        Shell.progress_hook = self.progress
+        try:
+            for i, (_label, func) in enumerate(self.items):
+                self.current = i
+                self.progress("")
+                self.started = time.time()
+                self._draw("running")
+                stop = threading.Event()
+                ticker = threading.Thread(target=self._tick, args=(stop,), daemon=True)
+                ticker.start()
+                try:
+                    res = func()
+                except Exception as e:  # noqa: BLE001
+                    res = (False, str(e)[:60])
+                finally:
+                    stop.set()
+                    ticker.join(timeout=0.6)
+                ok = _ok(res)
+                note = res[1] if isinstance(res, tuple) and len(res) > 1 else ""
+                self.results.append((ok, note))
+                if not ok:
+                    break
+        finally:
+            Shell.progress_hook = None
         self.current = None
         ok = bool(self.results) and all(r[0] for r in self.results)
         self._draw("done" if ok else "failed")

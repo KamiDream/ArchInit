@@ -52,8 +52,8 @@ python3 archinit.py
 > 步骤的运行提示/错误/结果都显示在界面内（任务面板、选择器顶部的黄色提示行、主界面底部的状态行），不会直接刷到终端上；底部状态行按任意键消失。
 > Step hints, errors and results are shown **inside the UI** (task panel, yellow notice line in the picker, status line at the bottom) instead of being printed to the terminal; any key dismisses the status line.
 >
-> 大部分步骤在**任务面板**里执行（`✅`/`⏳`/`❌` 清单，命令输出不落到终端）；只有本身就需要全屏交互的步骤（`kitten choose-fonts`、UU 官方安装脚本）会临时把终端交还给它，结束后自动回到面板。
-> Most steps run inside a **task panel** (a `✅`/`⏳`/`❌` checklist; command output never reaches the terminal). Only steps that are inherently interactive (`kitten choose-fonts`, the UU installer script) hand the terminal back temporarily and return to the panel afterwards.
+> 大部分步骤在**任务面板**里执行（`✅`/`⏳`/`❌` 清单，命令输出不落到终端）；执行中的任务会在清单下方显示一行**实时进度**：spinner + 已耗时 + 命令最新一行输出（如 pacman 的下载行、`git clone` 的 Receiving objects），失败时停在该步并给出原因。只有本身就需要全屏交互的步骤（`kitten choose-fonts`、UU 官方安装脚本）会临时把终端交还给它，结束后自动回到面板。
+> Most steps run inside a **task panel** (a `✅`/`⏳`/`❌` checklist; command output never reaches the terminal). The running task shows a **live progress line** below the list — spinner + elapsed seconds + the latest output line (pacman download lines, `git clone` receiving progress). On failure the panel stops on that step and shows the reason. Only inherently interactive steps (`kitten choose-fonts`, the UU installer) hand the terminal back temporarily and return to the panel afterwards.
 >
 > 八大分类（原混合安装已拆分为 KVM 安装 / 显卡驱动安装 / 终端美化，步骤完全保留）：
 > - **🖥️ 桌面安装 / Desktop Install**：注册 DMS 服务、显示管理器（LightDM）

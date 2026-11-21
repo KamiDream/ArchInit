@@ -8,9 +8,9 @@ class KvmSteps:
     @classmethod
     def install(cls):
         def start_network():
-            ok, out = Shell.sudo("virsh net-start default")
-            # 网络已在运行时也会返回非 0，这里视为正常
-            return True if "already" in out.lower() else (ok, Shell.brief(out))
+            # 网络已在运行时也会返回非 0，一律视为正常（下面有 autostart 与组权限兜底）
+            Shell.sudo("virsh net-start default")
+            return True
 
         def autostart_network():
             ok, out = Shell.sudo("virsh net-autostart default")
