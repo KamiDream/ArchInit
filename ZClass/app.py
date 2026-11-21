@@ -13,9 +13,11 @@ from .ui import UI
 class App:
     @staticmethod
     def _keepalive():
+        # 注意：必须跟命令执行用同一个“无 tty”上下文，否则续的是另一张票据
         while True:
             subprocess.run(["sudo", "-n", "true"],
-                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+                           stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                           stderr=subprocess.DEVNULL, check=False)
             time.sleep(60)
 
     @staticmethod
@@ -27,9 +29,10 @@ class App:
 
     @staticmethod
     def _sudo_cached():
+        """检查“无 tty”上下文里的 sudo 票据（与所有 sudo -n 命令一致）。"""
         return subprocess.run(["sudo", "-n", "true"],
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                              check=False).returncode == 0
+                              stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                              stderr=subprocess.DEVNULL, check=False).returncode == 0
 
     @staticmethod
     def _sudo_validate(secret):
@@ -58,16 +61,7 @@ class App:
                 return False
             if secret and self._sudo_validate(secret):
                 return True
-
-        # 某些系统 sudo 需要真实 tty（sudo -S 不可用）：回退到普通终端提示
-        curses.endwin()
-        try:
-            return subprocess.run(["sudo", "-v"], check=False).returncode == 0
-        finally:
-            try:
-                curses.reset_prog_mode()
-            except curses.error:
-                pass
+        return False
 
     def _curses_main(self, stdscr):
         curses.curs_set(0)

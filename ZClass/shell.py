@@ -3,6 +3,7 @@ import os
 import pty
 import re
 import select
+import shlex
 import shutil
 import struct
 import subprocess
@@ -51,6 +52,49 @@ class Shell:
         return r.returncode, ((r.stdout or "") + (r.stderr or "")).strip()
 
     @staticmethod
+    def _feed(buf, chunk, on_line):
+        """把新数据拼到 buf 上并按 \\r / \\n 切行回调；返回 (剩余 buf, 最后一行)。"""
+        buf += chunk
+        tail = ""
+        while True:
+            cuts = [i for i in (buf.find(b"\n"), buf.find(b"\r")) if i >= 0]
+            if not cuts:
+                break
+            idx = min(cuts)
+            line = ANSI.sub("", buf[:idx].decode("utf-8", "replace")).strip()
+            buf = buf[idx + 1:]
+            if line:
+                tail = line
+                if on_line:
+                    on_line(line)
+        return buf, tail
+
+    @classmethod
+    def _stream_pipe(cls, cmd, on_line=None):
+        """从管道（无 tty）逐行读取，返回 (ok, 最后一行)。"""
+        proc = subprocess.Popen(
+            cmd, shell=True, executable="/bin/bash", stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=0,
+        )
+        buf = b""
+        tail = ""
+        if proc.stdout is not None:
+            while True:
+                chunk = proc.stdout.read(8192)
+                if not chunk:
+                    break
+                buf, new_tail = cls._feed(buf, chunk, on_line)
+                tail = new_tail or tail
+        if buf.strip():
+            line = ANSI.sub("", buf.decode("utf-8", "replace")).strip()
+            if line:
+                tail = line
+                if on_line:
+                    on_line(line)
+        proc.wait()
+        return proc.returncode == 0, tail
+
+    @staticmethod
     def stream(cmd, on_line=None):
         """逐行读取命令输出（不写终端），返回 (ok, 最后一行)。用于展示进度。
 
@@ -88,18 +132,8 @@ class Shell:
                     break
                 if not chunk:
                     break
-                buf += chunk
-                while True:
-                    cuts = [i for i in (buf.find(b"\n"), buf.find(b"\r")) if i >= 0]
-                    if not cuts:
-                        break
-                    idx = min(cuts)
-                    line = ANSI.sub("", buf[:idx].decode("utf-8", "replace")).strip()
-                    buf = buf[idx + 1:]
-                    if line:
-                        tail = line
-                        if on_line:
-                            on_line(line)
+                buf, new_tail = Shell._feed(buf, chunk, on_line)
+                tail = new_tail or tail
             if buf.strip():
                 line = ANSI.sub("", buf.decode("utf-8", "replace")).strip()
                 if line:
@@ -201,8 +235,22 @@ class Shell:
 
     @classmethod
     def sudo(cls, cmd):
-        """以非交互方式（sudo -n）执行 root 命令，返回 (ok, 输出)。"""
-        return cls.quiet(f"sudo -n {cmd}")
+        """以 root 执行（非交互），返回 (ok, 输出)。
+
+        sudo 的凭证是按 tty 记的（tty_tickets），而我们给命令分配的 pty 每次都是
+        新的 /dev/pts/N，会不断触发“需要密码”。所以外层保持**无 tty**（与启动时
+        sudo -S -v 建立的票据一致），再在内部用 script 给命令一个 pty，这样既有
+        进度条，又不会要密码。
+        """
+        if shutil.which("script"):
+            full = f"sudo -n script -qec {shlex.quote(cmd)} /dev/null"
+        else:
+            full = f"sudo -n {cmd}"
+        hook = cls.progress_hook
+        if hook is not None:
+            return cls._stream_pipe(full, hook)
+        rc, out = cls.capture_all(full)
+        return rc == 0, out
 
     @classmethod
     def pacman(cls, pkgs, action="-S --needed --noconfirm"):

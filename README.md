@@ -48,6 +48,9 @@ python3 archinit.py
 >
 > 步骤结束后的等待提示为**单键响应**：`Enter` 继续、`q` 或 `ESC` 直接返回菜单（无需再按回车）。
 > After a step finishes, the wait prompt takes a **single key**: `Enter` continues, `q` or `ESC` returns to the menu immediately.
+
+> sudo 密码只需在启动页输一次：之后所有命令都在**同一个「无 tty」上下文**里以 `sudo -n` 执行（sudo 凭证默认按 tty 记录，换了 tty 就会重新要密码）；命令内部再用 `script` 分配 pty，所以 pacman 的进度条/百分比照样能显示。
+> The sudo password is asked only once, on the splash screen: afterwards every command runs with `sudo -n` inside the same **no-tty context** (sudo tickets are per-tty by default, so a different tty would ask again); each command still gets a pty via `script`, so pacman progress bars and percentages keep working.
 >
 > 步骤的运行提示/错误/结果都显示在界面内（任务面板、选择器顶部的黄色提示行、主界面底部的状态行），不会直接刷到终端上；底部状态行按任意键消失。
 > Step hints, errors and results are shown **inside the UI** (task panel, yellow notice line in the picker, status line at the bottom) instead of being printed to the terminal; any key dismisses the status line.
