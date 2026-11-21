@@ -123,6 +123,7 @@ REGREET_CSS_TEMPLATE = """/* ArchInit — 对齐 LightDM KamiDream 主题
 window {
     background-color: #161a24;      /* 背景图没加载时的兜底 */
     font-family: "Inter", "Noto Sans CJK SC", "Noto Sans", sans-serif;
+    font-size: __BASE_FS__px;       /* 基准字号，随屏幕物理宽度缩放 */
 }
 
 /* 登录卡片：主题里表单直接浮在背景上，这里只留很淡的一层玻璃 */
@@ -141,8 +142,14 @@ frame.widget-clock {
     background-image: none;
     background-color: rgba(255, 255, 255, 0.20);
     border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 8px;
-    padding: 6px 16px;
+    border-radius: 14px;
+    padding: __CLOCK_PAD_Y__px __CLOCK_PAD_X__px;
+}
+frame.widget-clock label {
+    color: #ffffff;
+    font-size: __CLOCK_FS__px;
+    font-weight: 600;
+    letter-spacing: 1px;
 }
 
 /* 文字 */
@@ -170,7 +177,7 @@ entry, passwordentry {
     min-width: __ENTRY_W__px;
     min-height: __BTN_H__px;
     padding: __BTN_PAD_Y__px __BTN_PAD_X__px;
-    font-size: 14px;
+    font-size: __ENTRY_FS__px;
 }
 entry:focus, entry:focus-within, passwordentry:focus, passwordentry:focus-within {
     background-image: none;
@@ -206,7 +213,7 @@ comboboxtext button, combobox button {
     color: #ffffff;
     min-height: __BTN_H__px;
     padding: __BTN_PAD_Y__px __BTN_PAD_X__px;
-    font-size: 14px;
+    font-size: __BTN_FS__px;
 }
 button:hover, button.flat:hover,
 menubutton > button:hover, dropdown > button:hover,
@@ -356,17 +363,18 @@ def _write(path, content):
 BASE_WIDTH = 1645
 
 
-def _logical_width():
-    """主显示器的逻辑宽度；拿不到时返回 0。
+def _screen_width():
+    """主显示器的**物理**宽度；拿不到时返回 0。
 
-    px 在 GTK 里是逻辑像素（已经跟着缩放走），所以这里只需要跟屏幕宽窄
-    等比例缩放“框有多大”。
+    登录器跑在 cage 里，而 cage 是纯 wlroots 合成器、不设置缩放，
+    所以 ReGreet 拿到的逻辑分辨率就是物理分辨率（本机 2880x1800）。
+    尺寸按它换算，才能和这块屏的实际大小匹配。
     """
     rc, out = Shell.capture_all("niri msg outputs 2>/dev/null")
     if rc == 0:
         for line in out.splitlines():
             line = line.strip()
-            if line.startswith("Logical size:"):
+            if line.startswith("Current mode:"):
                 try:
                     return int(line.split()[2].split("x")[0])
                 except (IndexError, ValueError):
@@ -380,21 +388,30 @@ def _logical_width():
 
 
 def _sizes():
-    """按当前屏幕算一套尺寸（GTK4 没有 media query，只能安装时算一次）。"""
-    width = _logical_width() or BASE_WIDTH
-    k = max(0.85, min(1.35, width / BASE_WIDTH))
+    """按当前屏幕算一套尺寸（GTK4 没有 media query，只能安装时算一次）。
+
+    以 1645 宽为基准：本机 2880 物理宽 → k=1.75。
+    """
+    width = _screen_width() or BASE_WIDTH
+    k = max(0.8, min(2.2, width / BASE_WIDTH))
 
     def s(base, low):
         return max(low, round(base * k))
 
     return {
-        "CARD_W": s(520, 380),
-        "CARD_PAD_Y": s(32, 22),
-        "CARD_PAD_X": s(38, 24),
-        "ENTRY_W": s(300, 220),
-        "BTN_H": s(36, 30),
+        "BASE_FS": s(15, 12),
+        "CARD_W": s(520, 360),
+        "CARD_PAD_Y": s(32, 20),
+        "CARD_PAD_X": s(38, 22),
+        "ENTRY_W": s(300, 200),
+        "ENTRY_FS": s(15, 12),
+        "CLOCK_FS": s(24, 16),
+        "CLOCK_PAD_Y": s(10, 6),
+        "CLOCK_PAD_X": s(22, 12),
+        "BTN_H": s(36, 28),
         "BTN_PAD_Y": s(8, 6),
-        "BTN_PAD_X": s(16, 12),
+        "BTN_PAD_X": s(16, 10),
+        "BTN_FS": s(14, 11),
     }
 
 
