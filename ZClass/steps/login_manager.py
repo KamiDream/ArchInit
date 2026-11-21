@@ -8,6 +8,8 @@ import re
 import shlex
 import subprocess
 
+from ..model import CANCELLED
+from ..picker import FreeText, Picker
 from ..shell import Shell
 from ..status import Status
 from ..taskview import TaskView
@@ -505,3 +507,31 @@ class LoginManagerSteps:
         Status.set("✅ 密钥环将随登录自动解锁，重启后生效 / keyring unlocks at login — reboot to apply"
                    if ok else "❌ 密钥环自动解锁配置失败 / keyring unlock setup failed")
         return ok
+
+    @classmethod
+    def background(cls):
+        """更换登录背景图：输入路径 → 拷到 /etc/greetd/background.png 并更新配置。"""
+        subtitle = ("输入图片完整路径，按 Tab 或 Enter 确认 · Esc 取消 / "
+                    "type the image path, Tab or Enter to confirm · Esc to cancel")
+        notice = ""
+        source = None
+        while source is None:
+            res = Picker.choose("更换登录背景图 / Change login background", [],
+                                allow_free=True, subtitle=subtitle, notice=notice)
+            if not isinstance(res, FreeText):
+                return CANCELLED
+            text = os.path.expanduser(str(res).strip().strip("'\""))
+            if not text:
+                notice = "⚠️  路径为空 / empty path"
+                continue
+            if not os.path.isfile(text):
+                notice = f"⚠️  找不到这张图 / not a file: {text}"
+                continue
+            source = text
+
+        ok, msg = set_background(source)
+        if ok:
+            Status.set(f"✅ 登录背景已换成 {os.path.basename(source)}，注销后生效 / log out to apply")
+            return True
+        Status.set(f"❌ 登录背景更换失败 / failed: {msg}")
+        return False

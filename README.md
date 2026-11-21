@@ -64,8 +64,8 @@ python3 archinit.py
 > - **💻 KVM 安装 / KVM Install**：KVM 虚拟化
 > - **🎮 显卡驱动安装 / GPU Drivers**：NVIDIA、Intel 核显、AMD 核显
 > - **✨ 终端美化 / Terminal Beautification**：Zsh、Antidote、Starship、fastfetch、Kitty 透明度
-> - **🔐 登录管理器 / Login Manager**：greetd + ReGreet（安装、配置启用、解锁密钥环）
-> - **🩹 修补工具 / Patch Tools**：UU 加速器、XDG 转英文、Fcitx5 环境变量、卸除 LightDM、更换登录背景图
+> - **🔐 登录管理器 / Login Manager**：greetd + ReGreet（安装、配置启用、更换背景图、解锁密钥环）
+> - **🩹 修补工具 / Patch Tools**：UU 加速器、XDG 转英文、Fcitx5 环境变量、卸除 LightDM
 > - **🔀 应用后端切换 / App Backend Toggle**：选择应用（列表或直接输入命令）并选平台启动
 >
 > Eight categories (the former "Mix Install" is split into KVM Install / GPU Drivers / Terminal Beautification; steps fully preserved):
@@ -74,8 +74,8 @@ python3 archinit.py
 > - **KVM Install**: KVM virtualization
 > - **GPU Drivers**: NVIDIA, Intel iGPU, AMD iGPU
 > - **Terminal Beautification**: Zsh, Antidote, Starship, fastfetch, Kitty opacity
-> - **Login Manager**: greetd + ReGreet (install, configure & enable, keyring unlock)
-> - **Patch Tools**: UU Accelerator, XDG dirs to English, Fcitx5 env vars, remove LightDM, change login background
+> - **Login Manager**: greetd + ReGreet (install, configure & enable, change background, keyring unlock)
+> - **Patch Tools**: UU Accelerator, XDG dirs to English, Fcitx5 env vars, remove LightDM
 > - **App Backend Toggle**: Pick an app (from the list or by typing a command) and launch it on a chosen backend
 >
 > 建议顺序：先「桌面安装」→「基础初始化」→「登录管理器」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「修补工具」「应用后端切换」。
@@ -281,7 +281,22 @@ python3 archinit.py
 | 🎨 `/etc/greetd/regreet.css` | **照 LightDM KamiDream 主题对齐**的 GTK4 样式表：白色半透明玻璃卡片 / 顶栏 / 下拉层、白字 + 淡蓝强调色 `#4fc3f7`（直接取自主题 `css/style.css` 的 `--accent`）、**长方形输入框（与 User 下拉框同尺寸同风格）**、6–18px 圆角、4px 细白滚动条、错误色 `#ef5350`；**用户名切换、会话选择、右侧按钮与密码框同一套玻璃底**（规避 GTK 深色主题的黑底）；**尺寸按主屏逻辑分辨率自动换算**（卡片宽 / 内边距 / 输入框尺寸，以 1645 宽为基准、限制在 0.85–1.35 倍）；已存在的非 ArchInit 样式会被保留以尊重自定义 / GTK4 stylesheet **matching the LightDM KamiDream theme**: white translucent glass card / clock / dropdown, white text with the theme's `#4fc3f7` accent, **rectangular inputs matching the User dropdown (same size and style)**, 6–18px radii, 4px white scrollbar and `#ef5350` error color; the **user switcher, session selector and side buttons share the same glass background as the password field** (so GTK's dark defaults never show through); **sizes are derived from the primary display's logical width** (card width / paddings / input size, based on 1645 wide, clamped to 0.85–1.35×); a pre-existing non-ArchInit stylesheet is left untouched |
 | 🔀 切换服务 / Switch services | `systemctl enable greetd`，若 `lightdm` 仍存在则 `systemctl disable lightdm`（已卸载则跳过，不会报错），然后校验 `greetd` 已启用、配置里含 `regreet` / Enables greetd, disables lightdm only when it still exists (skipped otherwise), then verifies |
 
-#### Step 3: 解锁密钥环 / Unlock Keyring at Login
+#### Step 3: 更换登录背景图 / Change Login Background
+
+> 登录器背景就是 `/etc/greetd/background.png`；这一步换成你指定的图片，并保证 `regreet.toml` 指向它。
+> The greeter background is just `/etc/greetd/background.png`; this step replaces it with an image you type and keeps `regreet.toml` pointing at it.
+
+| 操作 / Action | 说明 / Description |
+| --- | --- |
+| ⌨️ 输入图片路径 / Enter image path | 弹出输入框（直接打字），`Tab` 或 `Enter` 确认、`Esc` 取消；支持 `~` 展开 / Type the path, `Tab`/`Enter` to confirm, `Esc` to cancel; `~` is expanded |
+| ✅ 校验 / Validate | 路径不是文件时留在输入框并给黄色提示，不会动现有背景 / Stays in the prompt with a notice when the path is not a file |
+| 📦 复制并授权 / Copy & set mode | 以 root `install -Dm644` 到 `/etc/greetd/background.png`，`greeter` 用户一定读得到（图片放自己家目录也行）/ Copies as root with mode 644 so the `greeter` user can read it, even from your home |
+| ⚙️ `/etc/greetd/regreet.toml` | 只改 `[background] path` 一行；段不存在则补上（`fit = "Cover"`），其余配置原样保留 / Only rewrites the `path` line (adds the section when missing); everything else is kept |
+
+> 生效：**注销**（退出 niri 后 greetd 会重新拉起登录器）或重启。想完整显示整张图就把 `fit` 改成 `Contain`，拉伸填满用 `Fill`。
+> Apply by logging out (greetd restarts the greeter) or rebooting. Use `fit = "Contain"` for letterboxing or `"Fill"` to stretch.
+
+#### Step 4: 解锁密钥环 / Unlock Keyring at Login
 
 | 操作 / Action | 说明 / Description |
 | --- | --- |
@@ -352,21 +367,6 @@ python3 archinit.py
 
 > 卸除后开机直接进 greetd + ReGreet。本工具不再管理 LightDM，需要装回时自己 `sudo pacman -S lightdm lightdm-gtk-greeter`。
 > After removal the boot goes straight to greetd + ReGreet. This tool no longer manages LightDM; install `lightdm lightdm-gtk-greeter` manually if you ever need it back.
-
-#### Step 5: 更换登录背景图 / Change Login Background
-
-> 登录器背景就是 `/etc/greetd/background.png`；这一步换成你指定的图片，并保证 `regreet.toml` 指向它。
-> The greeter background is just `/etc/greetd/background.png`; this step replaces it with an image you type and keeps `regreet.toml` pointing at it.
-
-| 操作 / Action | 说明 / Description |
-| --- | --- |
-| ⌨️ 输入图片路径 / Enter image path | 弹出输入框（直接打字），`Tab` 或 `Enter` 确认、`Esc` 取消；支持 `~` 展开 / Type the path, `Tab`/`Enter` to confirm, `Esc` to cancel; `~` is expanded |
-| ✅ 校验 / Validate | 路径不是文件时留在输入框并给黄色提示，不会动现有背景 / Stays in the prompt with a notice when the path is not a file |
-| 📦 复制并授权 / Copy & set mode | 以 root `install -Dm644` 到 `/etc/greetd/background.png`，`greeter` 用户一定读得到（图片放自己家目录也行）/ Copies as root with mode 644 so the `greeter` user can read it, even from your home |
-| ⚙️ `/etc/greetd/regreet.toml` | 只改 `[background] path` 一行；段不存在则补上（`fit = "Cover"`），其余配置原样保留 / Only rewrites the `path` line (adds the section when missing); everything else is kept |
-
-> 生效：**注销**（退出 niri 后 greetd 会重新拉起登录器）或重启。想完整显示整张图就把 `fit` 改成 `Contain`，拉伸填满用 `Fill`。
-> Apply by logging out (greetd restarts the greeter) or rebooting. Use `fit = "Contain"` for letterboxing or `"Fill"` to stretch.
 
 ---
 
