@@ -84,6 +84,9 @@ python3 archinit.py
 
 > 对应 `archinit.py` 主菜单「桌面安装 / Desktop Install」分类；实现见 [`ZClass/steps/desktop.py`](ZClass/steps/desktop.py)。
 > Maps to the "Desktop Install" category in `archinit.py`; implementation in [`ZClass/steps/desktop.py`](ZClass/steps/desktop.py).
+>
+> 本分类**直接输出到终端**（不走任务面板）：安装脚本的进度、提示与输出都留在终端上，方便确认它到底在做什么。DMS 脚本仍跑在独立 pty 里，保证 `open("/dev/tty")` 可用。
+> This category **prints straight to the terminal** (no task panel): the installer's own progress and prompts stay on screen. The DMS script still runs in a dedicated pty so `open("/dev/tty")` works.
 
 #### Step 1: 注册 DMS 服务 / Register DMS Service
 
