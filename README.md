@@ -286,11 +286,15 @@ python3 archinit.py
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 📥 先克隆到临时目录 / Clone to a temp dir first              | `git clone --depth 1 https://github.com/KamiDream/LdmWk2Theme.git /tmp/KamiDream_Theme.clone`；**失败时直接退出，已装主题不受影响** / Clones into `/tmp` and aborts on failure, so an installed theme is never lost |
 | ✅ 校验完整性 / Verify the clone                            | 检查 `index.html`、`js/main.js`、`css/style.css` 三件套存在，缺失则中止（不会再出现“删了旧的、新的没装上”） / Verifies the three required files exist before touching the target |
-| 🔄 替换主题 / Replace theme                                 | 校验通过后才 `sudo rm -rf` 旧主题并复制新的，最后再检查 `index.html` 是否真的落盘；同时去掉 `.git` / Only after verification: remove the old theme, copy, then re-check `index.html` on disk; `.git` is stripped |
+| 📦 存到 `/usr/local`（不受包管理影响）/ Store under `/usr/local` | 主题实体放在 `/usr/local/share/lightdm-webkit/themes/KamiDream_Theme`，先复制到 `.new` 再原子替换；`lightdm-webkit2-greeter` 升级/重装都碰不到它 / The theme lives under `/usr/local/share/lightdm-webkit/themes/KamiDream_Theme` (copied to `.new` then swapped atomically); package upgrades of the greeter can't touch it |
+| 🔗 `/usr/share` 下留软链 / Symlink in `/usr/share`       | 在 greeter 的查找路径 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` 建一个指向 `/usr/local/...` 的软链，并去掉 `.git` / Symlinks the greeter's lookup path `/usr/share/lightdm-webkit/themes/KamiDream_Theme` to the `/usr/local` copy; `.git` is stripped |
 | 🖼️ 替换背景图片 / Replace background image                  | 替换 `/usr/share/lightdm-webkit/themes/KamiDream_Theme/assets/background.png` 为你自己的图片即可 / Replace the image at that path with your own                                |
 
 > ⚠️ 若主题目录缺失但 `webkit_theme` 仍指向它，登录界面会弹 `An error was detected in the current theme that could interfere with the system login process.`；Step 3 因此会在启用前检查主题是否已安装。
 > If the theme directory is missing while `webkit_theme` still points at it, LightDM shows `An error was detected in the current theme...`; Step 3 now checks that the theme is installed before enabling it.
+>
+> 验证（重启后仍生效）：`ls -l /usr/share/lightdm-webkit/themes/KamiDream_Theme` 应显示一个指向 `/usr/local/share/lightdm-webkit/themes/KamiDream_Theme` 的软链；真正的文件在 `/usr/local` 下，所以系统升级不会把它删掉。
+> Verify after a reboot: `ls -l /usr/share/lightdm-webkit/themes/KamiDream_Theme` should be a symlink into `/usr/local/share/lightdm-webkit/themes/KamiDream_Theme`; the real files live under `/usr/local`, so system upgrades cannot remove them.
 
 #### Step 3: 启用 LightDM 配置 / Enable LightDM Configuration
 

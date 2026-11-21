@@ -31,7 +31,8 @@ def _sudo_write(path, content, append=False):
 
 class LightDmSteps:
     THEME_NAME = "KamiDream_Theme"
-    THEMES_DIR = "/usr/share/lightdm-webkit/themes"
+    THEMES_DIR = "/usr/share/lightdm-webkit/themes"           # greeter 查找路径
+    STORE_DIR = "/usr/local/share/lightdm-webkit/themes"      # 真正存放主题（不受包管理影响）
     THEME_REPO = "https://github.com/KamiDream/LdmWk2Theme.git"
     REQUIRED = ("index.html", "js/main.js", "css/style.css")
 
@@ -40,7 +41,12 @@ class LightDmSteps:
         return os.path.join(cls.THEMES_DIR, cls.THEME_NAME)
 
     @classmethod
+    def store_path(cls):
+        return os.path.join(cls.STORE_DIR, cls.THEME_NAME)
+
+    @classmethod
     def theme_installed(cls):
+        """主题可被 greeter 找到（允许上一步留下的软链）。"""
         return os.path.isfile(os.path.join(cls.theme_path(), "index.html"))
 
     # ── Step 1: 安装 greeter ──
@@ -64,7 +70,8 @@ class LightDmSteps:
     @classmethod
     def theme(cls):
         target = cls.theme_path()
-        staging = target + ".new"
+        store = cls.store_path()
+        staging = store + ".new"
         clone = os.path.join(tempfile.gettempdir(), cls.THEME_NAME + ".clone")
 
         def prepare():
@@ -82,13 +89,17 @@ class LightDmSteps:
             return True
 
         def replace():
-            # 先复制到暂存目录，成功后才替换旧主题，缩小"旧的删了新的没到位"的窗口
+            # 主题实体放 /usr/local（包管理不管），在 /usr/share 下只留一个软链：
+            # 这样 lightdm-webkit2-greeter 升级/重装都不会影响主题。
             for cmd, why in (
-                (f"sudo -n mkdir -p {cls.THEMES_DIR}", "创建目录失败 / mkdir failed"),
+                (f"sudo -n mkdir -p {cls.STORE_DIR}", "创建目录失败 / mkdir failed"),
                 (f"sudo -n rm -rf {staging}", "清理暂存目录失败 / staging cleanup failed"),
                 (f'sudo -n cp -r "{clone}" "{staging}"', "复制失败 / copy failed"),
-                (f"sudo -n rm -rf {target}", "删除旧主题失败 / rm failed"),
-                (f"sudo -n mv {staging} {target}", "替换失败 / replace failed"),
+                (f"sudo -n rm -rf {store}", "删除旧主题失败 / rm failed"),
+                (f"sudo -n mv {staging} {store}", "替换失败 / replace failed"),
+                (f"sudo -n mkdir -p {cls.THEMES_DIR}", "创建主题目录失败 / mkdir failed"),
+                (f"sudo -n rm -rf {target}", "删除旧链接失败 / rm failed"),
+                (f"sudo -n ln -sfn {store} {target}", "创建软链失败 / symlink failed"),
             ):
                 rc, out = Shell.capture_all(cmd)
                 if rc != 0:
@@ -106,7 +117,7 @@ class LightDmSteps:
             ("替换已安装主题 / replace theme", replace),
             ("确认安装结果 / verify install", verify),
         ])
-        Status.set("✅ KamiDream 主题已更新 / theme updated · 背景 assets/background.png" if ok
+        Status.set("✅ KamiDream 主题已更新（实体在 /usr/local，/usr/share 下为软链）/ theme updated" if ok
                    else "❌ 主题未更新 / theme not updated")
         return ok
 
