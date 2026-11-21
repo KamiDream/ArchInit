@@ -7,7 +7,7 @@ from ..config import HOME
 from ..shell import Shell
 from ..status import Status
 from ..taskview import TaskView
-from .login_manager import ensure_background
+from .login_manager import GREETD_CONF, ensure_background
 
 XDG_DIRS = (
     'XDG_DESKTOP_DIR="$HOME/Desktop"\n'
@@ -166,13 +166,21 @@ class PatchSteps:
     def remove_lightdm(cls):
         """把 LightDM 整套清掉（包 / 服务 / 配置 / WebKit 主题目录）。
 
-        前置条件：greetd 已经启用 —— 否则删掉 LightDM 就没有登录器了。
-        删主题目录之前先把背景图留在 /etc/greetd/background.png，ReGreet 照样有壁纸。
+        前提是“装完并配好 greetd”：没启用就顺手启用；连 greetd 都没装、
+        或者还没写过 ReGreet 配置，就报错提示先去「登录管理器」。
+        这样不会出现「要删先启用 greetd、启用又得先停 lightdm」的死结。
+        删主题目录之前先把背景图留在 /etc/greetd/background.png。
         """
-        def check_greetd():
-            if not Shell.ok("systemctl is-enabled greetd"):
-                return False, "greetd 未启用，先跑「登录管理器 → 配置并启用」/ enable greetd first"
-            return True
+        def prepare_greetd():
+            if Shell.ok("systemctl is-enabled greetd"):
+                return True
+            if not Shell.installed("greetd"):
+                return False, "greetd 没装，先跑「登录管理器 → 安装」/ install greetd first"
+            if not Shell.ok(f"grep -q regreet {GREETD_CONF}"):
+                return False, "还没配置 ReGreet，先跑「登录管理器 → 配置并启用」/ configure ReGreet first"
+            # 装好了也配好了，只是没启用：这步直接帮它启用
+            ok, out = Shell.sudo("systemctl enable greetd")
+            return ok, Shell.brief(out)
 
         def disable():
             Shell.sudo("systemctl disable lightdm")   # 不存在也无所谓
@@ -199,7 +207,7 @@ class PatchSteps:
             return True
 
         ok = TaskView.run("修补工具 · 卸除 LightDM / Remove LightDM", [
-            ("确认 greetd 已启用 / greetd enabled", check_greetd),
+            ("确认/启用 greetd / ensure greetd enabled", prepare_greetd),
             ("保留登录背景图 / keep greeter background", ensure_background),
             ("停用 lightdm 服务 / disable service", disable),
             ("卸载 lightdm 相关包 / remove packages", uninstall),

@@ -353,12 +353,12 @@ python3 archinit.py
 
 #### Step 4: 卸除 LightDM / Remove LightDM
 
-> 前置条件：**greetd 已启用**（先跑「登录管理器 → 配置并启用」），否则删掉 LightDM 就没有登录器了。
-> Prerequisite: **greetd must already be enabled** (run Login Manager → Configure & enable first), otherwise removing LightDM leaves no greeter.
+> 顺序说明：先跑「登录管理器 → 安装」+「配置并启用」（后者会自己 `enable greetd` 并停用 lightdm），再来卸除。**不需要先手动停 LightDM** —— 这一步自己会 `systemctl disable lightdm` 后再卸载；如果 greetd 已装好也配好了、只是没启用，这里会顺手帮你启用。greetd 没装或没配置时才中止。
+> Order: run Login Manager → Install, then Configure & enable (it enables greetd and disables lightdm itself), then remove. **You never have to stop LightDM manually** — this step disables it right before uninstalling; if greetd is installed and configured but not yet enabled, it enables it here. It only aborts when greetd is missing or not configured.
 
 | 操作 / Action | 说明 / Description |
 | --- | --- |
-| ✅ 确认 greetd 已启用 / greetd enabled | `systemctl is-enabled greetd` 不通过则中止 / Aborts unless greetd is enabled |
+| ✅ 确认/启用 greetd / Ensure greetd | 已启用直接过；已装好且写过 ReGreet 配置则顺手 `systemctl enable greetd`；没装或没配置才中止（先跑「登录管理器」）/ Passes when enabled; enables it when greetd is installed and the ReGreet config exists; aborts only when greetd is missing or unconfigured |
 | 🖼️ 保留登录背景图 / Keep background | 确认 `/etc/greetd/background.png` 存在（缺了就从 KamiDream 主题目录拷一份），删主题目录后登录界面照样有壁纸 / Ensures `/etc/greetd/background.png` exists so the greeter keeps its wallpaper |
 | ⏹️ 停用 lightdm / Disable service | `systemctl disable lightdm`（没装也不报错）/ No-op when not installed |
 | 🗑️ 卸载包 / Remove packages | 用 `pacman -Rns` 卸掉已安装的 `lightdm`、`lightdm-gtk-greeter`、`lightdm-webkit2-greeter` / Removes whichever of those packages are installed |
