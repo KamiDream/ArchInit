@@ -272,16 +272,20 @@ python3 archinit.py
 
 | 操作 / Action                                             | 说明 / Description                                                                                                                                                                 |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🧹 清理旧主题 / Clean up old theme                          | 若 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` 已存在则删除 / Remove existing theme directory if present                                                                |
-| 📥 克隆主题 / Clone theme                                   | `git clone https://github.com/KamiDream/LdmWk2Theme` 到 `~/LdmWk2Theme` 并移动到 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` / Clone to `~/LdmWk2Theme` then move to target |
-| 🔄 更新主题 / Update theme                                  | 重复执行 Step 2 即可自动删除旧主题并下载最新版 / Re-run Step 2 to delete the old theme and download the latest version                                                           |
+| 📥 先克隆到临时目录 / Clone to a temp dir first              | `git clone --depth 1 https://github.com/KamiDream/LdmWk2Theme.git /tmp/KamiDream_Theme.clone`；**失败时直接退出，已装主题不受影响** / Clones into `/tmp` and aborts on failure, so an installed theme is never lost |
+| ✅ 校验完整性 / Verify the clone                            | 检查 `index.html`、`js/main.js`、`css/style.css` 三件套存在，缺失则中止（不会再出现“删了旧的、新的没装上”） / Verifies the three required files exist before touching the target |
+| 🔄 替换主题 / Replace theme                                 | 校验通过后才 `sudo rm -rf` 旧主题并复制新的，最后再检查 `index.html` 是否真的落盘；同时去掉 `.git` / Only after verification: remove the old theme, copy, then re-check `index.html` on disk; `.git` is stripped |
 | 🖼️ 替换背景图片 / Replace background image                  | 替换 `/usr/share/lightdm-webkit/themes/KamiDream_Theme/assets/background.png` 为你自己的图片即可 / Replace the image at that path with your own                                |
+
+> ⚠️ 若主题目录缺失但 `webkit_theme` 仍指向它，登录界面会弹 `An error was detected in the current theme that could interfere with the system login process.`；Step 3 因此会在启用前检查主题是否已安装。
+> If the theme directory is missing while `webkit_theme` still points at it, LightDM shows `An error was detected in the current theme...`; Step 3 now checks that the theme is installed before enabling it.
 
 #### Step 3: 启用 LightDM 配置 / Enable LightDM Configuration
 
 | 操作 / Action                                                      | 说明 / Description                                                                                                             |
 | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| ⚙️ 配置 `/etc/lightdm/lightdm.conf` / Configure lightdm.conf          | 在 `[Seat:*]` 段设置 `greeter-session=lightdm-webkit2-greeter` / Set greeter session to lightdm-webkit2-greeter              |
+| ⚙️ 前置检查 / Pre-check                                           | 主题目录下没有 `index.html` 时直接报错并中止（避免启用一个不存在的主题） / Aborts when the theme lacks `index.html` (avoids enabling a missing theme)                                     |
+| ⚙️ 配置 `/etc/lightdm/lightdm.conf` / Configure lightdm.conf          | 把 `[Seat:*]` 里的 `#greeter-session=…` 一行直接改成启用状态（不会留下重复行） / Turns the commented `#greeter-session=…` line into an active one (no duplicate lines)              |
 | ⚙️ 配置 `/etc/lightdm/lightdm-webkit2-greeter.conf` / Configure conf | 将 `webkit_theme` 设置为 `KamiDream_Theme`（替换原值） / Set `webkit_theme` to `KamiDream_Theme` (replaces existing value) |
 | 🔄 重启提示 / Reboot prompt                                         | 配置完成后提示用户重启系统以应用 LightDM / Prompt user to reboot to apply LightDM                                             |
 
@@ -387,6 +391,27 @@ python3 archinit.py
 
 确保已安装 Kitty：`sudo pacman -S kitty`，或在 [`archinit.py`](archinit.py) 的「基础初始化 / Basic Initialization」分类的 **Step 3**（Kitty 字体选择）前手动安装。
 Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before **Step 3** (Kitty font selector) of the "Basic Initialization" category in [`archinit.py`](archinit.py).
+
+### Q：登录界面提示 `An error was detected in the current theme…`？/ Login screen shows "An error was detected in the current theme…"?
+
+这是 `lightdm-webkit2-greeter`（`detect_theme_errors = true`）**找不到或无法加载主题**时的提示，通常是主题目录不存在：
+
+```bash
+ls /usr/share/lightdm-webkit/themes/KamiDream_Theme/index.html
+```
+
+若不存在：重跑「安装/更新 KamiDream 主题」（Step 2）再跑「启用 LightDM 配置」（Step 3），或手动恢复：
+
+```bash
+sudo mkdir -p /usr/share/lightdm-webkit/themes
+sudo rm -rf /usr/share/lightdm-webkit/themes/KamiDream_Theme
+sudo cp -r ~/Projects/Self/LdmWk2Theme /usr/share/lightdm-webkit/themes/KamiDream_Theme
+sudo rm -rf /usr/share/lightdm-webkit/themes/KamiDream_Theme/.git
+```
+
+主题里出现的「此主题需在 lightdm-webkit2-greeter 环境中运行」是**主题自己的提示**（`js/main.js` 检测到 `window.lightdm` 不存在），常见于直接用浏览器打开 `index.html` 预览，或 greeter 进入 fallback 模式 —— 它说明登录会话里没有注入 LightDM 桥，而不是主题写错。
+
+LightDM/WebKit2 greeter only shows this when it **cannot load the theme** (usually a missing theme directory) — reinstall the theme (Step 2) and re-enable LightDM (Step 3). The theme's own "此主题需在 lightdm-webkit2-greeter 环境中运行" message means `window.lightdm` is missing (browser preview or fallback mode), not a broken theme.
 
 ### Q：NVIDIA 驱动安装后黑屏？/ Black screen after NVIDIA driver install?
 
