@@ -390,10 +390,10 @@ def _screen_width():
 def _sizes():
     """按当前屏幕算一套尺寸（GTK4 没有 media query，只能安装时算一次）。
 
-    以 1645 宽为基准：本机 2880 物理宽 → k=1.75。
+    以 1645 宽为基准、上限 1.35 倍：本机 2880 物理宽会被压到 k=1.35。
     """
     width = _screen_width() or BASE_WIDTH
-    k = max(0.8, min(2.2, width / BASE_WIDTH))
+    k = max(0.8, min(1.35, width / BASE_WIDTH))
 
     def s(base, low):
         return max(low, round(base * k))
