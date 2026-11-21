@@ -4,6 +4,8 @@ import curses
 import threading
 import time
 import unicodedata
+from collections import deque
+from typing import ClassVar
 
 
 def _trunc(s, cells):
@@ -34,14 +36,32 @@ class TaskView:
     BRAND_LEFT = "Kami"
     BRAND_RIGHT = "Dream"
     _shared_stdscr = None  # 主界面调用 bind() 后复用该窗口
-    _live = ""             # 当前任务的实时输出行（跨线程共享）
 
     SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
+    LOG_LINES = 5          # 进度区最多保留几行（不同包/阶段）
+    _log: ClassVar[deque] = deque(maxlen=LOG_LINES)
+
+    @classmethod
+    def clear_log(cls):
+        cls._log.clear()
 
     @classmethod
     def progress(cls, text):
-        """由任务内部（通常是 Shell 的输出回调）调用，更新面板上的进度行。"""
-        cls._live = (text or "").strip()[:160]
+        """由任务内部（通常是 Shell 的输出回调）调用，更新进度区。
+
+        同一个包/阶段的进度刷新（pacman 用 \\r 原地重绘）会替换最后一行，
+        不同包则往上追加，这样能同时看到多个下载项而不是只看到一条在跳。
+        """
+        line = " ".join((text or "").split())
+        if not line:
+            return
+        key = tuple(line.split()[:2])
+        if cls._log:
+            prev = tuple(cls._log[-1].split()[:2])
+            if prev == key or cls._log[-1] == line:
+                cls._log[-1] = line
+                return
+        cls._log.append(line)
 
     def __init__(self, stdscr, title, items, hold):
         self.stdscr = stdscr
@@ -120,7 +140,16 @@ class TaskView:
         self._put(3, 2, self.title, self.attr_sel)
 
         y = 5
-        for i, (label, _func) in enumerate(self.items):
+        # 任务多时开窗（以当前任务为中心），避免后面的任务被默默截掉
+        avail = max(1, (h - 3) - y)
+        if len(self.items) > avail:
+            focus = self.current if self.current is not None else max(0, len(self.results) - 1)
+            start_i = max(0, min(focus - avail // 2, len(self.items) - avail))
+            window = list(enumerate(self.items))[start_i:start_i + avail]
+        else:
+            window = list(enumerate(self.items))
+
+        for i, (label, _func) in window:
             if y >= h - 3:
                 break
             if i < len(self.results):
@@ -139,14 +168,25 @@ class TaskView:
         if detail and y < h - 3:
             self._put(y + 1, 4, detail, self.attr_err)
 
-        # 进度行：spinner + 已耗时 + 命令最新一行输出
+        # 进度区：最近几条输出（同一包原地刷新，不同包依次累积）
         if state == "running" and self.current is not None:
-            live_y = min(y + 1, h - 3)
-            spin = self.SPINNER[int(time.time() * 8) % len(self.SPINNER)]
-            elapsed = int(time.time() - self.started) if self.started else 0
-            head = f"   {spin} {elapsed:>2d}s  "
-            self._put(live_y, 0, head, self.attr_sel)
-            self._put(live_y, len(head), TaskView._live or "连接中 … / starting …")
+            lines = list(TaskView._log)
+            if not lines:
+                lines = ["连接中 … / starting …"]
+            room = (h - 3) - (y + 1)
+            if room > 0:
+                show = lines[-room:]
+                start = (h - 3) - len(show)
+                for idx, text in enumerate(show):
+                    row = start + idx
+                    if idx == len(show) - 1:   # 最新一行带 spinner 与耗时
+                        spin = self.SPINNER[int(time.time() * 8) % len(self.SPINNER)]
+                        elapsed = int(time.time() - self.started) if self.started else 0
+                        head = f"   {spin} {elapsed:>2d}s  "
+                        self._put(row, 0, head, self.attr_sel)
+                        self._put(row, len(head), text)
+                    else:
+                        self._put(row, 9, text)
 
         self._put(h - 2, 0, "═" * (w - 1))
         footer = {
@@ -177,7 +217,7 @@ class TaskView:
         try:
             for i, (_label, func) in enumerate(self.items):
                 self.current = i
-                self.progress("")
+                self.clear_log()
                 self.started = time.time()
                 self._draw("running")
                 stop = threading.Event()
