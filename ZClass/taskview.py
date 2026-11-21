@@ -46,6 +46,20 @@ class TaskView:
     def clear_log(cls):
         cls._log.clear()
 
+    @staticmethod
+    def _item_key(line):
+        """判断“这是同一个项目/阶段”的标识。
+
+        pacman 的进度条宽度（[####] → [#####]）和百分比会变，不能拿来当标识，
+        否则同一个包会被反复当成新行，进度区就会上下乱跳。
+        """
+        words = line.split()
+        if not words:
+            return ""
+        if len(words) > 1 and not words[1].startswith("["):
+            return f"{words[0]} {words[1]}"
+        return words[0]
+
     @classmethod
     def progress(cls, text):
         """由任务内部（通常是 Shell 的输出回调）调用，更新进度区。
@@ -56,11 +70,18 @@ class TaskView:
         line = " ".join((text or "").split())
         if not line:
             return
-        key = tuple(line.split()[:2])
-        if cls._log:
-            prev = tuple(cls._log[-1].split()[:2])
-            if prev == key or cls._log[-1] == line:
-                cls._log[-1] = line
+        # pacman 的汇总/阶段行不是进度，放进来只会把其他行推来推去
+        low = line.lower()
+        if low.startswith(("total", "packages (", ":: ")):
+            return
+        if cls._log and cls._item_key(cls._log[-1]) == cls._item_key(line):
+            cls._log[-1] = line
+            return
+        # 同一项目已存在（并行下载时可能交错）就地更新，不新增行也不移动位置
+        key = cls._item_key(line)
+        for i in range(len(cls._log) - 1, -1, -1):
+            if cls._item_key(cls._log[i]) == key:
+                cls._log[i] = line
                 return
         cls._log.append(line)
 
@@ -73,6 +94,7 @@ class TaskView:
         self.current = None
         self.started = 0.0          # 当前任务开始时间
         self.total_start = 0.0      # 整个面板开始时间
+        self.stopping = False       # 收尾阶段禁止后台线程再画"运行中"
         self.lock = threading.Lock()
         self.attr_ok = curses.A_BOLD
         self.attr_err = curses.A_BOLD
@@ -193,15 +215,16 @@ class TaskView:
         }[state]
         self._put(h - 1, 2, footer)
 
-        # 右下角（双实线下）：spinner + 已耗时 / 总耗时
+        # 右下角（双实线下方）：spinner + 已耗时 / 总耗时
         if state == "running" and self.current is not None:
             spin = self.SPINNER[int(time.time() * 8) % len(self.SPINNER)]
             elapsed = int(time.time() - self.started) if self.started else 0
-            self._put(h - 1, max(0, w - len(f"{spin} {elapsed}s ") - 1), f"{spin} {elapsed}s ",
-                      self.attr_sel)
+            tail = f"{spin} {elapsed}s "
+            self._put(h - 1, max(0, w - len(tail) - 1), tail, self.attr_sel)
         elif state == "done" and self.total_start:
             total = int(time.time() - self.total_start)
-            self._put(h - 1, max(0, w - len(f"✅ {total}s ") - 1), f"✅ {total}s ", self.attr_ok)
+            tail = f"✅ {total}s "
+            self._put(h - 1, max(0, w - len(tail) - 1), tail, self.attr_ok)
         s.refresh()
 
     # ── 执行 ──
@@ -209,6 +232,8 @@ class TaskView:
         """后台定时重绘，使 spinner / 进度行 / 耗时保持更新。"""
         with contextlib.suppress(Exception):
             while not stop.wait(0.2):
+                if self.current is None or self.stopping:
+                    continue
                 self._draw("running")
 
     def _run(self):
@@ -245,6 +270,7 @@ class TaskView:
                     break
         finally:
             Shell.progress_hook = None
+        self.stopping = True    # 先让后台线程停下，避免和收尾画面抢着画
         self.current = None
         ok = bool(self.results) and all(r[0] for r in self.results)
         self._draw("done" if ok else "failed")
