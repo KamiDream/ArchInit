@@ -40,6 +40,7 @@ class TaskView:
     SPINNER = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
     LOG_LINES = 5          # 进度区最多保留几行（不同包/阶段）
     _log: ClassVar[deque] = deque(maxlen=LOG_LINES)
+    _suspended = False     # 终端交给外部程序（kitten / 安装脚本）期间暂停绘制
 
     @classmethod
     def clear_log(cls):
@@ -114,6 +115,8 @@ class TaskView:
 
     def _draw(self, state, detail=""):
         """重绘面板（加锁，避免后台 spinner 线程与主线程同时绘制）。"""
+        if TaskView._suspended:
+            return
         with self.lock:
             try:
                 self._draw_impl(state, detail)
@@ -140,8 +143,9 @@ class TaskView:
         self._put(3, 2, self.title, self.attr_sel)
 
         y = 5
-        # 任务多时开窗（以当前任务为中心），避免后面的任务被默默截掉
-        avail = max(1, (h - 3) - y)
+        # 任务多时开窗（以当前任务为中心），并给进度区留出几行
+        reserve = min(TaskView.LOG_LINES, 4)
+        avail = max(1, (h - 3) - y - reserve)
         if len(self.items) > avail:
             focus = self.current if self.current is not None else max(0, len(self.results) - 1)
             start_i = max(0, min(focus - avail // 2, len(self.items) - avail))
@@ -258,7 +262,11 @@ class TaskView:
     @classmethod
     @contextlib.contextmanager
     def terminal(cls):
-        """临时把终端交还给外部程序（如 kitten / 交互式安装脚本），结束后回到面板。"""
+        """临时把终端交还给外部程序（如 kitten / 交互式安装脚本），结束后回到面板。
+
+        期间必须暂停绘制，否则后台 spinner 线程会把面板画到对方的界面上。
+        """
+        TaskView._suspended = True
         try:
             curses.endwin()
         except curses.error:
@@ -273,6 +281,7 @@ class TaskView:
                     cls._shared_stdscr.refresh()
             except curses.error:
                 pass
+            TaskView._suspended = False
 
     @classmethod
     def run(cls, title, items, hold=0.6):
