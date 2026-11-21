@@ -4,6 +4,8 @@ ReGreet 是 Wayland 的 GTK4 登录器，需要一个合成器承载，这里按
 配置/样式都写在 /etc/greetd 下；坐标与开关都通过任务面板展示。
 """
 import os
+import re
+import shlex
 import subprocess
 
 from ..shell import Shell
@@ -36,6 +38,29 @@ def ensure_background():
             Shell.sudo(f"cp -f {src} {BACKGROUND}")
             break
     return True
+
+
+def set_background(source):
+    """把 source 拷成登录器背景，并让 regreet.toml 指向它。返回 (ok, 说明)。
+
+    以 root 拷贝成 644，所以源图在不在用户家目录都无所谓；greeter 用户读得到。
+    """
+    ok, out = Shell.sudo(f"install -Dm644 {shlex.quote(source)} {BACKGROUND}")
+    if not ok:
+        return False, Shell.brief(out)
+
+    ok, cur = Shell.sudo_capture(f"cat {REGREET_CONF}")
+    cur = cur if ok else ""
+    line = f'path = "{BACKGROUND}"'
+    if re.search(r"(?m)^\s*path\s*=", cur):
+        new = re.sub(r"(?m)^\s*path\s*=.*$", line, cur)
+    elif re.search(r"(?m)^\[background\]\s*$", cur):
+        new = re.sub(r"(?m)^(\[background\]\s*)$", r"\1\n" + line, cur, count=1)
+    else:
+        block = f"[background]\n{line}\nfit = \"Cover\"\n"
+        new = block + ("\n" + cur if cur.strip() else "")
+    okw, errw = _write(REGREET_CONF, new)
+    return okw, Shell.brief(errw)
 
 PAM_GREETD = "/etc/pam.d/greetd"
 PAM_BACKUP = "/etc/pam.d/greetd.archinit.bak"

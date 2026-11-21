@@ -4,10 +4,12 @@ import shutil
 import time
 
 from ..config import HOME
+from ..model import CANCELLED
+from ..picker import FreeText, Picker
 from ..shell import Shell
 from ..status import Status
 from ..taskview import TaskView
-from .login_manager import ensure_background
+from .login_manager import ensure_background, set_background
 
 XDG_DIRS = (
     'XDG_DESKTOP_DIR="$HOME/Desktop"\n'
@@ -209,3 +211,31 @@ class PatchSteps:
         Status.set("✅ LightDM 已卸除，开机直接用 greetd / removed" if ok
                    else "❌ 卸除未完成，greetd 需先可用 / not removed")
         return ok
+
+    # ── 更换登录背景 ──
+    @classmethod
+    def login_background(cls):
+        subtitle = ("输入图片完整路径，按 Tab 或 Enter 确认 · Esc 取消 / "
+                    "type the image path, Tab or Enter to confirm · Esc to cancel")
+        notice = ""
+        source = None
+        while source is None:
+            res = Picker.choose("更换登录背景图 / Change login background", [],
+                                allow_free=True, subtitle=subtitle, notice=notice)
+            if not isinstance(res, FreeText):
+                return CANCELLED
+            text = os.path.expanduser(str(res).strip().strip("'\""))
+            if not text:
+                notice = "⚠️  路径为空 / empty path"
+                continue
+            if not os.path.isfile(text):
+                notice = f"⚠️  找不到这张图 / not a file: {text}"
+                continue
+            source = text
+
+        ok, msg = set_background(source)
+        if ok:
+            Status.set(f"✅ 登录背景已换成 {os.path.basename(source)}，注销后生效 / log out to apply")
+            return True
+        Status.set(f"❌ 登录背景更换失败 / failed: {msg}")
+        return False

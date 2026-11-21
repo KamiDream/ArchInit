@@ -52,6 +52,7 @@ class Catalog:
                 Step("XDG 用户目录转英文 / Migrate XDG Dirs to English", PatchSteps.xdg),
                 Step("Fcitx5 输入法环境变量 / Fcitx5 IM Environment Variables", PatchSteps.fcitx),
                 Step("卸除 LightDM / Remove LightDM", PatchSteps.remove_lightdm),
+                Step("更换登录背景图 / Change Login Background", PatchSteps.login_background),
             ]),
             Category("应用后端切换 / App Backend Toggle", [
                 Step("选择应用启动 / Pick App & Launch", BackendSteps.app_backend),
