@@ -253,6 +253,9 @@ class Shell:
     def sudo(cls, cmd):
         """以 root 执行（非交互），返回 (ok, 输出)。
 
+        注意：任务面板激活时返回的“输出”只是**最后一行**（用作进度
+        行）；需要完整输出请用 sudo_capture()。
+
         sudo 的凭证是按 tty 记的（tty_tickets），而我们给命令分配的 pty 每次都是
         新的 /dev/pts/N，会不断触发“需要密码”。所以外层保持**无 tty**（与启动时
         sudo -S -v 建立的票据一致），再在内部用 script 给命令一个 pty，这样既有
@@ -265,6 +268,21 @@ class Shell:
         hook = cls.progress_hook
         if hook is not None:
             return cls._stream_pipe(full, hook)
+        rc, out = cls.capture_all(full)
+        return rc == 0, out
+
+    @classmethod
+    def sudo_capture(cls, cmd):
+        """以 root 执行并返回**完整输出**（不受任务面板进度钩子影响）。
+
+        Shell.sudo() 在任务面板激活时走 _stream_pipe，返回的是**最后一行**
+        （给它当进度行用）。要把输出当数据（文件内容之类）来拼接/判断时，
+        必须用这个，否则会把内容截断。
+        """
+        if shutil.which("script"):
+            full = f"sudo -n script -qec {shlex.quote(cmd)} /dev/null"
+        else:
+            full = f"sudo -n {cmd}"
         rc, out = cls.capture_all(full)
         return rc == 0, out
 

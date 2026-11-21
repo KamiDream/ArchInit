@@ -6,7 +6,7 @@
 #   ZClass/style.py      Style（ANSI 着色）
 #   ZClass/shell.py      Shell（命令执行 / 文件读写）
 #   ZClass/model.py      Step、Category
-#   ZClass/steps/*.py    各分类步骤类（Desktop/Basic/Kvm/Gpu/Terminal/LightDm/Patch）
+#   ZClass/steps/*.py    各分类步骤类（Desktop/Basic/Kvm/Gpu/Terminal/LoginManager/Patch/Backend）
 #   ZClass/catalog.py    Catalog（组装分类）
 #   ZClass/ui.py         UI（curses 两栏界面）
 #   ZClass/app.py        App（启动、sudo、进入界面）

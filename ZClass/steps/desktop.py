@@ -16,19 +16,3 @@ class DesktopSteps:
         if not ok:
             print(Style.yellow("    ⚠️  安装脚本未成功完成 / the installer did not finish"))
         return ok
-
-    @staticmethod
-    def lightdm():
-        print(">>> Installing LightDM and greeter...")
-        rc = Shell.run("sudo pacman -S --needed --noconfirm lightdm lightdm-gtk-greeter")
-
-        print(">>> Enabling LightDM display manager...")
-        rc2 = Shell.run("sudo systemctl enable lightdm")
-
-        print(">>> Starting LightDM...")
-        rc3 = Shell.run("sudo systemctl start lightdm")
-
-        if rc != 0 or rc2 != 0 or rc3 != 0:
-            print(Style.yellow("    ⚠️  有命令执行失败，请检查上方输出 / some commands failed"))
-            return False
-        return True

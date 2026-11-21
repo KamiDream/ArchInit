@@ -59,27 +59,27 @@ python3 archinit.py
 > Most steps run inside a **task panel** (a `✅`/`⏳`/`❌` checklist; command output never reaches the terminal). The running task shows a **progress area (last few lines)**: progress bars refresh in place for the same package while different packages stack upwards, including **download percentage, transferred size and speed**; the spinner and elapsed time sit in the **bottom-right corner, under the `═` rule** (e.g. `nvidia-utils  [#####] 45%  68.2 MiB  5.1 MiB/s`). On failure the panel stops on that step with the reason; only steps that need a real terminal or full-screen interaction (`kitten choose-fonts`, the UU installer, the DMS installer) hand the terminal back temporarily; the UU and DMS installers run inside a **dedicated pty** (own controlling terminal, with your keyboard and their output forwarded), so their `open("/dev/tty")` never fails with "unable to open new tty".
 >
 > 八大分类（原混合安装已拆分为 KVM 安装 / 显卡驱动安装 / 终端美化，步骤完全保留）：
-> - **🖥️ 桌面安装 / Desktop Install**：注册 DMS 服务、显示管理器（LightDM）
+> - **🖥️ 桌面安装 / Desktop Install**：注册 DMS 服务
 > - **🧱 基础初始化 / Basic Initialization**：niri 核心组件、系统拓展组件、Kitty 字体、AUR 助手、NTFS 增强工具、雾凇拼音、密钥库
 > - **💻 KVM 安装 / KVM Install**：KVM 虚拟化
 > - **🎮 显卡驱动安装 / GPU Drivers**：NVIDIA、Intel 核显、AMD 核显
 > - **✨ 终端美化 / Terminal Beautification**：Zsh、Antidote、Starship、fastfetch、Kitty 透明度
-> - **🎨 LightDM 配置 / LightDM WebKit2 Greeter**：WebKit2 Greeter、KamiDream 主题、启用配置、黑屏救急
-> - **🩹 修补工具 / Patch Tools**：UU 加速器、XDG 转英文、Fcitx5 环境变量
+> - **🔐 登录管理器 / Login Manager**：greetd + ReGreet（安装、配置启用、解锁密钥环）
+> - **🩹 修补工具 / Patch Tools**：UU 加速器、XDG 转英文、Fcitx5 环境变量、卸除 LightDM
 > - **🔀 应用后端切换 / App Backend Toggle**：选择应用（列表或直接输入命令）并选平台启动
 >
 > Eight categories (the former "Mix Install" is split into KVM Install / GPU Drivers / Terminal Beautification; steps fully preserved):
-> - **Desktop Install**: Register DMS service, Display Manager (LightDM)
+> - **Desktop Install**: Register DMS service
 > - **Basic Initialization**: Niri core components, system extensions, Kitty font, AUR helper, NTFS tools, Rime-ice, keyring
 > - **KVM Install**: KVM virtualization
 > - **GPU Drivers**: NVIDIA, Intel iGPU, AMD iGPU
 > - **Terminal Beautification**: Zsh, Antidote, Starship, fastfetch, Kitty opacity
-> - **LightDM Configuration**: WebKit2 greeter, KamiDream theme, enable config, black-screen emergency fix
-> - **Patch Tools**: UU Accelerator, XDG dirs to English, Fcitx5 env vars
+> - **Login Manager**: greetd + ReGreet (install, configure & enable, keyring unlock)
+> - **Patch Tools**: UU Accelerator, XDG dirs to English, Fcitx5 env vars, remove LightDM
 > - **App Backend Toggle**: Pick an app (from the list or by typing a command) and launch it on a chosen backend
 >
-> 建议顺序：先「桌面安装」→「基础初始化」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「LightDM 配置」「修补工具」「应用后端切换」。
-> Suggested order: Desktop Install → Basic Initialization → optional KVM / GPU Drivers / Terminal Beautification → optional LightDM Configuration / Patch Tools / App Backend Toggle.
+> 建议顺序：先「桌面安装」→「基础初始化」→「登录管理器」→ 按需 KVM / 显卡驱动 / 终端美化 → 可选「修补工具」「应用后端切换」。
+> Suggested order: Desktop Install → Basic Initialization → Login Manager → optional KVM / GPU Drivers / Terminal Beautification → optional Patch Tools / App Backend Toggle.
 
 ---
 
@@ -96,14 +96,6 @@ python3 archinit.py
 | 操作 / Action            | 说明 / Description                                                                                                                                          |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🔗 安装 DMS / Install DMS | 通过官方脚本安装 DMS / Install DMS via the official script：`curl -fsSL https://install.danklinux.com \| sh`                                              |
-
-#### Step 2: 显示管理器 / Display Manager (LightDM)
-
-| 操作 / Action                     | 说明 / Description                                                      |
-| --------------------------------- | ----------------------------------------------------------------------- |
-| 📦 安装 LightDM / Install LightDM   | 安装 `lightdm` 与 `lightdm-gtk-greeter` / Install `lightdm` and `lightdm-gtk-greeter` |
-| ▶️ 启用 LightDM / Enable LightDM | 设置 LightDM 开机自启 / Enable LightDM to start on boot                 |
-| 🚀 启动 LightDM / Start LightDM  | 立即启动 LightDM 显示管理器 / Start LightDM display manager immediately |
 
 ---
 
@@ -260,62 +252,48 @@ python3 archinit.py
 | 🎨 调整背景透明度 / Adjust opacity | 弹出光标列表（↑/↓ 选择，当前值预先高亮）：`0.6` / `0.7` / `0.8`（默认）/ `0.9` / `1.0`，Esc 取消；选中后自动更新 `~/.config/kitty/kitty.conf` / Opens a cursor list (↑/↓, current value pre-highlighted): `0.6`/`0.7`/`0.8` (default)/`0.9`/`1.0`, Esc to cancel; updates `~/.config/kitty/kitty.conf` |
 
 ---
-### 🎨 LightDM 配置 / LightDM WebKit2 Greeter
+### 🔐 登录管理器 / Login Manager（greetd + ReGreet）
 
-> 对应 `archinit.py` 主菜单「LightDM 配置 / LightDM WebKit2 Greeter」分类；实现见 [`ZClass/steps/lightdm.py`](ZClass/steps/lightdm.py)。
-> Maps to the "LightDM Configuration" category in `archinit.py`; implementation in [`ZClass/steps/lightdm.py`](ZClass/steps/lightdm.py).
+> 对应 `archinit.py` 主菜单「登录管理器 / Login Manager（greetd + ReGreet）」分类；实现见 [`ZClass/steps/login_manager.py`](ZClass/steps/login_manager.py)。
+> Maps to the "Login Manager" category in `archinit.py`; implementation in [`ZClass/steps/login_manager.py`](ZClass/steps/login_manager.py).
 >
-> 本分类下的四个步骤都在**界面内的任务面板**里执行（`ArchInit_KamiDream` 品牌 + 任务清单，`⏳` 进行中 / `✅` 成功 / `❌` 失败），**命令输出不落到终端**；最终结果再显示到主界面底部状态行（如 `✅ LightDM 已配置，重启后生效`）。失败时会停在那一步的清单上等你按键，并提示原因（如 `sudo 凭证过期`）。
-> All four steps run inside an **in-UI task panel** (branded header + task list with `⏳` running / `✅` done / `❌` failed) and **command output never reaches the terminal**; the outcome is then mirrored in the status line at the bottom (e.g. `✅ configured — reboot to apply`). On failure the panel stays on screen with the reason (e.g. `sudo expired`).
-
-> ⚠️ **单 N 卡独显或开启了独显直连的用户（纯 N 卡用户）请勿使用此配置！**
-> **Do NOT use this configuration if you have a single/primary NVIDIA GPU!**
+> 用 greetd + ReGreet 替代 LightDM：ReGreet 是 GTK4/Wayland 登录器，需要一个合成器承载，这里按上游推荐用 **cage**；会话列表直接读 `/usr/share/wayland-sessions`（你这台机器目前只有 Niri）。整套不依赖 webkit2gtk，主题也不会因为 WebKit 升级而失效。
+> Replaces LightDM with greetd + ReGreet: a GTK4/Wayland greeter hosted by **cage** (upstream's recommended setup). Sessions come from `/usr/share/wayland-sessions` (only Niri on this machine). Nothing depends on webkit2gtk anymore.
 >
-> 用于替换默认的 LightDM GTK Greeter，安装 `lightdm-webkit2-greeter` 并启用 KamiDream WebKit2 主题。
-> Use this script to replace the default LightDM GTK greeter with `lightdm-webkit2-greeter` and the KamiDream WebKit2 theme.
+> ⚠️ 换了登录器就可能把自己关在门外：启用前请确认 `regreet` / `cage` 可执行。出问题就在 TTY（`Ctrl+Alt+F2`）里排查：
+> `journalctl -u greetd -b -e` 看错误；配置坏了可以 `sudo systemctl disable greetd` 先停用，修好 `/etc/greetd/config.toml` 再启用。LightDM 已不再作为方案，需要装回时用 `sudo pacman -S lightdm lightdm-gtk-greeter`（本工具不再提供回退步骤）。
+> ⚠️ Switching the greeter can lock you out: verify `regreet` / `cage` run first. If it breaks, use a TTY (`Ctrl+Alt+F2`): `journalctl -u greetd -b -e`, or `sudo systemctl disable greetd` and fix `/etc/greetd/config.toml`. LightDM is no longer part of this tool; install `lightdm lightdm-gtk-greeter` manually if you ever need it back.
 
-#### Step 1: 安装 LightDM WebKit2 Greeter / Install LightDM WebKit2 Greeter
+#### Step 1: 安装 greetd + ReGreet / Install
 
-| 操作 / Action                                           | 说明 / Description                                                                                   |
-| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| 📦 安装 lightdm-webkit2-greeter / Install package          | `sudo pacman -S --needed --noconfirm lightdm-webkit2-greeter` / Install lightdm-webkit2-greeter only |
+| 操作 / Action | 说明 / Description |
+| --- | --- |
+| 📦 安装三个包 / Install packages | `greetd greetd-regreet cage`（ReGreet 的 GTK4 / GStreamer / AccountsService 依赖由包自动拉取）/ Installs `greetd greetd-regreet cage` (GTK4/GStreamer/AccountsService deps are pulled automatically) |
 
-#### Step 2: 安装/更新 KamiDream 主题 / Install / Update KamiDream Theme
+#### Step 2: 配置并启用 / Configure & enable
 
-| 操作 / Action                                             | 说明 / Description                                                                                                                                                                 |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 📥 先克隆到临时目录 / Clone to a temp dir first              | `git clone --depth 1 https://github.com/KamiDream/LdmWk2Theme.git /tmp/KamiDream_Theme.clone`；**失败时直接退出，已装主题不受影响** / Clones into `/tmp` and aborts on failure, so an installed theme is never lost |
-| ✅ 校验完整性 / Verify the clone                            | 检查 `index.html`、`js/main.js`、`css/style.css` 三件套存在，缺失则中止（不会再出现“删了旧的、新的没装上”） / Verifies the three required files exist before touching the target |
-| 📦 存到 `/usr/local`（不受包管理影响）/ Store under `/usr/local` | 主题实体放在 `/usr/local/share/lightdm-webkit/themes/KamiDream_Theme`，先复制到 `.new` 再原子替换；`lightdm-webkit2-greeter` 升级/重装都碰不到它 / The theme lives under `/usr/local/share/lightdm-webkit/themes/KamiDream_Theme` (copied to `.new` then swapped atomically); package upgrades of the greeter can't touch it |
-| 🔗 `/usr/share` 下留软链 / Symlink in `/usr/share`       | 在 greeter 的查找路径 `/usr/share/lightdm-webkit/themes/KamiDream_Theme` 建一个指向 `/usr/local/...` 的软链，并去掉 `.git` / Symlinks the greeter's lookup path `/usr/share/lightdm-webkit/themes/KamiDream_Theme` to the `/usr/local` copy; `.git` is stripped |
-| 🖼️ 替换背景图片 / Replace background image                  | 替换 `/usr/share/lightdm-webkit/themes/KamiDream_Theme/assets/background.png` 为你自己的图片即可 / Replace the image at that path with your own                                |
+| 操作 / Action | 说明 / Description |
+| --- | --- |
+| ✅ 检查可执行文件 / Check binaries | `/usr/bin/regreet`、`/usr/bin/cage` 缺失则中止（先跑 Step 1）/ Aborts when either binary is missing |
+| ⚙️ `/etc/greetd/config.toml` | 写入 `[terminal] vt = 1` 与 `[default_session] command = "dbus-run-session cage -s -mlast -d -- regreet"`、`user = "greeter"`（`-s` 保留 VT 切换，`-mlast` 只用最后接入的显示器，`-d` 不要客户端装饰）/ Writes the terminal + default session (`cage -s -mlast -d -- regreet`) |
+| 🖼️ 准备登录背景 / Prepare background | 把 KamiDream 背景图从 `lightdm-webkit` 主题目录拷到 `/etc/greetd/background.png`（已存在则跳过）；之后卸掉 LightDM 也不会丢壁纸 / Copies the KamiDream background to `/etc/greetd/background.png` (skipped when present), so removing LightDM later won't break the greeter |
+| 🖼️ `/etc/greetd/regreet.toml` | 背景指向 `/etc/greetd/background.png`（`fit = "Cover"`），GTK 基底用深色变体（`application_prefer_dark_theme = true`）；背景不存在时只写 GTK 设置 / Points the background at `/etc/greetd/background.png` with `fit = "Cover"` and selects the **dark** GTK base variant; only the GTK settings are written when the image is missing |
+| 🎨 `/etc/greetd/regreet.css` | **照 LightDM KamiDream 主题对齐**的 GTK4 样式表：白色半透明玻璃卡片 / 顶栏 / 下拉层、白字 + 淡蓝强调色 `#4fc3f7`（直接取自主题 `css/style.css` 的 `--accent`）、**长方形输入框（与 User 下拉框同尺寸同风格）**、6–18px 圆角、4px 细白滚动条、错误色 `#ef5350`；**用户名切换、会话选择、右侧按钮与密码框同一套玻璃底**（规避 GTK 深色主题的黑底）；**尺寸按主屏逻辑分辨率自动换算**（卡片宽 / 内边距 / 输入框尺寸，以 1645 宽为基准、限制在 0.85–1.35 倍）；已存在的非 ArchInit 样式会被保留以尊重自定义 / GTK4 stylesheet **matching the LightDM KamiDream theme**: white translucent glass card / clock / dropdown, white text with the theme's `#4fc3f7` accent, **rectangular inputs matching the User dropdown (same size and style)**, 6–18px radii, 4px white scrollbar and `#ef5350` error color; the **user switcher, session selector and side buttons share the same glass background as the password field** (so GTK's dark defaults never show through); **sizes are derived from the primary display's logical width** (card width / paddings / input size, based on 1645 wide, clamped to 0.85–1.35×); a pre-existing non-ArchInit stylesheet is left untouched |
+| 🔀 切换服务 / Switch services | `systemctl enable greetd`，若 `lightdm` 仍存在则 `systemctl disable lightdm`（已卸载则跳过，不会报错），然后校验 `greetd` 已启用、配置里含 `regreet` / Enables greetd, disables lightdm only when it still exists (skipped otherwise), then verifies |
 
-> ⚠️ 若主题目录缺失但 `webkit_theme` 仍指向它，登录界面会弹 `An error was detected in the current theme that could interfere with the system login process.`；Step 3 因此会在启用前检查主题是否已安装。
-> If the theme directory is missing while `webkit_theme` still points at it, LightDM shows `An error was detected in the current theme...`; Step 3 now checks that the theme is installed before enabling it.
->
-> 验证（重启后仍生效）：`ls -l /usr/share/lightdm-webkit/themes/KamiDream_Theme` 应显示一个指向 `/usr/local/share/lightdm-webkit/themes/KamiDream_Theme` 的软链；真正的文件在 `/usr/local` 下，所以系统升级不会把它删掉。
-> Verify after a reboot: `ls -l /usr/share/lightdm-webkit/themes/KamiDream_Theme` should be a symlink into `/usr/local/share/lightdm-webkit/themes/KamiDream_Theme`; the real files live under `/usr/local`, so system upgrades cannot remove them.
+#### Step 3: 解锁密钥环 / Unlock Keyring at Login
 
-#### Step 3: 启用 LightDM 配置 / Enable LightDM Configuration
+| 操作 / Action | 说明 / Description |
+| --- | --- |
+| 🔑 检查依赖 / Check deps | `gnome-keyring` 未安装时自动装；`/usr/lib/security/pam_gnome_keyring.so` 缺失则中止 / Installs `gnome-keyring` when missing, aborts if the PAM module is absent |
+| 📝 写入 `/etc/pam.d/greetd` | 追加 `-auth optional pam_gnome_keyring.so` 与 `-session optional pam_gnome_keyring.so auto_start`（放在 `include` 之后，等 `pam_systemd` 建好 `/run/user/<uid>`）；首次写入前备份为 `/etc/pam.d/greetd.archinit.bak`，已含该模块则不重复写 / Appends the two `pam_gnome_keyring` lines after the includes, backs up to `.archinit.bak` once, and skips when already present |
+| ✅ 校验 / Verify | 文件中必须出现两次 `pam_gnome_keyring.so`（auth + session）/ The file must mention `pam_gnome_keyring.so` twice |
 
-| 操作 / Action                                                      | 说明 / Description                                                                                                             |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| ⚙️ 前置检查 / Pre-check                                           | 主题目录下没有 `index.html` 时直接报错并中止（避免启用一个不存在的主题） / Aborts when the theme lacks `index.html` (avoids enabling a missing theme)                                     |
-| ⚙️ 配置 `/etc/lightdm/lightdm.conf` / Configure lightdm.conf          | 把 `[Seat:*]` 里的 `#greeter-session=…` 一行直接改成启用状态（不会留下重复行） / Turns the commented `#greeter-session=…` line into an active one (no duplicate lines)              |
-| ⚙️ 配置 `/etc/lightdm/lightdm-webkit2-greeter.conf` / Configure conf | 将 `webkit_theme` 设置为 `KamiDream_Theme`（替换原值） / Set `webkit_theme` to `KamiDream_Theme` (replaces existing value) |
-| 🔄 重启提示 / Reboot prompt                                         | 配置完成后提示用户重启系统以应用 LightDM / Prompt user to reboot to apply LightDM                                             |
-
-#### Step 4: 黑屏救急 / Black Screen Emergency Fix
-
-> 如果配置 LightDM WebKit2 Greeter 后出现黑屏无法进入图形界面，运行此步骤可快速恢复默认 Greeter。
-> If you encounter a black screen after configuring LightDM WebKit2 Greeter, run this step to quickly restore the default greeter.
-
-| 操作 / Action                                                         | 说明 / Description                                                                                          |
-| --------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| #️⃣ 注释 WebKit2 Greeter 配置 / Comment out WebKit2 Greeter config       | 在 `/etc/lightdm/lightdm.conf` 中将 `greeter-session=lightdm-webkit2-greeter` 行前加 `#` 注释掉 / Comment out the line |
-| 🔄 重启系统 / Reboot system                                           | 重启系统以恢复默认 GTK Greeter / Reboot to restore default greeter                                                 |
+> 为什么需要这步：LightDM 的 `/etc/pam.d/lightdm` 自带 `pam_gnome_keyring.so`，登录时密码顺手把「登录密钥环」解锁了；`greetd` 的 PAM 栈（`system-local-login`）没有它，所以换成 greetd 后每次开机都会弹「输入密钥环密码」。补上这两行即可恢复开机免输。
+> Why this step: LightDM's PAM file ships `pam_gnome_keyring.so`, so the login password also unlocks the *login* keyring; greetd's stack (`system-local-login`) doesn't include it, hence the keyring prompt on every boot. These two lines restore it.
 
 ---
+
 ### 🩹 修补工具 / Patch Tools
 
 > 对应 `archinit.py` 主菜单「修补工具 / Patch Tools」分类；实现见 [`ZClass/steps/patch.py`](ZClass/steps/patch.py)。
@@ -358,6 +336,23 @@ python3 archinit.py
 | | ✏️ 写入环境变量 / Write environment variables     | 在 `~/.config/environment.d/fcitx.conf` 写入 `XMODIFIERS=@im=fcitx5`、`GTK_IM_MODULE=fcitx5`、`QT_IM_MODULE=fcitx5`、`SDL_IM_MODULE=fcitx5` / Write `XMODIFIERS=@im=fcitx5`, `GTK_IM_MODULE=fcitx5`, `QT_IM_MODULE=fcitx5`, `SDL_IM_MODULE=fcitx5` to `~/.config/environment.d/fcitx.conf` |
 | | ✅ 完成提示 / Completion notice                    | 提示重新登录后生效（environment.d 由 systemd 用户会话加载）/ Re-login to take effect (environment.d is loaded by systemd user session)                                                                                                                                                   |
 
+#### Step 4: 卸除 LightDM / Remove LightDM
+
+> 前置条件：**greetd 已启用**（先跑「登录管理器 → 配置并启用」），否则删掉 LightDM 就没有登录器了。
+> Prerequisite: **greetd must already be enabled** (run Login Manager → Configure & enable first), otherwise removing LightDM leaves no greeter.
+
+| 操作 / Action | 说明 / Description |
+| --- | --- |
+| ✅ 确认 greetd 已启用 / greetd enabled | `systemctl is-enabled greetd` 不通过则中止 / Aborts unless greetd is enabled |
+| 🖼️ 保留登录背景图 / Keep background | 确认 `/etc/greetd/background.png` 存在（缺了就从 KamiDream 主题目录拷一份），删主题目录后登录界面照样有壁纸 / Ensures `/etc/greetd/background.png` exists so the greeter keeps its wallpaper |
+| ⏹️ 停用 lightdm / Disable service | `systemctl disable lightdm`（没装也不报错）/ No-op when not installed |
+| 🗑️ 卸载包 / Remove packages | 用 `pacman -Rns` 卸掉已安装的 `lightdm`、`lightdm-gtk-greeter`、`lightdm-webkit2-greeter` / Removes whichever of those packages are installed |
+| 🧹 清理目录 / Clean up | 删除 `/usr/share/lightdm-webkit`、`/usr/local/share/lightdm-webkit`、`/etc/lightdm` / Deletes those directories |
+| ✅ 校验 / Verify | 确认包已卸载、`lightdm` 不再设为开机启动 / Confirms the packages are gone and lightdm is no longer enabled |
+
+> 卸除后开机直接进 greetd + ReGreet。本工具不再管理 LightDM，需要装回时自己 `sudo pacman -S lightdm lightdm-gtk-greeter`。
+> After removal the boot goes straight to greetd + ReGreet. This tool no longer manages LightDM; install `lightdm lightdm-gtk-greeter` manually if you ever need it back.
+
 ---
 
 ### 🔀 应用后端切换 / App Backend Toggle
@@ -389,7 +384,7 @@ python3 archinit.py
 
 ## 🔧 自定义与扩展 / Customization
 
-- **选择步骤 / Choose steps**：[`archinit.py`](archinit.py) 提供统一交互式菜单（`curses`）：主菜单选择 8 大分类，分类内用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回 / [`archinit.py`](archinit.py) provides a unified interactive menu (`curses`): pick one of 8 categories from the main menu, then use ↑/↓ to select a step, Enter to execute, q/Esc to go back.
+- **选择步骤 / Choose steps**：[`archinit.py`](archinit.py) 提供统一交互式菜单（`curses`）：主菜单选择 9 大分类，分类内用 ↑/↓ 选择步骤，Enter 执行，q/Esc 返回 / [`archinit.py`](archinit.py) provides a unified interactive menu (`curses`): pick one of 9 categories from the main menu, then use ↑/↓ to select a step, Enter to execute, q/Esc to go back.
 - **自动配置 / Automated edits**：所有配置修改（locale、pacman.conf、mkinitcpio.conf、.zshrc 等）均由脚本自动完成（`sed` 或 Python 直接读写文件），无需手动编辑 / All configuration changes (locale, pacman.conf, mkinitcpio.conf, .zshrc, etc.) are applied automatically (`sed` or direct file I/O in Python) — no manual editing required.
 - **添加自己的包 / Add your own packages**：步骤现在以「任务面板」形式执行，改 `ZClass/steps/` 里对应任务的 `Shell.pacman("…")` 包列表即可（如 `basic.py`、`gpu.py`）；新增的每条任务写成 `(显示名称, callable)`，callable 返回 `True/False` 或 `(bool, 失败原因)` / Steps run as a **task panel**: edit the `Shell.pacman("…")` lists inside the tasks under `ZClass/steps/` (e.g. `basic.py`, `gpu.py`). Each task is `(label, callable)` where the callable returns `True/False` or `(bool, reason)`.
 
@@ -407,27 +402,6 @@ python3 archinit.py
 
 确保已安装 Kitty：`sudo pacman -S kitty`，或在 [`archinit.py`](archinit.py) 的「基础初始化 / Basic Initialization」分类的 **Step 3**（Kitty 字体选择）前手动安装。
 Make sure Kitty is installed: `sudo pacman -S kitty`, or install it manually before **Step 3** (Kitty font selector) of the "Basic Initialization" category in [`archinit.py`](archinit.py).
-
-### Q：登录界面提示 `An error was detected in the current theme…`？/ Login screen shows "An error was detected in the current theme…"?
-
-这是 `lightdm-webkit2-greeter`（`detect_theme_errors = true`）**找不到或无法加载主题**时的提示，通常是主题目录不存在：
-
-```bash
-ls /usr/share/lightdm-webkit/themes/KamiDream_Theme/index.html
-```
-
-若不存在：重跑「安装/更新 KamiDream 主题」（Step 2）再跑「启用 LightDM 配置」（Step 3），或手动恢复：
-
-```bash
-sudo mkdir -p /usr/share/lightdm-webkit/themes
-sudo rm -rf /usr/share/lightdm-webkit/themes/KamiDream_Theme
-sudo cp -r ~/Projects/Self/LdmWk2Theme /usr/share/lightdm-webkit/themes/KamiDream_Theme
-sudo rm -rf /usr/share/lightdm-webkit/themes/KamiDream_Theme/.git
-```
-
-主题里出现的「此主题需在 lightdm-webkit2-greeter 环境中运行」是**主题自己的提示**（`js/main.js` 检测到 `window.lightdm` 不存在），常见于直接用浏览器打开 `index.html` 预览，或 greeter 进入 fallback 模式 —— 它说明登录会话里没有注入 LightDM 桥，而不是主题写错。
-
-LightDM/WebKit2 greeter only shows this when it **cannot load the theme** (usually a missing theme directory) — reinstall the theme (Step 2) and re-enable LightDM (Step 3). The theme's own "此主题需在 lightdm-webkit2-greeter 环境中运行" message means `window.lightdm` is missing (browser preview or fallback mode), not a broken theme.
 
 ### Q：NVIDIA 驱动安装后黑屏？/ Black screen after NVIDIA driver install?
 

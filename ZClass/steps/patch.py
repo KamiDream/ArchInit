@@ -7,6 +7,7 @@ from ..config import HOME
 from ..shell import Shell
 from ..status import Status
 from ..taskview import TaskView
+from .login_manager import ensure_background
 
 XDG_DIRS = (
     'XDG_DESKTOP_DIR="$HOME/Desktop"\n'
@@ -154,4 +155,57 @@ class PatchSteps:
         ])
         Status.set("✅ Fcitx5 环境变量已配置，重新登录后生效 / re-login to apply" if ok
                    else "❌ Fcitx5 环境变量写入失败 / failed")
+        return ok
+
+    # ── 卸除 LightDM ──
+    LIGHTDM_PKGS = ("lightdm", "lightdm-gtk-greeter", "lightdm-webkit2-greeter")
+    LIGHTDM_DIRS = ("/usr/share/lightdm-webkit", "/usr/local/share/lightdm-webkit",
+                    "/etc/lightdm")
+
+    @classmethod
+    def remove_lightdm(cls):
+        """把 LightDM 整套清掉（包 / 服务 / 配置 / WebKit 主题目录）。
+
+        前置条件：greetd 已经启用 —— 否则删掉 LightDM 就没有登录器了。
+        删主题目录之前先把背景图留在 /etc/greetd/background.png，ReGreet 照样有壁纸。
+        """
+        def check_greetd():
+            if not Shell.ok("systemctl is-enabled greetd"):
+                return False, "greetd 未启用，先跑「登录管理器 → 配置并启用」/ enable greetd first"
+            return True
+
+        def disable():
+            Shell.sudo("systemctl disable lightdm")   # 不存在也无所谓
+            return True
+
+        def uninstall():
+            pkgs = [p for p in cls.LIGHTDM_PKGS if Shell.installed(p)]
+            if not pkgs:
+                return True
+            ok, out = Shell.pacman(" ".join(pkgs), "-Rns --noconfirm")
+            return ok, Shell.brief(out)
+
+        def cleanup():
+            for path in cls.LIGHTDM_DIRS:
+                Shell.sudo(f"rm -rf {path}")
+            return True
+
+        def verify():
+            left = [p for p in cls.LIGHTDM_PKGS if Shell.installed(p)]
+            if left:
+                return False, "仍安装着 " + ", ".join(left)
+            if Shell.ok("systemctl is-enabled lightdm"):
+                return False, "lightdm 仍设为开机启动 / still enabled"
+            return True
+
+        ok = TaskView.run("修补工具 · 卸除 LightDM / Remove LightDM", [
+            ("确认 greetd 已启用 / greetd enabled", check_greetd),
+            ("保留登录背景图 / keep greeter background", ensure_background),
+            ("停用 lightdm 服务 / disable service", disable),
+            ("卸载 lightdm 相关包 / remove packages", uninstall),
+            ("清理主题与配置目录 / clean up dirs", cleanup),
+            ("校验 / verify", verify),
+        ])
+        Status.set("✅ LightDM 已卸除，开机直接用 greetd / removed" if ok
+                   else "❌ 卸除未完成，greetd 需先可用 / not removed")
         return ok
